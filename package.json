@@ -1,0 +1,22 @@
+{
+  "name": "RavenBot",
+  "version": "1.0.0",
+  "description": "Retrieves a variety of data for the story 'Worth the Candle' by Alexander Wales.",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "Makin",
+  "license": "Public Domain",
+  "dependencies": {
+    "cron": "^1.8.2",
+    "discord.js": "^12.3.1",
+    "fs": "0.0.1-security",
+    "googleapis": "^39.2.0",
+    "http": "0.0.0",
+    "node-persist": "^2.1.0",
+    "showdown": "^1.9.1",
+    "turndown": "^6.0.0"
+  }
+}
