@@ -67,7 +67,7 @@ const runCommands = async (interaction: Interaction): Promise<void> => {
 };
 client.on("interactionCreate", async (interaction) => {
   await runCommands(interaction).catch((e) => {
-    if (interaction.isRepliable) {
+   
       if (
         interaction.isMessageContextMenu() ||
         interaction.isUserContextMenu() ||
@@ -81,7 +81,7 @@ client.on("interactionCreate", async (interaction) => {
           ephemeral: true,
         });
       }
-    }
+    
   });
 });
 
