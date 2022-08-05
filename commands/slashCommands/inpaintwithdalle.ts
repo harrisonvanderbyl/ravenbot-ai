@@ -1,4 +1,3 @@
-import { Dalle, dalle } from "../../charaterBuilders/imageGenerators/dalle";
 import {
   MessageActionRow,
   MessageAttachment,
@@ -7,6 +6,7 @@ import {
 } from "discord.js";
 import { existsSync, readFileSync, writeFileSync } from "fs";
 
+import { Dalle } from "../../charaterBuilders/imageGenerators/dalle";
 import { SlashCommand } from "./typing";
 import axios from "axios";
 import sharp from "sharp";
@@ -188,21 +188,38 @@ export const inpaintwithdalle: SlashCommand = {
     }
 
     // read dalle key from config file
-    const dalleKey = JSON.parse(readFileSync("./dalleconfig.json").toString())[interaction.user.id];
+    const dalleKey = JSON.parse(readFileSync("./dalleconfig.json").toString())[
+      interaction.user.id
+    ];
 
-    if(!dalleKey) {
+    if (!dalleKey) {
       await interaction.editReply({
-        content: "You need to set your dalle key. You can use /dalleusage to set your key, or ask someone to share their key with you using /dalleusage config:true",
+        content:
+          "You need to set your dalle key. You can use /dalleusage to set your key, or ask someone to share their key with you using /dalleusage config:true",
       });
-      return
+      return;
     }
 
-    const buffers = await dalle(
-      interaction,
-      prompt,
-      new Dalle(dalleKey),
-      await sharp(buffer).png().resize(1024, 1024, { fit: "fill" }).toBuffer()
-    );
+    const buffers = await new Dalle(dalleKey)
+      .generate(
+        prompt,
+        await sharp(buffer).png().resize(1024, 1024, { fit: "fill" }).toBuffer()
+      )
+      .then(
+        async (generations) =>
+          await Promise.all(
+            generations.map((gen, i) =>
+              axios.get(gen.generation.image_path, {
+                responseType: "arraybuffer",
+                responseEncoding: "binary",
+              })
+            )
+          ).then((buffers) => buffers.map((buff) => buff.data as Buffer))
+      )
+      .catch((e) => {
+        console.log(e);
+        throw e;
+      });
     await interaction.editReply({
       content: prompt,
       files: buffers.map(
@@ -212,6 +229,6 @@ export const inpaintwithdalle: SlashCommand = {
     });
   },
   slashCommand: async (client, interaction) => {
-    return
-  }
+    return;
+  },
 };

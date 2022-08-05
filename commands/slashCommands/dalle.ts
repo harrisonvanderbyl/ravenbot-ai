@@ -1,44 +1,56 @@
 import * as WomboDreamApi from "wombo-dream-api";
 
-import { Dalle, dalle } from "../../charaterBuilders/imageGenerators/dalle";
 import { existsSync, readFileSync, writeFileSync } from "fs";
 
+import { Dalle } from "../../charaterBuilders/imageGenerators/dalle";
 import { MessageAttachment } from "discord.js";
 import { SlashCommand } from "./typing";
+import axios from "axios";
 import { dallemini } from "../../charaterBuilders/imageGenerators/dallemini";
 import styles from "../styles.json";
 import { wombo } from "../../charaterBuilders/imageGenerators/wombo";
 
 export const picture: SlashCommand = {
   slashCommand: async (client, interaction) => {
-
     // if no dalle config file exists create one
     if (!existsSync("./dalleconfig.json")) {
       writeFileSync("./dalleconfig.json", JSON.stringify({}));
     }
 
     // read dalle key from config file
-    const dalleKey = JSON.parse(readFileSync("./dalleconfig.json").toString())[interaction.user.id];
+    const dalleKey = JSON.parse(readFileSync("./dalleconfig.json").toString())[
+      interaction.user.id
+    ];
 
-    if(!dalleKey) {
+    if (!dalleKey) {
       await interaction.editReply({
-        content: "You need to set your dalle key. You can use /dalleusage to set your key, or ask someone to share their key with you by using the context menu.",
+        content:
+          "You need to set your dalle key. You can use /dalleusage to set your key, or ask someone to share their key with you by using the context menu.",
       });
-      return
+      return;
     }
 
-    const dallec = new Dalle(dalleKey)
+    const dallec = new Dalle(dalleKey);
 
     console.log(JSON.stringify(interaction.options.data));
 
-    const buffers = await dalle(
-      interaction,
-      interaction.options.get("prompt").value as string,
-      new Dalle(dalleKey)
-    ).catch((e) => {
-      console.log("Error", JSON.stringify(e));
-      throw (e);
-    })
+    const buffers = await dallec
+      .generate(interaction.options.get("prompt").value as string)
+      .then(
+        async (generations) =>
+          await Promise.all(
+            generations.map((gen, i) =>
+              axios.get(gen.generation.image_path, {
+                responseType: "arraybuffer",
+                responseEncoding: "binary",
+              })
+            )
+          ).then((buffers) => buffers.map((buff) => buff.data as Buffer))
+      )
+      .catch((e) => {
+        console.log("Error", JSON.stringify(e));
+        throw e;
+      });
     await interaction.editReply({
       embeds: [
         {
