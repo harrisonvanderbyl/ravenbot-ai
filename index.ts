@@ -17,56 +17,56 @@ client.on("ready", () => {
 });
 
 client.on("messageCreate", async (message) => {});
-const runCommands = async (interaction: Interaction) => {
-  if (!debug == (interaction.channelId == adminChannel)) {
-    console.log("not interacting");
-    return;
-  }
+const runCommands = async (interaction: Interaction): Promise<void> => {
+  return new Promise(async (resolve, reject) => {
+    if (!debug == (interaction.channelId == adminChannel)) {
+      console.log("not interacting");
+      return;
+    }
 
-  // debug = false; adminChannel = true; output: true
-  // debug = true; adminChannel = false; output: true
+    // debug = false; adminChannel = true; output: true
+    // debug = true; adminChannel = false; output: true
 
-  if (interaction.isMessageContextMenu() || interaction.isUserContextMenu()) {
-    Object.values(commands)
-      .filter((c) => c.commandSchema.name == interaction.commandName)
-      .forEach(async (c) => {
-        await c.contextCommand(client, interaction).catch((e) => {
-          console.log(e);
-          throw e;
+    if (interaction.isMessageContextMenu() || interaction.isUserContextMenu()) {
+      Object.values(commands)
+        .filter((c) => c.commandSchema.name == interaction.commandName)
+        .forEach(async (c) => {
+          await c.contextCommand(client, interaction).catch((e) => {
+            console.log(e);
+            reject(e);
+          });
         });
-      });
-  }
-  if (interaction.isCommand()) {
-    Object.values(commands)
-      .filter((c) => c.commandSchema.name == interaction.commandName)
-      .forEach(async (c) => {
-        if (!c.skipDeferReply) {
-          await interaction.deferReply({});
-        }
-        await c.slashCommand(client, interaction).catch((e) => {
-          console.log(e);
-          throw e;
+    }
+    if (interaction.isCommand()) {
+      Object.values(commands)
+        .filter((c) => c.commandSchema.name == interaction.commandName)
+        .forEach(async (c) => {
+          if (!c.skipDeferReply) {
+            await interaction.deferReply({});
+          }
+          await c.slashCommand(client, interaction).catch((e) => {
+            console.log(e);
+            reject(e);
+          });
         });
-      });
-  }
-  if (interaction.isModalSubmit()) {
-    await interaction.deferReply();
+    }
+    if (interaction.isModalSubmit()) {
+      await interaction.deferReply();
 
-    Object.values(commands)
-      .filter((c) => c.commandSchema.name == interaction.customId)
-      .forEach(async (c) => {
-        await c.modalSubmit(client, interaction).catch((e) => {
-          console.log(e);
-          throw e;
+      Object.values(commands)
+        .filter((c) => c.commandSchema.name == interaction.customId)
+        .forEach(async (c) => {
+          await c.modalSubmit(client, interaction).catch((e) => {
+            console.log(e);
+            reject(e);
+          });
         });
-      });
-  }
+    }
+    resolve();
+  });
 };
 client.on("interactionCreate", async (interaction) => {
-  try {
-    await runCommands(interaction);
-  } catch (e) {
-    console.log(e);
+  await runCommands(interaction).catch((e) => {
     if (interaction.isRepliable) {
       if (
         interaction.isMessageContextMenu() ||
@@ -82,7 +82,7 @@ client.on("interactionCreate", async (interaction) => {
         });
       }
     }
-  }
+  });
 });
 
 client.on("guildCreate", (guild) => {
