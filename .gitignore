@@ -2,10 +2,14 @@ config.json
 credentials.json
 token.json
 logs.txt
+.build
+gpt.json
+offline.json
+wombokeys.json
 
 files/
 .node-persist/
-
+.aws.json
 # Logs
 logs
 *.log

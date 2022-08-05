@@ -1,0 +1,26 @@
+{
+  "compilerOptions": {
+    "preserveConstEnums": true,
+    "inlineSources": true,
+    "inlineSourceMap": true,
+    "sourceRoot": "/",
+    "target": "es2020",
+    "lib": ["es2020"],
+    "outDir": ".build",
+    "module": "commonjs",
+    "moduleResolution": "Node16",
+    "esModuleInterop": true,
+    "resolveJsonModule": true,
+    "skipLibCheck": true,
+    "allowSyntheticDefaultImports": true,
+    "incremental": true
+  },
+  "include": [
+    "./index.ts",
+    "./config",
+    "./gpt3",
+    "./characterBuilders",
+    "./commands"
+  ],
+  "exclude": ["node_modules", "mmo-starter"]
+}
