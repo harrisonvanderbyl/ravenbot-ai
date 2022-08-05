@@ -96,7 +96,7 @@ export class Dalle {
                       const generations = body.generations;
                       clearInterval(refreshIntervalId);
                       resolve(generations.data);
-                    }else if (body.status === "rejected") {
+                    } else if (body.status === "rejected") {
                       clearInterval(refreshIntervalId);
                       reject("Failed due to policy violation, Bonk!");
                     }
@@ -126,5 +126,9 @@ export const dalle = (
             responseEncoding: "binary",
           })
         )
-      ).then((buffers) => buffers.map((buff) => buff.data as Buffer))
+      )
+        .then((buffers) => buffers.map((buff) => buff.data as Buffer))
+        .catch((e) => {
+          throw e;
+        })
   );

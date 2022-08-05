@@ -35,7 +35,10 @@ export const picture: SlashCommand = {
       interaction,
       interaction.options.get("prompt").value as string,
       new Dalle(dalleKey)
-    );
+    ).catch((e) => {
+      console.log("Error", JSON.stringify(e));
+      throw (e);
+    })
     await interaction.editReply({
       embeds: [
         {

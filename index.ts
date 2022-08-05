@@ -30,7 +30,10 @@ const runCommands = async (interaction: Interaction) => {
     Object.values(commands)
       .filter((c) => c.commandSchema.name == interaction.commandName)
       .forEach(async (c) => {
-        await c.contextCommand(client, interaction);
+        await c.contextCommand(client, interaction).catch((e) => {
+          console.log(e);
+          throw e;
+        });
       });
   }
   if (interaction.isCommand()) {
@@ -40,7 +43,10 @@ const runCommands = async (interaction: Interaction) => {
         if (!c.skipDeferReply) {
           await interaction.deferReply({});
         }
-        await c.slashCommand(client, interaction);
+        await c.slashCommand(client, interaction).catch((e) => {
+          console.log(e);
+          throw e;
+        });
       });
   }
   if (interaction.isModalSubmit()) {
@@ -49,7 +55,10 @@ const runCommands = async (interaction: Interaction) => {
     Object.values(commands)
       .filter((c) => c.commandSchema.name == interaction.customId)
       .forEach(async (c) => {
-        await c.modalSubmit(client, interaction);
+        await c.modalSubmit(client, interaction).catch((e) => {
+          console.log(e);
+          throw e;
+        });
       });
   }
 };
@@ -57,8 +66,12 @@ client.on("interactionCreate", async (interaction) => {
   await runCommands(interaction).catch((e) => {
     console.log(e);
     if (interaction.isRepliable) {
-      if (interaction.isMessageContextMenu() || interaction.isUserContextMenu() || interaction.isCommand()) {
-        if(interaction.replied){
+      if (
+        interaction.isMessageContextMenu() ||
+        interaction.isUserContextMenu() ||
+        interaction.isCommand()
+      ) {
+        if (interaction.replied) {
           interaction.deleteReply();
         }
         interaction.followUp({
