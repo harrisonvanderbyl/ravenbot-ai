@@ -63,7 +63,9 @@ const runCommands = async (interaction: Interaction) => {
   }
 };
 client.on("interactionCreate", async (interaction) => {
-  await runCommands(interaction).catch((e) => {
+  try {
+    await runCommands(interaction);
+  } catch (e) {
     console.log(e);
     if (interaction.isRepliable) {
       if (
@@ -80,8 +82,9 @@ client.on("interactionCreate", async (interaction) => {
         });
       }
     }
-  });
+  }
 });
+
 client.on("guildCreate", (guild) => {
   console.log(
     `New guild joined: ${guild.name} (id: ${guild.id}). This guild has ${guild.memberCount} members!`
