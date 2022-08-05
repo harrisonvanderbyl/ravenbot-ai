@@ -18,7 +18,7 @@ client.on("ready", () => {
 
 client.on("messageCreate", async (message) => {});
 const runCommands = async (interaction: Interaction): Promise<void> => {
-  return new Promise(async (resolve, reject) => {
+  return await new Promise(async (resolve, reject) => {
     if (!debug == (interaction.channelId == adminChannel)) {
       console.log("not interacting");
       return;
@@ -32,7 +32,7 @@ const runCommands = async (interaction: Interaction): Promise<void> => {
         .filter((c) => c.commandSchema.name == interaction.commandName)
         .forEach(async (c) => {
           await c.contextCommand(client, interaction).catch((e) => {
-            console.log(e);
+            console.log("error: level: commands",e);
             reject(e);
           });
         });
@@ -45,7 +45,7 @@ const runCommands = async (interaction: Interaction): Promise<void> => {
             await interaction.deferReply({});
           }
           await c.slashCommand(client, interaction).catch((e) => {
-            console.log(e);
+            console.log("error: level: commands",e);
             reject(e);
           });
         });
@@ -57,7 +57,7 @@ const runCommands = async (interaction: Interaction): Promise<void> => {
         .filter((c) => c.commandSchema.name == interaction.customId)
         .forEach(async (c) => {
           await c.modalSubmit(client, interaction).catch((e) => {
-            console.log(e);
+            console.log("error: level: commands",e);
             reject(e);
           });
         });
@@ -67,6 +67,7 @@ const runCommands = async (interaction: Interaction): Promise<void> => {
 };
 client.on("interactionCreate", async (interaction) => {
   await runCommands(interaction).catch((e) => {
+    console.log("Error: level index.ts",e);
    
       if (
         interaction.isMessageContextMenu() ||
