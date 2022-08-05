@@ -28,61 +28,64 @@ const runCommands = async (interaction: Interaction): Promise<void> => {
     // debug = true; adminChannel = false; output: true
 
     if (interaction.isMessageContextMenu() || interaction.isUserContextMenu()) {
-      Object.values(commands)
-        .filter((c) => c.commandSchema.name == interaction.commandName)
-        .forEach(async (c) => {
-          await c.contextCommand(client, interaction).catch((e) => {
-            console.log("error: level: commands",e);
-            reject(e);
-          });
+      const c = Object.values(commands).find(
+        (c) => c.commandSchema.name == interaction.commandName
+      );
+      if (c) {
+        await c.contextCommand(client, interaction).catch((e) => {
+          console.log("error: level: commands", e);
+          reject(e);
         });
+      }
     }
     if (interaction.isCommand()) {
-      Object.values(commands)
-        .filter((c) => c.commandSchema.name == interaction.commandName)
-        .forEach(async (c) => {
-          if (!c.skipDeferReply) {
-            await interaction.deferReply({});
-          }
-          await c.slashCommand(client, interaction).catch((e) => {
-            console.log("error: level: commands",e);
-            reject(e);
-          });
+      const c = Object.values(commands).find(
+        (c) => c.commandSchema.name == interaction.commandName
+      );
+
+      if (c) {
+        if (!c.skipDeferReply) {
+          await interaction.deferReply({});
+        }
+        await c.slashCommand(client, interaction).catch((e) => {
+          console.log("error: level: commands", e);
+          reject(e);
         });
+      }
     }
     if (interaction.isModalSubmit()) {
       await interaction.deferReply();
 
-      Object.values(commands)
-        .filter((c) => c.commandSchema.name == interaction.customId)
-        .forEach(async (c) => {
-          await c.modalSubmit(client, interaction).catch((e) => {
-            console.log("error: level: commands",e);
-            reject(e);
-          });
-        });
+      await Promise.all(
+        Object.values(commands)
+          .filter((c) => c.commandSchema.name == interaction.customId)
+          .map((c) => c.modalSubmit(client, interaction))
+      ).catch((e) => {
+        console.log("error: level: commands", e);
+        reject(e);
+      });
     }
+
     resolve();
   });
 };
 client.on("interactionCreate", async (interaction) => {
   await runCommands(interaction).catch((e) => {
-    console.log("Error: level index.ts",e);
-   
-      if (
-        interaction.isMessageContextMenu() ||
-        interaction.isUserContextMenu() ||
-        interaction.isCommand()
-      ) {
-        if (interaction.replied) {
-          interaction.deleteReply();
-        }
-        interaction.followUp({
-          content: "Error:" + JSON.stringify(e),
-          ephemeral: true,
-        });
+    console.log("Error: level index.ts", e);
+
+    if (
+      interaction.isMessageContextMenu() ||
+      interaction.isUserContextMenu() ||
+      interaction.isCommand()
+    ) {
+      if (interaction.replied) {
+        interaction.deleteReply();
       }
-    
+      interaction.followUp({
+        content: "Error:" + JSON.stringify(e),
+        ephemeral: true,
+      });
+    }
   });
 });
 
