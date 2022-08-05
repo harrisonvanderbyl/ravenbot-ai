@@ -111,11 +111,10 @@ export class Dalle {
 export const dalle = (
   repmessage: BaseCommandInteraction,
   prompt: string,
-  dallec:Dalle,
-  img?: Buffer,
- 
-) => {
-  return dallec.generate(prompt, img).then(
+  dallec: Dalle,
+  img?: Buffer
+) =>
+  dallec.generate(prompt, img).then(
     async (generations) =>
       await Promise.all(
         generations.map((gen, i) =>
@@ -126,4 +125,3 @@ export const dalle = (
         )
       ).then((buffers) => buffers.map((buff) => buff.data as Buffer))
   );
-};
