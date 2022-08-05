@@ -1,6 +1,6 @@
+import { Interaction, TextChannel } from "discord.js";
 import { adminChannel, client } from "./commands/client";
 
-import { TextChannel } from "discord.js";
 import commands from "./commands/slashCommands";
 import config from "./config/config.json";
 import { debug } from "./offline.json";
@@ -16,13 +16,8 @@ client.on("ready", () => {
   });
 });
 
-
-
-client.on("messageCreate", async (message) => {
-  
-});
-
-client.on("interactionCreate", async (interaction) => {
+client.on("messageCreate", async (message) => {});
+const runCommands = async (interaction: Interaction) => {
   if (!debug == (interaction.channelId == adminChannel)) {
     console.log("not interacting");
     return;
@@ -57,6 +52,22 @@ client.on("interactionCreate", async (interaction) => {
         await c.modalSubmit(client, interaction);
       });
   }
+};
+client.on("interactionCreate", async (interaction) => {
+  await runCommands(interaction).catch((e) => {
+    console.log(e);
+    if (interaction.isRepliable) {
+      if (interaction.isMessageContextMenu() || interaction.isUserContextMenu() || interaction.isCommand()) {
+        if(interaction.replied){
+          interaction.deleteReply();
+        }
+        interaction.followUp({
+          content: "Error:" + JSON.stringify(e),
+          ephemeral: true,
+        });
+      }
+    }
+  });
 });
 client.on("guildCreate", (guild) => {
   console.log(
