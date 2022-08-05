@@ -111,24 +111,29 @@ export class Dalle {
   }
 }
 
-export const dalle = (
+export const dalle = async (
   repmessage: BaseCommandInteraction,
   prompt: string,
   dallec: Dalle,
   img?: Buffer
 ) =>
-  dallec.generate(prompt, img).then(
-    async (generations) =>
-      await Promise.all(
-        generations.map((gen, i) =>
-          axios.get(gen.generation.image_path, {
-            responseType: "arraybuffer",
-            responseEncoding: "binary",
-          })
+  dallec
+    .generate(prompt, img)
+    .then(
+      async (generations) =>
+        await Promise.all(
+          generations.map((gen, i) =>
+            axios.get(gen.generation.image_path, {
+              responseType: "arraybuffer",
+              responseEncoding: "binary",
+            })
+          )
         )
-      )
-        .then((buffers) => buffers.map((buff) => buff.data as Buffer))
-        .catch((e) => {
-          throw e;
-        })
-  );
+          .then((buffers) => buffers.map((buff) => buff.data as Buffer))
+          .catch((e) => {
+            throw e;
+          })
+    )
+    .catch((e) => {
+      throw e;
+    });
