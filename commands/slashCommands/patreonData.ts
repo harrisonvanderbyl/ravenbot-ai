@@ -17,7 +17,7 @@ app.get("/", (req, res) => {
   }
   let token;
 
-  return oauth
+  return oauth(config.CLIENT_ID, config.CLIENT_SECRET)
     .getTokens(code, redirectURL)
     .then(({ access_token }) => {
       token = access_token; // eslint-disable-line camelcase
