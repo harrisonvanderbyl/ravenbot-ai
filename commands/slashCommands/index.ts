@@ -2,10 +2,11 @@ import { dalle_mini } from "./dallemini";
 import { dalleusage } from "./dalleusage";
 import { heyCommand } from "./hey";
 import { inpaintwithdalle } from "./inpaintwithdalle";
+import { patreonCommand } from "./patreonData";
 import { picture } from "./dalle";
 import { remixwithwombo } from "./remixwithwombo";
 import { scsquote } from "./scsquote";
-import {sharedallekey} from "./sharedallekey"
+import { sharedallekey } from "./sharedallekey";
 import { speakas } from "./speakas";
 import { styles } from "./styles";
 import { womocommand } from "./wombo";
@@ -21,5 +22,6 @@ export default {
   styles,
   womocommand,
   dalle_mini,
-  sharedallekey
+  sharedallekey,
+  patreonCommand,
 };
