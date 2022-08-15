@@ -16,11 +16,11 @@ console.log("Starting load of server");
 console.log("Exporting starts");
 
 export const start = async () => {
-  console.log("Starting sss server");
   const privateKey1 = readFileSync(
     "/etc/letsencrypt/live/" + config.redirectUrl + "/privkey.pem",
     "utf8"
   );
+  console.log(privateKey1);
   const certificate1 = readFileSync(
     "/etc/letsencrypt/live/" + config.redirectUrl + "/cert.pem",
     "utf8"
@@ -44,12 +44,10 @@ export const start = async () => {
 
   // Starting both http & https servers
   //const httpServer = http.createServer(app);
-  //   const httpsServer = https.createServer(credentials1, app);
+  const httpsServer = https.createServer(credentials1, app);
+  console.log("Starting server");
 
-  //   //   httpServer.listen(80, () => {
-  //   //     console.log("HTTP Server running on port 80");
-  //   //   });
-  //   httpsServer.listen(443, () => {
-  //     console.log("HTTPS Server running on port 443");
-  //   });
+  httpsServer.listen(443, () => {
+    console.log("HTTPS Server running on port 443");
+  });
 };
