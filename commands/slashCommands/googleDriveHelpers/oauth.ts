@@ -88,11 +88,17 @@ export const listFolders = async (interaction: CommandInteraction) => {
   auth.setCredentials(credentials);
   const service = google.drive({ version: "v3", auth });
 
-  const files = await service.files.list({
-    pageSize: 10,
-    q: `mimeType = 'application/vnd.google-apps.folder'`,
-    fields: "nextPageToken, files(id, name)",
-  });
+  const files = await service.files
+    .list({
+      pageSize: 10,
+      q: `mimeType = 'application/vnd.google-apps.folder'`,
+      fields: "nextPageToken, files(id, name)",
+    })
+    .catch((err) => null);
+
+  if (!files) {
+    return await generateGoogleLoginButton(interaction);
+  }
   files.data.files;
 
   if (!existsSync("./patreonConfig.json")) {
