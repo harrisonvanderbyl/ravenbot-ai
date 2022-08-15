@@ -2,8 +2,10 @@ import {
   CommandInteraction,
   MessageActionRow,
   MessageButton,
+  MessageSelectMenu,
 } from "discord.js";
 import { existsSync, readFileSync, writeFileSync } from "fs";
+import { generateLoginButton, getPatreonData } from "../patreonHelpers/oauth";
 
 import { GoogleAuth } from "google-auth-library";
 import { app } from "../webserver/express";
@@ -75,7 +77,7 @@ export const listFolders = async (interaction: CommandInteraction) => {
   )[interaction.user.id];
 
   if (!credentials) {
-    return await generateLoginButton(interaction);
+    return await generateGoogleLoginButton(interaction);
   }
 
   const auth = new google.auth.OAuth2(
@@ -91,11 +93,54 @@ export const listFolders = async (interaction: CommandInteraction) => {
     q: `mimeType = 'application/vnd.google-apps.folder'`,
     fields: "nextPageToken, files(id, name)",
   });
+  files.data.files;
 
-  await interaction.reply(JSON.stringify(files.data.files));
+  if (!existsSync("./patreonConfig.json")) {
+    writeFileSync("./patreonConfig.json", JSON.stringify({}));
+  }
+  const patreonInfo = JSON.parse(
+    readFileSync("./patreonConfig.json").toString()
+  )[interaction.user.id];
+  if (!patreonInfo) {
+    return await generateLoginButton(interaction);
+  } else {
+    const data = await getPatreonData(
+      patreonInfo.token,
+      "/current_user/campaigns"
+    );
+
+    const tiers = data.rawJson.included
+      .filter((i) => i.type === "reward")
+      .map((i) => ({
+        label: i.attributes.title ?? i.attributes.description,
+        value: i.id,
+        description: i.attributes.description,
+      }));
+
+    await interaction.reply({
+      content: "Share a folder with a group of your patreons!",
+      components: [
+        new MessageActionRow().addComponents(
+          new MessageSelectMenu()
+            .addOptions(
+              files.data.files.map((file) => ({
+                label: file.name,
+                value: file.id,
+              }))
+            )
+            .setCustomId("folderselect")
+        ),
+        new MessageActionRow().addComponents(
+          new MessageSelectMenu().addOptions(tiers).setCustomId("tierselect")
+        ),
+      ],
+    });
+  }
 };
 
-export const generateLoginButton = async (interaction: CommandInteraction) => {
+export const generateGoogleLoginButton = async (
+  interaction: CommandInteraction
+) => {
   const authUrl = oAuth2Client.generateAuthUrl({
     redirect_uri: "https://" + config.redirectUrl + "/googleoauth/",
     scope: SCOPES,
