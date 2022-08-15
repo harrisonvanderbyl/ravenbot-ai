@@ -7,18 +7,8 @@ import express from "express";
 import url from "url";
 
 const app = express();
-var redirectURL = "http://writerbot.selkiemyth.com/";
-const loginUrl = url.format({
-  protocol: "https",
-  host: "patreon.com",
-  pathname: "/oauth2/authorize",
-  query: {
-    response_type: "code",
-    client_id: config.CLIENT_ID,
-    redirect_uri: redirectURL,
-    state: "chill",
-  },
-});
+var redirectURL = "writerbot.selkiemyth.com:5000/";
+
 const database = {};
 app.get("/", (req, res) => {
   const { code } = req.query;
@@ -34,13 +24,13 @@ app.get("/", (req, res) => {
       const apiClient = patreon(token);
       return apiClient("/current_user");
     })
-    .then(({ store, rawJson }) => {
+    .then(async ({ store, rawJson }) => {
       const { id } = rawJson.data;
-      database[id] = { ...rawJson.data, token };
+      //   database[id] = { ...rawJson.data, token };
       console.log(
         `Saved user ${store.find("user", id).full_name} to the database`
       );
-      return res.redirect(`/protected/${id}`);
+      return res.redirect(await database[id]());
     })
     .catch((err) => {
       console.log(err);
@@ -55,7 +45,23 @@ export const patreonCommand: SlashCommand = {
   skipDeferReply: true,
 
   slashCommand: async (client, interaction: CommandInteraction) => {
-    interaction.reply({
+    const loginUrl = url.format({
+      protocol: "https",
+      host: "patreon.com",
+      pathname: "/oauth2/authorize",
+      query: {
+        response_type: "code",
+        client_id: config.CLIENT_ID,
+        redirect_uri: redirectURL,
+        state: interaction.user.id,
+      },
+    });
+    database[interaction.user.id] = async () => {
+      const message = await interaction.editReply(`You are now logged in.`);
+
+      return `https://discordapp.com/channels/${interaction.guild.id}/${interaction.channel.id}/${message.id}`;
+    };
+    await interaction.reply({
       ephemeral: true,
       content: loginUrl,
     });
