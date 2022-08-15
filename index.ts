@@ -6,7 +6,6 @@ import config from "./config/config.json";
 import { debug } from "./offline.json";
 import { start } from "./commands/slashCommands/webserver/express";
 
-start();
 // Finally, WriterBot Begins
 client.on("ready", () => {
   console.log(
@@ -16,6 +15,8 @@ client.on("ready", () => {
   client.channels.fetch(adminChannel).then((channel) => {
     (channel as TextChannel).send(`Bot has been started`);
   });
+
+  start();
 });
 
 client.on("messageCreate", async (message) => {});
