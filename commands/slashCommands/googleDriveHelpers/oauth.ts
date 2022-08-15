@@ -148,7 +148,7 @@ export const listFolders = async (interaction: CommandInteraction) => {
       if (i.user.id === interaction.user.id) {
         if (i.customId === "folderselect") {
           myPieces.folder = i.values.join(",");
-          await i.editReply({
+          await interaction.editReply({
             content: "Share a folder with a group of your patreons!",
             components: [
               new MessageActionRow().addComponents(
@@ -168,7 +168,7 @@ export const listFolders = async (interaction: CommandInteraction) => {
         }
         if (i.customId === "tierselect") {
           myPieces.tier = i.values.join(",");
-          await i.editReply({
+          await interaction.editReply({
             content: "Share a folder with a group of your patreons!",
             components: [
               new MessageActionRow().addComponents(
@@ -202,7 +202,7 @@ export const listFolders = async (interaction: CommandInteraction) => {
           collector2.on("collect", async (ii) => {
             if (ii.user.id === interaction.user.id) {
               if (ii.customId === "confirmshare") {
-                await ii.editReply({
+                await interaction.editReply({
                   content: "Sharing folder...",
                   components: [],
                 });
