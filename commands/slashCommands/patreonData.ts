@@ -1,4 +1,9 @@
-import { CommandInteraction, Interaction } from "discord.js";
+import {
+  CommandInteraction,
+  Interaction,
+  InteractionReplyOptions,
+  MessageOptions,
+} from "discord.js";
 import { oauth, patreon } from "patreon";
 
 import { SlashCommand } from "./typing";
@@ -9,7 +14,9 @@ import url from "url";
 const app = express();
 var redirectURL = "http://writerbot.selkiemyth.com:5000/";
 
-const database = {};
+const database: {
+  [key: string]: (m?: InteractionReplyOptions) => Promise<string>;
+} = {};
 app.get("/", (req, res) => {
   const { code, state } = req.query;
   if (!code) {
@@ -22,15 +29,18 @@ app.get("/", (req, res) => {
     .then(({ access_token }) => {
       token = access_token; // eslint-disable-line camelcase
       const apiClient = patreon(token);
-      return apiClient("/current_user");
+      return Promise.all([apiClient("/current_user")]);
     })
-    .then(async ({ store, rawJson }) => {
+    .then(async ([{ store, rawJson }]) => {
       const { id } = rawJson.data;
+
       //   database[id] = { ...rawJson.data, token };
       console.log(
         `Saved user ${store.find("user", id).full_name} to the database`
       );
-      return res.redirect(await database[state]());
+      return res.redirect(
+        await database[state]({ content: JSON.stringify(rawJson.data) })
+      );
     })
     .catch((err) => {
       console.log(err);
@@ -56,10 +66,12 @@ export const patreonCommand: SlashCommand = {
         state: interaction.user.id,
       },
     });
-    database[interaction.user.id] = async () => {
+    database[interaction.user.id] = async (m) => {
       const message = await interaction.editReply(`You are now logged in.`);
-
-      return `https://discordapp.com/channels/${interaction.guild.id}/${interaction.channel.id}/${message.id}`;
+      if (m) {
+        await interaction.followUp(m);
+      }
+      return `discord://discordapp.com/channels/${interaction.guild.id}/${interaction.channel.id}/${message.id}`;
     };
     await interaction.reply({
       ephemeral: true,
