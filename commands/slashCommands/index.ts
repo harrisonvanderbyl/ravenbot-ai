@@ -1,5 +1,6 @@
 import { dalle_mini } from "./dallemini";
 import { dalleusage } from "./dalleusage";
+import { drivedata } from "./drivedata";
 import { heyCommand } from "./hey";
 import { inpaintwithdalle } from "./inpaintwithdalle";
 import { patreonCommand } from "./patreonData";
@@ -24,4 +25,5 @@ export default {
   dalle_mini,
   sharedallekey,
   patreonCommand,
+  drivedata,
 };

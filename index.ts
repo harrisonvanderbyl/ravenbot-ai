@@ -4,7 +4,9 @@ import { adminChannel, client } from "./commands/client";
 import commands from "./commands/slashCommands";
 import config from "./config/config.json";
 import { debug } from "./offline.json";
+import { start } from "./commands/slashCommands/webserver/express";
 
+start();
 // Finally, WriterBot Begins
 client.on("ready", () => {
   console.log(
@@ -79,12 +81,16 @@ client.on("interactionCreate", async (interaction) => {
       interaction.isCommand()
     ) {
       if (interaction.replied) {
-        interaction.deleteReply();
+        interaction.followUp({
+          content: "Error:" + JSON.stringify(e),
+          ephemeral: true,
+        });
+      } else {
+        interaction.reply({
+          content: "Error:" + JSON.stringify(e),
+          ephemeral: true,
+        });
       }
-      interaction.followUp({
-        content: "Error:" + JSON.stringify(e),
-        ephemeral: true,
-      });
     }
   });
 });

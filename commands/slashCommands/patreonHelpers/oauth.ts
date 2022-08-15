@@ -7,11 +7,10 @@ import {
 import { oauth, patreon } from "patreon";
 import { readFileSync, writeFileSync } from "fs";
 
+import { app } from "../webserver/express";
 import config from "../../../config/config.json";
-import express from "express";
 import url from "url";
 
-const app = express();
 var redirectURL = config.redirectUrl;
 
 export const getPatreonData = async (token: string, url = "/current_user") => {
@@ -64,10 +63,6 @@ app.get("/", (req, res) => {
       return res.send("error loading patreon bot");
     });
 });
-const server = app.listen(config.port, () => {
-  const { port } = server.address();
-  console.log(`Listening on http:/localhost:${port}`);
-});
 
 const generateUserStats = async (data) => {};
 
@@ -79,7 +74,7 @@ export const generateLoginButton = async (interaction: CommandInteraction) => {
     query: {
       response_type: "code",
       client_id: config.CLIENT_ID,
-      redirect_uri: redirectURL,
+      redirect_uri: "https://" + redirectURL,
       state: interaction.user.id,
     },
   });
