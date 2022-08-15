@@ -128,6 +128,7 @@ export const listFolders = async (interaction: CommandInteraction) => {
     }));
 
     await interaction.reply({
+      ephemeral: true,
       content: "Share a folder with a group of your patreons!",
       components: [
         new MessageActionRow().addComponents(
@@ -158,7 +159,7 @@ export const listFolders = async (interaction: CommandInteraction) => {
                   .setCustomId("folderselect")
                   .setDisabled(true)
                   .setPlaceholder(
-                    folders.find((f) => f.id == i.values.join(",")).label
+                    folders.find((f) => f.value == i.values.join(",")).label
                   )
               ),
               new MessageActionRow().addComponents(
@@ -180,7 +181,9 @@ export const listFolders = async (interaction: CommandInteraction) => {
                   .addOptions(folders)
                   .setCustomId("folderselect")
                   .setDisabled(true)
-                  .setPlaceholder(i.values.join(","))
+                  .setPlaceholder(
+                    folders.find((f) => f.value == myPieces.folder).label
+                  )
               ),
               new MessageActionRow().addComponents(
                 new MessageSelectMenu()
