@@ -39,7 +39,30 @@ export const patreonCommand: SlashCommand = {
       );
 
       await interaction.editReply({
-        content: JSON.stringify(data.rawJson),
+        embeds: [
+          ...(data.rawJson.data[0]
+            ? [
+                {
+                  title: "Patreon Stats",
+                  description: `${data.rawJson.data[0].attributes.name}`,
+                  fields: [
+                    {
+                      name: "Subscribers",
+                      value: `${data.rawJson.data[0].attributes.patron_count}`,
+                    },
+                    {
+                      name: "Total Donations",
+                      value: `${
+                        data.rawJson.data[0].attributes.pledge_sum / 100
+                      } ${
+                        data.rawJson.data[0].attributes.pledge_sum_currency
+                      } (${data.rawJson.data[0].attributes.pay_per_name} `,
+                    },
+                  ],
+                },
+              ]
+            : []),
+        ],
       });
     }
   },

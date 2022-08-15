@@ -12,7 +12,7 @@ import express from "express";
 import url from "url";
 
 const app = express();
-var redirectURL = "http://writerbot.selkiemyth.com:5000/";
+var redirectURL = config.redirectUrl;
 
 export const getPatreonData = async (token: string, url = "/current_user") => {
   const apiClient = patreon(token);
