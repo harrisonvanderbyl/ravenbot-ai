@@ -5,6 +5,7 @@ import https from "https";
 import { readFileSync } from "fs";
 
 export const app = express();
+console.log("Starting load of server");
 
 // Certificate for Domain 1
 const privateKey1 = readFileSync(
@@ -25,6 +26,8 @@ const credentials1 = {
   ca: ca1,
 };
 
+console.log("Ending load of certs");
+
 // Certificate for Domain 3
 // ... (just like line 22-29)
 // Certificate for Domain 4
@@ -38,6 +41,8 @@ const httpsServer = https.createServer(credentials1, app);
 // httpsServer.addContext('<domain4.com>', credentials4); if you have the fourth domain.
 
 //..
+console.log("Exporting starts");
+
 export const start = async () => {
   httpServer.listen(80, () => {
     console.log("HTTP Server running on port 80");
