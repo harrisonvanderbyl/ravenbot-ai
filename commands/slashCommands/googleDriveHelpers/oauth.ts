@@ -61,7 +61,7 @@ export const storeToken = async (
 
   await interaction.editReply({
     content: "Successfully logged in!",
-    components: null,
+    components: [],
   });
 };
 
@@ -85,7 +85,10 @@ export const listFolders = async (interaction: CommandInteraction) => {
   const service = google.drive({ version: "v3", auth });
 
   const files = await service.files.list({
+    oauth_token: credentials.access_token,
+    auth: auth,
     pageSize: 10,
+
     fields: "nextPageToken, files(id, name)",
   });
 
@@ -106,7 +109,8 @@ export const generateLoginButton = async (interaction: CommandInteraction) => {
       .setStyle("LINK")
   );
   await interaction.reply({
-    content: "Login to Google Drive",
+    ephemeral: true,
+    content: "Login to Google Drive!",
     components: [buttons],
   });
 
