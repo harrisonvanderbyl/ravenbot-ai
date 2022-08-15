@@ -147,6 +147,7 @@ export const listFolders = async (interaction: CommandInteraction) => {
     collector.on("collect", async (i) => {
       if (i.user.id === interaction.user.id) {
         if (i.customId === "folderselect") {
+          i.deferUpdate();
           myPieces.folder = i.values.join(",");
           await interaction.editReply({
             content: "Share a folder with a group of your patreons!",
@@ -156,7 +157,9 @@ export const listFolders = async (interaction: CommandInteraction) => {
                   .addOptions(folders)
                   .setCustomId("folderselect")
                   .setDisabled(true)
-                  .setPlaceholder(i.values.join(","))
+                  .setPlaceholder(
+                    folders.find((f) => f.id == i.values.join(",")).label
+                  )
               ),
               new MessageActionRow().addComponents(
                 new MessageSelectMenu()
@@ -167,6 +170,7 @@ export const listFolders = async (interaction: CommandInteraction) => {
           });
         }
         if (i.customId === "tierselect") {
+          i.deferUpdate();
           myPieces.tier = i.values.join(",");
           await interaction.editReply({
             content: "Share a folder with a group of your patreons!",
@@ -183,7 +187,9 @@ export const listFolders = async (interaction: CommandInteraction) => {
                   .addOptions(tiers)
                   .setCustomId("tierselect")
                   .setDisabled(true)
-                  .setPlaceholder(i.values.join(","))
+                  .setPlaceholder(
+                    tiers.find((f) => f.value == i.values.join(",")).label
+                  )
               ),
               new MessageActionRow().addComponents(
                 new MessageButton()
@@ -200,6 +206,7 @@ export const listFolders = async (interaction: CommandInteraction) => {
               componentType: "BUTTON",
             });
           collector2.on("collect", async (ii) => {
+            ii.deferUpdate();
             if (ii.user.id === interaction.user.id) {
               if (ii.customId === "confirmshare") {
                 await interaction.editReply({
