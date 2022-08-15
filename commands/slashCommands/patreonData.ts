@@ -6,8 +6,6 @@ import config from "../../config/config.json";
 import express from "express";
 import url from "url";
 
-var patreonOAuthClient = oauth(config.CLIENT_ID, config.CLIENT_SECRET);
-
 const app = express();
 var redirectURL = "http://writerbot.selkiemyth.com/";
 const loginUrl = url.format({
@@ -48,7 +46,7 @@ app.get("/", (req, res) => {
       console.log(err);
     });
 });
-const server = app.listen(5000, () => {
+const server = app.listen(config.port, () => {
   const { port } = server.address();
   console.log(`Listening on http:/localhost:${port}`);
 });
