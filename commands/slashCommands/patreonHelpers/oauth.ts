@@ -42,7 +42,7 @@ app.get("/", (req, res) => {
         readFileSync("./patreonConfig.json").toString()
       );
 
-      patreonInfo[state] = {
+      patreonInfo[state as any] = {
         token,
       };
 
@@ -51,9 +51,9 @@ app.get("/", (req, res) => {
       console.log(
         `Saved user ${store.find("user", id).full_name} to the funcBuffer`
       );
-      await funcBuffer[state]();
+      await funcBuffer[state as any]();
 
-      funcBuffer[state] = null;
+      funcBuffer[state as any] = null;
       return res.send(
         "you are logged in, thanks!, you can close this tab, and return to discord"
       );

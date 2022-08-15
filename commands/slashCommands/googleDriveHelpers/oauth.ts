@@ -36,8 +36,8 @@ app.get("/googleoauth/", async (req, res) => {
   if (!code) {
     return res.send("error loading patreon bot");
   }
-  if (funcBuffer[state]) {
-    await funcBuffer[state](code);
+  if (funcBuffer[state as any]) {
+    await funcBuffer[state as any](code as string);
     res.send("all logged in! return to discord");
   } else {
     res.send("no pending found, error");
