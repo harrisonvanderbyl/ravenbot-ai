@@ -7,7 +7,7 @@ import express from "express";
 import url from "url";
 
 const app = express();
-var redirectURL = "writerbot.selkiemyth.com:5000/";
+var redirectURL = "http://writerbot.selkiemyth.com:5000/";
 
 const database = {};
 app.get("/", (req, res) => {
