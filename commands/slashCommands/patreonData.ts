@@ -1,20 +1,8 @@
-import {
-  ButtonInteraction,
-  CommandInteraction,
-  Interaction,
-  InteractionReplyOptions,
-  MessageActionRow,
-  MessageButton,
-  MessageOptions,
-} from "discord.js";
 import { existsSync, readFileSync, writeFileSync } from "fs";
 import { generateLoginButton, getPatreonData } from "./patreonHelpers/oauth";
-import { oauth, patreon } from "patreon";
 
+import { CommandInteraction } from "discord.js";
 import { SlashCommand } from "./typing";
-import config from "../../config/config.json";
-import express from "express";
-import url from "url";
 
 const generateUserStats = async (data) => {};
 
@@ -56,7 +44,7 @@ export const patreonCommand: SlashCommand = {
                         data.rawJson.data[0].attributes.pledge_sum / 100
                       } ${
                         data.rawJson.data[0].attributes.pledge_sum_currency
-                      } (${data.rawJson.data[0].attributes.pay_per_name} `,
+                      } per ${data.rawJson.data[0].attributes.pay_per_name} `,
                     },
                   ],
                 },
