@@ -15,8 +15,9 @@ client.on("ready", () => {
   client.channels.fetch(adminChannel).then((channel) => {
     (channel as TextChannel).send(`Bot has been started`);
   });
-
+  console.log("starting servers");
   start();
+  console.log("fin started servers");
 });
 
 client.on("messageCreate", async (message) => {});
