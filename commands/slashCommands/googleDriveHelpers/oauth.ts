@@ -114,26 +114,104 @@ export const listFolders = async (interaction: CommandInteraction) => {
       .map((i) => ({
         label: i.attributes.title ?? i.attributes.description,
         value: i.id,
-        description: i.attributes.description.slice(0, 95)[0] + "...",
+        description: i.attributes.description.slice(0, 95) + "...",
       }));
+    const folders = files.data.files.map((file) => ({
+      label: file.name,
+      value: file.id,
+    }));
 
     await interaction.reply({
       content: "Share a folder with a group of your patreons!",
       components: [
         new MessageActionRow().addComponents(
           new MessageSelectMenu()
-            .addOptions(
-              files.data.files.map((file) => ({
-                label: file.name,
-                value: file.id,
-              }))
-            )
+            .addOptions(folders)
             .setCustomId("folderselect")
         ),
-        new MessageActionRow().addComponents(
-          new MessageSelectMenu().addOptions(tiers).setCustomId("tierselect")
-        ),
       ],
+    });
+
+    const collector = interaction.channel.createMessageComponentCollector({
+      time: 15000,
+      componentType: "SELECT_MENU",
+    });
+    const myPieces = { folder: "", tier: "" };
+
+    collector.on("collect", async (i) => {
+      if (i.user.id === interaction.user.id) {
+        if (i.customId === "folderselect") {
+          myPieces.folder = i.values.join(",");
+          await i.editReply({
+            content: "Share a folder with a group of your patreons!",
+            components: [
+              new MessageActionRow().addComponents(
+                new MessageSelectMenu()
+                  .addOptions(folders)
+                  .setCustomId("folderselect")
+                  .setDisabled(true)
+                  .setPlaceholder(i.values.join(","))
+              ),
+              new MessageActionRow().addComponents(
+                new MessageSelectMenu()
+                  .addOptions(tiers)
+                  .setCustomId("tierselect")
+              ),
+            ],
+          });
+        }
+        if (i.customId === "tierselect") {
+          myPieces.tier = i.values.join(",");
+          await i.editReply({
+            content: "Share a folder with a group of your patreons!",
+            components: [
+              new MessageActionRow().addComponents(
+                new MessageSelectMenu()
+                  .addOptions(folders)
+                  .setCustomId("folderselect")
+                  .setDisabled(true)
+                  .setPlaceholder(i.values.join(","))
+              ),
+              new MessageActionRow().addComponents(
+                new MessageSelectMenu()
+                  .addOptions(tiers)
+                  .setCustomId("tierselect")
+                  .setDisabled(true)
+                  .setPlaceholder(i.values.join(","))
+              ),
+              new MessageActionRow().addComponents(
+                new MessageButton()
+                  .setLabel("Confirm Share")
+                  .setCustomId("confirmshare")
+                  .setStyle("PRIMARY")
+              ),
+            ],
+          });
+
+          const collector2 =
+            interaction.channel.createMessageComponentCollector({
+              time: 15000,
+              componentType: "BUTTON",
+            });
+          collector2.on("collect", async (ii) => {
+            if (ii.user.id === interaction.user.id) {
+              if (ii.customId === "confirmshare") {
+                await ii.editReply({
+                  content: "Sharing folder...",
+                  components: [],
+                });
+                await shareFolder(interaction, myPieces.folder, myPieces.tier);
+              }
+            }
+          });
+        }
+      } else {
+        i.reply({ content: `These buttons aren't for you!`, ephemeral: true });
+      }
+    });
+
+    collector.on("end", (collected) => {
+      console.log(`Collected ${collected.size} interactions.`);
     });
   }
 };
@@ -163,3 +241,5 @@ export const generateGoogleLoginButton = async (
     await storeToken(interaction, code);
   };
 };
+
+const shareFolder = (interaction, folder, reward) => {};
