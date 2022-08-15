@@ -114,7 +114,7 @@ export const listFolders = async (interaction: CommandInteraction) => {
       .map((i) => ({
         label: i.attributes.title ?? i.attributes.description,
         value: i.id,
-        description: i.attributes.description,
+        description: i.attributes.description.slice(0, 95)[0] + "...",
       }));
 
     await interaction.reply({
