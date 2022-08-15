@@ -88,7 +88,7 @@ export const listFolders = async (interaction: CommandInteraction) => {
 
   const files = await service.files.list({
     pageSize: 10,
-
+    q: `mimeType = 'application/vnd.google-apps.folder'`,
     fields: "nextPageToken, files(id, name)",
   });
 
