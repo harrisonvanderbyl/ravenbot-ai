@@ -82,7 +82,7 @@ client.on("interactionCreate", async (interaction) => {
       interaction.isUserContextMenu() ||
       interaction.isCommand()
     ) {
-      if (interaction.replied) {
+      if (interaction.replied || interaction.deferred) {
         interaction.followUp({
           content: "Error:" + JSON.stringify(e),
           ephemeral: true,
