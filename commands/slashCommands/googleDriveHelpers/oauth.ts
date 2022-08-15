@@ -78,15 +78,15 @@ export const listFolders = async (interaction: CommandInteraction) => {
     return await generateLoginButton(interaction);
   }
 
-  const auth = new GoogleAuth({
-    scopes: "https://www.googleapis.com/auth/drive",
-    credentials,
-  });
+  const auth = new google.auth.OAuth2(
+    client_id,
+    client_secret,
+    redirect_uris[0]
+  );
+  auth.setCredentials(credentials);
   const service = google.drive({ version: "v3", auth });
 
   const files = await service.files.list({
-    oauth_token: credentials.access_token,
-    auth: auth,
     pageSize: 10,
 
     fields: "nextPageToken, files(id, name)",
