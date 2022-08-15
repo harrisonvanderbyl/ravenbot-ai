@@ -38,7 +38,7 @@ const httpsServer = https.createServer(credentials1, app);
 // httpsServer.addContext('<domain4.com>', credentials4); if you have the fourth domain.
 
 //..
-export const start = () => {
+export const start = async () => {
   httpServer.listen(80, () => {
     console.log("HTTP Server running on port 80");
   });
