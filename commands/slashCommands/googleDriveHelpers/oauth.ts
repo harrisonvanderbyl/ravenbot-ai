@@ -92,7 +92,7 @@ export const listFolders = async (interaction: CommandInteraction) => {
     fields: "nextPageToken, files(id, name)",
   });
 
-  await interaction.editReply(JSON.stringify(files.data.files));
+  await interaction.reply(JSON.stringify(files.data.files));
 };
 
 export const generateLoginButton = async (interaction: CommandInteraction) => {
