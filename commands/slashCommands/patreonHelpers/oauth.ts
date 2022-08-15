@@ -14,13 +14,13 @@ import url from "url";
 const app = express();
 var redirectURL = "http://writerbot.selkiemyth.com:5000/";
 
-export const getPatreonData = async (token: string) => {
+export const getPatreonData = async (token: string, url = "/current_user") => {
   const apiClient = patreon(token);
-  return apiClient("/current_user");
+  return apiClient(url);
 };
 
 const funcBuffer: {
-  [key: string]: (m?: InteractionReplyOptions) => Promise<string>;
+  [key: string]: () => Promise<void>;
 } = {};
 app.get("/", (req, res) => {
   const { code, state } = req.query;
@@ -52,15 +52,16 @@ app.get("/", (req, res) => {
       console.log(
         `Saved user ${store.find("user", id).full_name} to the funcBuffer`
       );
-      const redirectUrl = await funcBuffer[state]({
-        content: JSON.stringify(rawJson),
-      });
+      await funcBuffer[state]();
 
       funcBuffer[state] = null;
-      return res.redirect(redirectUrl);
+      return res.send(
+        "you are logged in, thanks!, you can close this tab, and return to discord"
+      );
     })
     .catch((err) => {
       console.log(err);
+      return res.send("error loading patreon bot");
     });
 });
 const server = app.listen(config.port, () => {
@@ -82,13 +83,8 @@ export const generateLoginButton = async (interaction: CommandInteraction) => {
       state: interaction.user.id,
     },
   });
-  funcBuffer[interaction.user.id] = async (m) => {
-    await interaction.editReply(`You are now logged in!.`);
-    if (m) {
-      const message = await interaction.followUp(m);
-      return `discord://discord.com/channels/${interaction.guild.id}/${interaction.channel.id}/${message.id}`;
-    }
-    return "google.com";
+  funcBuffer[interaction.user.id] = async () => {
+    await interaction.editReply(`You are now logged in!`);
   };
   const row = new MessageActionRow().addComponents(
     new MessageButton().setLabel("Login").setURL(loginUrl).setStyle("LINK")

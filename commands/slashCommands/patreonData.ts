@@ -33,7 +33,10 @@ export const patreonCommand: SlashCommand = {
     } else {
       await interaction.deferReply();
 
-      const data = await getPatreonData(patreonInfo.token);
+      const data = await getPatreonData(
+        patreonInfo.token,
+        "/current_user/campaigns"
+      );
 
       await interaction.editReply({
         content: JSON.stringify(data.rawJson),
