@@ -6,7 +6,6 @@ import {
 import { existsSync, readFileSync, writeFileSync } from "fs";
 
 import { GoogleAuth } from "google-auth-library";
-import { TextInputStyles } from "discord.js/typings/enums";
 import { app } from "../webserver/express";
 import config from "../../../config/config.json";
 import { google } from "googleapis";
@@ -95,12 +94,9 @@ export const listFolders = async (interaction: CommandInteraction) => {
 
 export const generateLoginButton = async (interaction: CommandInteraction) => {
   const authUrl = oAuth2Client.generateAuthUrl({
-    redirect_uri:
-      "https://" +
-      config.redirectUrl +
-      "/googleoauth/?state=" +
-      interaction.user.id,
+    redirect_uri: "https://" + config.redirectUrl + "/googleoauth/",
     scope: SCOPES,
+    state: interaction.user.id,
   });
 
   const buttons = new MessageActionRow().addComponents(
