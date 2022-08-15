@@ -11,7 +11,7 @@ var redirectURL = "http://writerbot.selkiemyth.com:5000/";
 
 const database = {};
 app.get("/", (req, res) => {
-  const { code } = req.query;
+  const { code, state } = req.query;
   if (!code) {
     return res.send("error loading patreon bot");
   }
@@ -30,7 +30,7 @@ app.get("/", (req, res) => {
       console.log(
         `Saved user ${store.find("user", id).full_name} to the database`
       );
-      return res.redirect(await database[id]());
+      return res.redirect(await database[state]());
     })
     .catch((err) => {
       console.log(err);
