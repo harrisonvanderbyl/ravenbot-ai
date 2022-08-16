@@ -90,3 +90,34 @@ export const generateLoginButton = async (interaction: CommandInteraction) => {
     components: [row],
   });
 };
+
+export const getPatreonEmails = async (
+  token: string,
+  award?: string,
+  count = "10",
+  page = ""
+) => {
+  const url =
+    "/campaigns/7651472/pledges?page%5Bcount%5D=" + count + "&sort=created";
+  const data = await getPatreonData(token, url + page);
+
+  return [
+    ...data.rawJson.data
+      .map(
+        (d) =>
+          data.rawJson.included.find(
+            (pledge) =>
+              d.relationships.patron.data.id == pledge.id &&
+              (!award || award == d.relationships.reward?.data.id)
+          )?.attributes.email
+      )
+      .filter((d) => d),
+    ...(data.rawJson.links.next
+      ? await getPatreonEmails(
+          token,
+          count,
+          data.rawJson.links.next.split(url)[1]
+        )
+      : []),
+  ];
+};

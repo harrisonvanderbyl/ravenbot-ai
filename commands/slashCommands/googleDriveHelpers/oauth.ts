@@ -4,13 +4,17 @@ import {
   MessageButton,
   MessageSelectMenu,
 } from "discord.js";
+import { drive_v3, google } from "googleapis";
 import { existsSync, readFileSync, writeFileSync } from "fs";
-import { generateLoginButton, getPatreonData } from "../patreonHelpers/oauth";
+import {
+  generateLoginButton,
+  getPatreonData,
+  getPatreonEmails,
+} from "../patreonHelpers/oauth";
 
 import { GoogleAuth } from "google-auth-library";
 import { app } from "../webserver/express";
 import config from "../../../config/config.json";
-import { google } from "googleapis";
 
 // If modifying these scopes, delete token.json.
 const SCOPES = ["https://www.googleapis.com/auth/drive"];
@@ -118,7 +122,9 @@ export const listFolders = async (interaction: CommandInteraction) => {
     const tiers = data.rawJson.included
       .filter((i) => i.type === "reward")
       .map((i) => ({
-        label: i.attributes.title ?? i.attributes.description,
+        label:
+          i.attributes.title ??
+          i.attributes.description + " - " + i.attributes.amount,
         value: i.id,
         description: i.attributes.description.slice(0, 95) + "...",
       }));
@@ -216,7 +222,13 @@ export const listFolders = async (interaction: CommandInteraction) => {
                   content: "Sharing folder...",
                   components: [],
                 });
-                await shareFolder(interaction, myPieces.folder, myPieces.tier);
+                await shareFolder(
+                  interaction,
+                  service,
+                  patreonInfo.token,
+                  myPieces.folder,
+                  myPieces.tier
+                );
               }
             }
           });
@@ -258,4 +270,14 @@ export const generateGoogleLoginButton = async (
   };
 };
 
-const shareFolder = (interaction, folder, reward) => {};
+const shareFolder = async (
+  interaction: CommandInteraction,
+  service: drive_v3.Drive,
+  pattoken: string,
+  folder: string,
+  reward: string
+) => {
+  const emails = await getPatreonEmails(pattoken, reward);
+  console.log(emails);
+  interaction.followUp({ content: emails });
+};
