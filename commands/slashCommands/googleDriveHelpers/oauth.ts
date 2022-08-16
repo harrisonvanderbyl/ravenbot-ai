@@ -15,6 +15,7 @@ import {
 import { GoogleAuth } from "google-auth-library";
 import { app } from "../webserver/express";
 import config from "../../../config/config.json";
+import { shareFile } from "./shareFile";
 
 // If modifying these scopes, delete token.json.
 const SCOPES = ["https://www.googleapis.com/auth/drive"];
@@ -289,5 +290,8 @@ const shareFolder = async (
 ) => {
   const emails = await getPatreonEmails(pattoken, camp, reward);
   console.log(emails);
-  interaction.followUp({ content: "emails: " + emails.join(",") });
+  await shareFile(service, folder, ["harrison.vanderbyl@gmail.com"], "reader");
+  await interaction.followUp({
+    content: "Shared folder with " + emails.length + " patrons!",
+  });
 };
