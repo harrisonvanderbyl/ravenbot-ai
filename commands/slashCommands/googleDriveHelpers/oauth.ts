@@ -2,6 +2,7 @@ import {
   CommandInteraction,
   MessageActionRow,
   MessageButton,
+  MessageEmbed,
   MessageSelectMenu,
 } from "discord.js";
 import { drive_v3, google } from "googleapis";
@@ -290,8 +291,39 @@ const shareFolder = async (
 ) => {
   const emails = await getPatreonEmails(pattoken, camp, reward);
   console.log(emails);
-  await shareFile(service, folder, ["harrison.vanderbyl@gmail.com"], "reader");
+
+  // get data from interaction
+  const expire = interaction.options.get("expire")?.value ?? false;
+  const role = interaction.options.get("role")?.value ?? "reader";
+  const message = interaction.options.get("message")?.value ?? "";
+
+  await shareFile(
+    service,
+    folder,
+    emails,
+    role as "writer" | "reader" | "commenter",
+    message as string,
+    expire as boolean
+  );
   await interaction.followUp({
     content: "Shared folder with " + emails.length + " patrons!",
+    embeds: [
+      new MessageEmbed()
+        .setTitle("Details")
+        .setDescription(
+          "Shared folder with " +
+            emails.length +
+            " patrons!\n" +
+            "Role: " +
+            role +
+            "\n" +
+            "Message: " +
+            message +
+            "\n" +
+            "Expire at end of month: " +
+            expire
+        )
+        .setColor(0x00ff00),
+    ],
   });
 };
