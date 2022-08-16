@@ -156,7 +156,7 @@ export const listFolders = async (interaction: CommandInteraction) => {
     collector.on("collect", async (i) => {
       if (i.user.id === interaction.user.id) {
         if (i.customId === "folderselect") {
-          i.deferUpdate();
+          await i.deferUpdate();
           myPieces.folder = i.values.join(",");
           await interaction.editReply({
             content: "Share a folder with a group of your patreons!",
@@ -178,8 +178,9 @@ export const listFolders = async (interaction: CommandInteraction) => {
             ],
           });
         }
+
         if (i.customId === "tierselect") {
-          i.deferUpdate();
+          await i.deferUpdate();
           myPieces.tier = i.values.join(",");
           await interaction.editReply({
             content: "Share a folder with a group of your patreons!",
@@ -217,7 +218,7 @@ export const listFolders = async (interaction: CommandInteraction) => {
               componentType: "BUTTON",
             });
           collector2.on("collect", async (ii) => {
-            ii.deferUpdate();
+            await ii.deferUpdate();
             if (ii.user.id === interaction.user.id) {
               if (ii.customId === "confirmshare") {
                 await interaction.editReply({
@@ -235,14 +236,19 @@ export const listFolders = async (interaction: CommandInteraction) => {
               }
             }
           });
+          collector2.on("end", async (ii) => {
+            console.log("end");
+          });
         }
-      } else {
-        i.reply({ content: `These buttons aren't for you!`, ephemeral: true });
       }
     });
 
-    collector.on("end", (collected) => {
+    collector.on("end", async (collected) => {
       console.log(`Collected ${collected.size} interactions.`);
+      await interaction.editReply({
+        content: "Time's up!",
+        components: [],
+      });
     });
   }
 };
