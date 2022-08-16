@@ -293,7 +293,8 @@ const shareFolder = async (
   console.log(emails);
 
   // get data from interaction
-  const expire = interaction.options.get("expire")?.value ?? false;
+  const expire =
+    interaction.options.get("expire")?.value === false ? false : true;
   const role = interaction.options.get("role")?.value ?? "reader";
   const message = interaction.options.get("message")?.value ?? "";
 
