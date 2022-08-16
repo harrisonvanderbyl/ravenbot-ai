@@ -119,6 +119,8 @@ export const listFolders = async (interaction: CommandInteraction) => {
       "/current_user/campaigns"
     );
 
+    const camp = data.data[0].id;
+
     const tiers = data.rawJson.included
       .filter((i) => i.type === "reward")
       .map((i) => ({
@@ -146,7 +148,7 @@ export const listFolders = async (interaction: CommandInteraction) => {
     });
 
     const collector = interaction.channel.createMessageComponentCollector({
-      time: 15000,
+      time: 30000,
       componentType: "SELECT_MENU",
     });
     const myPieces = { folder: "", tier: "" };
@@ -226,6 +228,7 @@ export const listFolders = async (interaction: CommandInteraction) => {
                   interaction,
                   service,
                   patreonInfo.token,
+                  camp,
                   myPieces.folder,
                   myPieces.tier
                 );
@@ -274,10 +277,11 @@ const shareFolder = async (
   interaction: CommandInteraction,
   service: drive_v3.Drive,
   pattoken: string,
+  camp: string,
   folder: string,
   reward: string
 ) => {
-  const emails = await getPatreonEmails(pattoken, reward);
+  const emails = await getPatreonEmails(pattoken, camp, reward);
   console.log(emails);
-  interaction.followUp({ content: emails });
+  interaction.followUp({ content: "emails: " + emails.join(",") });
 };

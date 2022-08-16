@@ -93,12 +93,17 @@ export const generateLoginButton = async (interaction: CommandInteraction) => {
 
 export const getPatreonEmails = async (
   token: string,
+  campaign: string,
   award?: string,
   count = "10",
   page = ""
 ) => {
   const url =
-    "/campaigns/7651472/pledges?page%5Bcount%5D=" + count + "&sort=created";
+    "/campaigns/" +
+    campaign +
+    "/pledges?page%5Bcount%5D=" +
+    count +
+    "&sort=created";
   const data = await getPatreonData(token, url + page);
 
   return [
