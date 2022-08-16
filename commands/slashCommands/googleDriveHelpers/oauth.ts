@@ -119,7 +119,7 @@ export const listFolders = async (interaction: CommandInteraction) => {
       "/current_user/campaigns"
     );
 
-    const camp = data.data[0].id;
+    const camp = data.rawJson.data[0].id;
 
     const tiers = data.rawJson.included
       .filter((i) => i.type === "reward")
