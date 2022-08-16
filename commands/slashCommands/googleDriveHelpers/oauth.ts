@@ -307,7 +307,8 @@ const shareFolder = async (
     expire as boolean
   );
   await interaction.followUp({
-    content: "Shared folder with " + emails.length + " patrons!",
+    ephemeral: true,
+    content: null,
     embeds: [
       new MessageEmbed()
         .setTitle("Details")
