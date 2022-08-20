@@ -7,7 +7,12 @@ export const stablediffusion: SlashCommand = {
   skipDeferReply: true,
 
   slashCommand: async (client, interaction: CommandInteraction) => {
-    await interaction.reply("Command should finish within 2 minutes");
+    const optionsString = interaction.options.data
+      .map((option) => `${option.name}: ${option.value}`)
+      .join(", ");
+    await interaction.reply(
+      `Generating image with stable diffusion with options ${optionsString}. Ideal generation time is below 2 minutes`
+    );
     const data = await stable(
       interaction,
       interaction.options.get("prompt").value as string
