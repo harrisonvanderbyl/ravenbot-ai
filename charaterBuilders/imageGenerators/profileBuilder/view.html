@@ -1,0 +1,15 @@
+<!-- display image from .json file-->
+<html>
+    <div id="imgadd">
+        
+    </div>
+</html>
+<script>
+    // fetch image from .json file
+    var json = fetch('./.json', {
+        method: 'GET', 
+    });
+    var img = document.getElementById("imgadd");
+    var imgsrc = img.image;
+    img.innerHTML = "<img src=" + imgsrc + ">";
+</script>

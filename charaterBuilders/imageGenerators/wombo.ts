@@ -29,20 +29,15 @@ export const downloadToBuffer = async (imageUrl: string): Promise<Buffer> => {
   ).data;
 };
 
-const createImage = async (
-  loadingMessage: BaseCommandInteraction | ModalSubmitInteraction,
+export const createImage = async (
   prompt: string,
   level: "HIGH" | "MEDIUM" | "LOW" = "MEDIUM",
   style: number = 10,
-  imageData?: Buffer,
-  memberID = loadingMessage.user.id ?? "default",
-  makeButtons = true
+  imageData?: Buffer
 ) => {
   const instance = WomboDreamApi.buildDefaultInstance();
 
-  if (
-    !(await instance.fetchStyles()).map((s: any) => s.id).includes(style) 
-  ) {
+  if (!(await instance.fetchStyles()).map((s: any) => s.id).includes(style)) {
     throw "Please select a valid type";
   }
 
@@ -86,6 +81,7 @@ const createImage = async (
         }));
       })
       .catch((err) => {
+        console.log(err);
         throw "something went wrong";
       });
   });
@@ -101,15 +97,7 @@ export const wombo = async (
   makeButtons = true
 ) => {
   //14
-  const firstBuffer = await createImage(
-    loadingMessage,
-    prompt,
-    level,
-    style,
-    imageData,
-    memberID,
-    makeButtons
-  ).catch((err) => {
+  const firstBuffer = await createImage(prompt, level, style).catch((err) => {
     throw err;
   });
   const buffers = [firstBuffer];

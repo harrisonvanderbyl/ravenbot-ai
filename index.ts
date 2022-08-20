@@ -7,7 +7,7 @@ import { debug } from "./offline.json";
 import { start } from "./commands/slashCommands/webserver/express";
 
 // Finally, WriterBot Begins
-client.on("ready", () => {
+client.on("ready", async () => {
   console.log(
     `Bot has started, with ${client.users.cache.size} users, in ${client.channels.cache.size} channels of ${client.guilds.cache.size} guilds.`
   );

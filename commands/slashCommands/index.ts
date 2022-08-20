@@ -9,9 +9,9 @@ import { remixwithwombo } from "./remixwithwombo";
 import { scsquote } from "./scsquote";
 import { sharedallekey } from "./sharedallekey";
 import { speakas } from "./speakas";
+import { stablediffusion } from "./buildPrompt";
 import { styles } from "./styles";
 import { womocommand } from "./wombo";
-
 export default {
   dalleusage,
   heyCommand,
@@ -26,4 +26,5 @@ export default {
   sharedallekey,
   patreonCommand,
   drivedata,
+  stablediffusion,
 };
