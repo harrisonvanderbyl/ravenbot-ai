@@ -31,6 +31,9 @@ app.get("/sdlist", (req, res) => {
 });
 
 app.post("/upload/:id", async (req, res) => {
+  console.log(req.params.id, "upload");
+  console.log(req.body, "upload");
+
   const id = req.params.id;
   const { prompt, callback } = promptlist[id];
   const imagedata = req.body;
@@ -38,6 +41,7 @@ app.post("/upload/:id", async (req, res) => {
 
   delete promptlist[id];
 });
+
 export const stable = async (
   interaction: CommandInteraction,
   prompt: string
