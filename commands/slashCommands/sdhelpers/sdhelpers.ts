@@ -31,15 +31,21 @@ app.get("/sdlist", (req, res) => {
 });
 
 app.post("/upload/:id", async (req, res) => {
-  console.log(req.params.id, "upload");
-  console.log(req.body, "upload");
+  try {
+    console.log(req.params.id, "upload");
+    console.log(req.body, "upload");
 
-  const id = req.params.id;
-  const { prompt, callback } = promptlist[id];
-  const imagedata = req.body;
-  await callback(imagedata);
+    const id = req.params.id;
+    const { prompt, callback } = promptlist[id];
+    const imagedata = req.body;
+    await callback(imagedata);
 
-  delete promptlist[id];
+    delete promptlist[id];
+    res.send("ok");
+  } catch (e) {
+    console.log(e);
+    res.send("error");
+  }
 });
 
 export const stable = async (
