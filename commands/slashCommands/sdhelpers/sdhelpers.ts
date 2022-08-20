@@ -88,9 +88,9 @@ export const stable = async (
       timeout: 0,
       // use rand to generate a seed for the generator
       seed:
-        (interaction.options.get("seed").value as string) ||
+        (interaction.options.get("seed")?.value as string) ||
         Math.random().toString(),
-      samples: (interaction.options.get("samples").value as string) || "20",
+      samples: (interaction.options.get("samples")?.value as string) || "20",
     };
   });
 };
