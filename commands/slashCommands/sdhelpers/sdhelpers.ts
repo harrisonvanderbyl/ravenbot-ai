@@ -21,13 +21,15 @@ app.get("/sdlist", (req, res) => {
   if (!top) {
     return res.send("{}");
   }
-  const { prompt, callback, timeout } = top[1];
+  const { prompt, callback, timeout, samples, seed } = top[1];
   const id = top[0];
   promptlist[id].timeout = Date.now() + 120 * 1000; // 2 minutes
   return res.send(
     JSON.stringify({
       prompt,
       id,
+      samples,
+      seed,
     })
   );
   //res.send(JSON.stringify(Object.entries(promptlist)
