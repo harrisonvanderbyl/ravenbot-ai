@@ -1,8 +1,4 @@
-import {
-  Configuration,
-  CreateCompletionResponse,
-  OpenAIApi,
-} from "openai";
+import { Configuration, CreateCompletionResponse, OpenAIApi } from "openai";
 import axios, { AxiosResponse } from "axios";
 
 import { apikey } from "../config/config.json";
@@ -18,7 +14,8 @@ export const gpt3 = async (
   requestor = "HarrisonVanderbyl@gmail.com", // For complience, all requests need to send identifying infomation
   engine = "text-davinci-002"
 ) =>
-  openai.createCompletion(engine, {
+  openai.createCompletion({
+    model: engine,
     prompt,
     temperature: 0.9,
     max_tokens: 150,
