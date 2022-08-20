@@ -12,10 +12,12 @@
   "license": "MIT",
   "dependencies": {
     "@grpc/grpc-js": "^1.6.10",
+    "@types/body-parser": "^1.19.2",
     "@types/inquirer": "^8.2.2",
     "@types/node-persist": "^3.1.2",
     "@types/sharp": "^0.30.4",
     "axios": "^0.26.1",
+    "body-parser": "^1.20.0",
     "cron": "^1.8.2",
     "discord.js": "^13.0.0",
     "discord.js-selfbot-v13": "^2.3.52",

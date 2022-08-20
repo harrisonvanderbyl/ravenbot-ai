@@ -1,3 +1,4 @@
+import body from "body-parser";
 import config from "./../../../config/config.json";
 import { createServer } from "https";
 import express from "express";
@@ -5,7 +6,7 @@ import { readFileSync } from "fs";
 
 export const app = express();
 
-app.use(express.bodyParser());
+app.use(body.text());
 console.log("Starting load of server");
 
 // Certificate for Domain 1
