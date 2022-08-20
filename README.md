@@ -40,5 +40,8 @@ Pull requests are welcome. For major changes, please open an issue first to disc
 ### Roadmap
 add stability.ai and other models.
 
+### Support
+[Patreon](https://www.patreon.com/Unexplored_Horizons)
+
 ## License
 [MIT](https://choosealicense.com/licenses/mit/)
