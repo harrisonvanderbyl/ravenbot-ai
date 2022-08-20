@@ -33,6 +33,18 @@ export const stablediffusion: SlashCommand = {
         type: 3,
         description: "What to ask stable diffusion",
       },
+      {
+        name: "seed",
+        required: false,
+        type: 3,
+        description: "The seed to use",
+      },
+      {
+        name: "samples",
+        required: false,
+        type: 3,
+        description: "The number of samples to use",
+      },
     ],
   },
 };

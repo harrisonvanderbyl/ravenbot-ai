@@ -6,7 +6,10 @@ const promptlist: {
   [key: string]: {
     prompt: string;
     callback: (imagedata: string) => Promise<void>;
+    update: (updatetext: string) => Promise<void>;
     timeout: number;
+    seed: string;
+    samples: string;
   };
 } = {};
 
@@ -48,6 +51,23 @@ app.post("/upload/:id", async (req, res) => {
   }
 });
 
+app.post("/update/:id", async (req, res) => {
+  try {
+    console.log(req.params.id, "update");
+    console.log(req.body, "update");
+
+    const id = req.params.id;
+    const { prompt, update } = promptlist[id];
+    const updatetext = req.body;
+    await update(updatetext);
+
+    res.send("ok");
+  } catch (e) {
+    console.log(e);
+    res.send("error");
+  }
+});
+
 export const stable = async (
   interaction: CommandInteraction,
   prompt: string
@@ -59,7 +79,18 @@ export const stable = async (
       callback: async (imagedata: string) => {
         resolve(Buffer.from(imagedata, "base64"));
       },
+      update: async (updatetext: string) => {
+        interaction.editReply({
+          content: updatetext,
+        });
+      },
+
       timeout: 0,
+      // use rand to generate a seed for the generator
+      seed:
+        (interaction.options.get("seed").value as string) ||
+        Math.random().toString(),
+      samples: (interaction.options.get("samples").value as string) || "20",
     };
   });
 };
