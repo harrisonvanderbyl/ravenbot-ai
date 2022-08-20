@@ -4,6 +4,8 @@ import express from "express";
 import { readFileSync } from "fs";
 
 export const app = express();
+
+app.use(express.bodyParser());
 console.log("Starting load of server");
 
 // Certificate for Domain 1
