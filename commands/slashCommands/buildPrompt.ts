@@ -49,12 +49,10 @@ export const stablediffusion: SlashCommand = {
         new MessageActionRow().addComponents(
           new MessageButton()
             .setLabel("Patreon")
-            .setCustomId("Patreon")
             .setStyle("LINK")
             .setURL("https://patreon.com/unexplored_horizons"),
           new MessageButton()
             .setLabel("Host Node")
-            .setCustomId("Host A Node")
             .setStyle("LINK")
             .setURL("https://github.com/harrisonvanderbyl/SD")
         ),
