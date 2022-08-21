@@ -1,5 +1,6 @@
 import { CommandInteraction } from "discord.js";
 import { app } from "../webserver/express";
+
 // This is a decentralized generator that allows for anyone to deploy a generator to lighten the server.
 // TODO: create client and implement security
 const promptlist: {
@@ -13,7 +14,19 @@ const promptlist: {
   };
 } = {};
 
+const peers: {
+  [key: string]: {
+    name: "string";
+    lastseen: number;
+  };
+} = {};
+
 app.get("/sdlist", (req, res) => {
+  peers[req.ip ?? "unknown"] = {
+    name: req.headers.name ?? "unknown",
+    lastseen: Date.now(),
+  };
+
   const top = Object.entries(promptlist).filter(([key, value]) => {
     return value.timeout < Date.now();
   })[0];
@@ -74,6 +87,26 @@ export const stable = async (
   interaction: CommandInteraction,
   prompt: string
 ): Promise<Buffer> => {
+  await interaction.editReply({
+    embeds: [
+        {
+            title: "Network",
+            footer:{
+                text: "Peers:"+Object.entries(peers).filter(([a,b])=>b.lastseen>Date.now()-1000*60).map(([a,b])=>b.name+"("+a+")").join(", ")
+            },
+            fields: [
+                {
+                    name: "Peers",
+                    value: Object.values(peers).filter(m=>m.lastseen>Date.now()-1000*60).length.toFixed(0),
+                },
+                {
+                    name: "Pending",
+                    value: Object.keys(promptlist).length.toFixed(0),
+                }
+            ]
+        }
+    ]})
+    
   return new Promise((resolve, reject) => {
     const id = interaction.id;
     promptlist[id] = {
