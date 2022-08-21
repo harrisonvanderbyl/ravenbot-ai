@@ -13,9 +13,12 @@ export const stablediffusion: SlashCommand = {
     await interaction.reply(
       `Generating image with stable diffusion with options ${optionsString}. Ideal generation time is below 2 minutes`
     );
+    const seed = (interaction.options.get("seed")?.value as string) ||
+    Math.random().toPrecision(5)
     const data = await stable(
       interaction,
-      interaction.options.get("prompt").value as string
+      interaction.options.get("prompt").value as string,
+      seed
     );
     await interaction.editReply({
       content: null,
@@ -24,6 +27,13 @@ export const stablediffusion: SlashCommand = {
       embeds : [
         {
           title: (interaction.options.get("prompt").value as string),
+          fields: [
+            {
+               name:"Seed",
+               value : seed,
+               inline: true
+            }
+          ],
           image: {
             url: `attachment://generation.jpeg`,
           },
