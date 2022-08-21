@@ -95,26 +95,31 @@ const updateNetworkStats = async ()=>{
                 footer:{
                     text: "Peers:"+Object.entries(peers).filter(([a,b])=>b.lastseen>Date.now()-1000*60).map(([a,b])=>b.name+"("+a+")").join(", ")
                 },
+                description: `
+                This is a decentralized generator that allows for anyone to deploy a generator to lighten the server.
+                You can use the code on [github](https://github.com/harrisonvanderbyl/SD) to deploy your own node to lighten the load.
+                You can also support me on [patreon](https://www.patreon.com/unexplored_horizons/)
+                `,
                 fields: [
+                    {
+                        name: "Status",
+                        value: promptlist[key].progress,
+                        inline: true
+                    },
+                    {
+                        name: "Seed",
+                        value: promptlist[key].seed.replace(".",""),
+                    },
                     {
                         name: "Peers",
                         value: Object.values(peers).filter(m=>m.lastseen>Date.now()-1000*60).length.toFixed(0),
-                        inline: true
                     },
                     {
                         name: "Pending",
                         value: Object.keys(promptlist).length.toFixed(0),
                         inline: true
-                    },
-                    {
-                        name: "status",
-                        value: promptlist[key].progress,
-                        inline: true
-                    },
-                    {
-                        name: "seed",
-                        value: promptlist[key].seed,
                     }
+                    
                 ]
             }
         ]
