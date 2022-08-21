@@ -1,4 +1,9 @@
-import { CommandInteraction, MessageAttachment } from "discord.js";
+import {
+  CommandInteraction,
+  MessageActionRow,
+  MessageAttachment,
+  MessageButton,
+} from "discord.js";
 
 import { SlashCommand } from "./typing";
 import { stable } from "./sdhelpers/sdhelpers";
@@ -13,8 +18,9 @@ export const stablediffusion: SlashCommand = {
     await interaction.reply(
       `Generating image with stable diffusion with options ${optionsString}. Ideal generation time is below 2 minutes`
     );
-    const seed = (interaction.options.get("seed")?.value as string) ||
-    Math.random().toPrecision(5)
+    const seed =
+      (interaction.options.get("seed")?.value as string) ||
+      Math.random().toPrecision(5);
     const data = await stable(
       interaction,
       interaction.options.get("prompt").value as string,
@@ -22,22 +28,36 @@ export const stablediffusion: SlashCommand = {
     );
     await interaction.editReply({
       content: null,
-      
+
       files: [new MessageAttachment(data, `generation.jpeg`)],
-      embeds : [
+      embeds: [
         {
-          title: (interaction.options.get("prompt").value as string),
+          title: interaction.options.get("prompt").value as string,
           fields: [
             {
-               name:"Seed",
-               value : seed,
-               inline: true
-            }
+              name: "Seed",
+              value: seed,
+              inline: true,
+            },
           ],
           image: {
             url: `attachment://generation.jpeg`,
           },
         },
+      ],
+      components: [
+        new MessageActionRow().addComponents(
+          new MessageButton()
+            .setLabel("Patreon")
+            .setCustomId("Patreon")
+            .setStyle("LINK")
+            .setURL("https://patreon.com/unexplored_horizons"),
+          new MessageButton()
+            .setLabel("Host Node")
+            .setCustomId("Host A Node")
+            .setStyle("LINK")
+            .setURL("https://github.com/harrisonvanderbyl/SD")
+        ),
       ],
     });
   },

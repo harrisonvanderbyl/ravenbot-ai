@@ -1,4 +1,4 @@
-import { CommandInteraction, MessageEmbed, MessageEmbedOptions } from "discord.js";
+import { CommandInteraction, MessageEmbedOptions } from "discord.js";
 
 import { app } from "../webserver/express";
 
@@ -9,7 +9,7 @@ const promptlist: {
     prompt: string;
     callback: (imagedata: string) => Promise<void>;
     update: (updatetext: string) => Promise<void>;
-    updateNetworkStats: (data:MessageEmbedOptions[]) => Promise<void>;
+    updateNetworkStats: (data: MessageEmbedOptions[]) => Promise<void>;
     timeout: number;
     seed: string;
     samples: string;
@@ -25,29 +25,34 @@ const peers: {
 } = {};
 
 app.get("/sdlist", (req, res) => {
-  peers[req.ip ?? "unknown"] = {
-    name: req.headers.name ?? "unknown",
-    lastseen: Date.now(),
-  };
+  try {
+    peers[req.ip ?? "unknown"] = {
+      name: req.headers.name ?? "unknown",
+      lastseen: Date.now(),
+    };
 
-  const top = Object.entries(promptlist).filter(([key, value]) => {
-    return value.timeout < Date.now();
-  })[0];
+    const top = Object.entries(promptlist).filter(([key, value]) => {
+      return value.timeout < Date.now();
+    })[0];
 
-  if (!top) {
-    return res.send("{}");
+    if (!top) {
+      return res.send("{}");
+    }
+    const { prompt, callback, timeout, samples, seed } = top[1];
+    const id = top[0];
+    promptlist[id].timeout = Date.now() + 600 * 1000; // 2 minutes
+    return res.send(
+      JSON.stringify({
+        prompt,
+        id,
+        samples,
+        seed,
+      })
+    );
+  } catch (e) {
+    console.log(e);
+    res.send("{}");
   }
-  const { prompt, callback, timeout, samples, seed } = top[1];
-  const id = top[0];
-  promptlist[id].timeout = Date.now() + 120 * 1000; // 2 minutes
-  return res.send(
-    JSON.stringify({
-      prompt,
-      id,
-      samples,
-      seed,
-    })
-  );
   //res.send(JSON.stringify(Object.entries(promptlist)
 });
 
@@ -86,54 +91,55 @@ app.post("/update/:id", async (req, res) => {
   }
 });
 
-const updateNetworkStats = async ()=>{
-    for (const [key, value] of Object.entries(promptlist)) {
-      await value.updateNetworkStats(
-        [
-            {
-                title: "Stats",
-                footer:{
-                    text: "Peers:"+Object.entries(peers).filter(([a,b])=>b.lastseen>Date.now()-1000*60).map(([a,b])=>b.name+"("+a+")").join(", ")
-                },
-                description: 
-                `Deploy your own [node](https://github.com/harrisonvanderbyl/SD)
-                Support me on [patreon](https://www.patreon.com/unexplored_horizons/)
-                `,
-                fields: [
-                    {
-                        name: "Status",
-                        value: promptlist[key].progress,
-                        inline: true
-                    },
-                    {
-                        name: "Seed",
-                        value: promptlist[key].seed.replace(".",""),
-                        inline: true
-                    },
-                    {
-                        name: "Peers",
-                        value: Object.values(peers).filter(m=>m.lastseen>Date.now()-1000*60).length.toFixed(0),
-                        inline: true
-                    },
-                    {
-                        name: "Pending",
-                        value: Object.keys(promptlist).length.toFixed(0),
-                        inline: true
-                    }
-                    
-                ]
-            }
-        ]
-      );
-    }
-}
+const updateNetworkStats = async () => {
+  for (const [key, value] of Object.entries(promptlist)) {
+    await value.updateNetworkStats([
+      {
+        title: "Stats",
+        footer: {
+          text:
+            "Peers:" +
+            Object.entries(peers)
+              .filter(([a, b]) => b.lastseen > Date.now() - 1000 * 600)
+              .map(([a, b]) => b.name + "(" + a + ")")
+              .join(", "),
+        },
+
+        fields: [
+          {
+            name: "Status",
+            value: promptlist[key].progress,
+            inline: true,
+          },
+          {
+            name: "Seed",
+            value: promptlist[key].seed.replace(".", ""),
+            inline: true,
+          },
+          {
+            name: "Peers",
+            value: Object.values(peers)
+              .filter((m) => m.lastseen > Date.now() - 1000 * 60)
+              .length.toFixed(0),
+            inline: true,
+          },
+          {
+            name: "Pending",
+            value: Object.keys(promptlist).length.toFixed(0),
+            inline: true,
+          },
+        ],
+      },
+    ]);
+  }
+};
 
 export const stable = async (
   interaction: CommandInteraction,
   prompt: string,
-  seed:string
+  seed: string
 ): Promise<Buffer> => {
-  const promise:Promise<Buffer> = new Promise((resolve, reject) => {
+  const promise: Promise<Buffer> = new Promise((resolve, reject) => {
     const id = interaction.id;
     promptlist[id] = {
       prompt,
@@ -145,18 +151,21 @@ export const stable = async (
           content: updatetext,
         });
       },
-      updateNetworkStats: async (data) => {await interaction.editReply({
-        embeds: data})},
+      updateNetworkStats: async (data) => {
+        await interaction.editReply({
+          embeds: data,
+        });
+      },
 
       timeout: 0,
       // use rand to generate a seed for the generator
       seed,
       samples: (interaction.options.get("samples")?.value as string) || "20",
-        progress: "Pending",
+      progress: "Pending",
     };
-  })
+  });
 
   await updateNetworkStats();
-    
+
   return promise;
 };
