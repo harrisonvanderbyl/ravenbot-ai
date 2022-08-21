@@ -18,7 +18,17 @@ export const stablediffusion: SlashCommand = {
       interaction.options.get("prompt").value as string
     );
     await interaction.editReply({
+      content: null,
+      
       files: [new MessageAttachment(data, `generation.jpeg`)],
+      embeds : [
+        {
+          title: (interaction.options.get("prompt").value as string),
+          image: {
+            url: `attachment://generation.jpeg`,
+          },
+        },
+      ],
     });
   },
   contextCommand: async (interaction) => {

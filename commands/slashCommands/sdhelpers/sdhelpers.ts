@@ -8,6 +8,7 @@ const promptlist: {
     prompt: string;
     callback: (imagedata: string) => Promise<void>;
     update: (updatetext: string) => Promise<void>;
+    updateNetworkStats: () => Promise<void>;
     timeout: number;
     seed: string;
     samples: string;
@@ -59,6 +60,7 @@ app.post("/upload/:id", async (req, res) => {
     await callback(imagedata);
 
     delete promptlist[id];
+    await updateNetworkStats();
     res.send("ok");
   } catch (e) {
     console.log(e);
@@ -83,29 +85,17 @@ app.post("/update/:id", async (req, res) => {
   }
 });
 
+const updateNetworkStats = ()=>{
+    for (const [key, value] of Object.entries(promptlist)) {
+      value.updateNetworkStats();
+    }
+}
+
 export const stable = async (
   interaction: CommandInteraction,
   prompt: string
 ): Promise<Buffer> => {
-  await interaction.editReply({
-    embeds: [
-        {
-            title: "Network",
-            footer:{
-                text: "Peers:"+Object.entries(peers).filter(([a,b])=>b.lastseen>Date.now()-1000*60).map(([a,b])=>b.name+"("+a+")").join(", ")
-            },
-            fields: [
-                {
-                    name: "Peers",
-                    value: Object.values(peers).filter(m=>m.lastseen>Date.now()-1000*60).length.toFixed(0),
-                },
-                {
-                    name: "Pending",
-                    value: Object.keys(promptlist).length.toFixed(0),
-                }
-            ]
-        }
-    ]})
+  
     
   return new Promise((resolve, reject) => {
     const id = interaction.id;
@@ -119,6 +109,27 @@ export const stable = async (
           content: updatetext,
         });
       },
+      updateNetworkStats: async () => {await interaction.editReply({
+        embeds: [
+            {
+                title: "Network",
+                footer:{
+                    text: "Peers:"+Object.entries(peers).filter(([a,b])=>b.lastseen>Date.now()-1000*60).map(([a,b])=>b.name+"("+a+")").join(", ")
+                },
+                fields: [
+                    {
+                        name: "Peers",
+                        value: Object.values(peers).filter(m=>m.lastseen>Date.now()-1000*60).length.toFixed(0),
+                        inline: true
+                    },
+                    {
+                        name: "Pending",
+                        value: Object.keys(promptlist).length.toFixed(0),
+                        inline: true
+                    }
+                ]
+            }
+        ]})},
 
       timeout: 0,
       // use rand to generate a seed for the generator
