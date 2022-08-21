@@ -96,14 +96,6 @@ const updateNetworkStats = async () => {
     await value.updateNetworkStats([
       {
         title: "Stats",
-        footer: {
-          text:
-            "Peers:" +
-            Object.entries(peers)
-              .filter(([a, b]) => b.lastseen > Date.now() - 1000 * 600)
-              .map(([a, b]) => b.name + "(" + a + ")")
-              .join(", "),
-        },
 
         fields: [
           {
