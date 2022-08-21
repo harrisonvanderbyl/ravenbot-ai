@@ -113,6 +113,7 @@ const updateNetworkStats = async ()=>{
                     {
                         name: "Peers",
                         value: Object.values(peers).filter(m=>m.lastseen>Date.now()-1000*60).length.toFixed(0),
+                        inline: true
                     },
                     {
                         name: "Pending",
