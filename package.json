@@ -5,6 +5,7 @@
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
+    "lint": "yarn prettier --write .",
     "commands": "yarn ts-node ./commands/createSlashCommands.mts"
   },
   "keywords": [],
@@ -32,6 +33,7 @@
     "openai": "^3.0.0",
     "patreon": "^0.4.1",
     "png-to-jpeg": "^1.0.1",
+    "prettier": "^2.7.1",
     "request": "^2.88.2",
     "sharp": "^0.30.7",
     "showdown": "^1.9.1",
