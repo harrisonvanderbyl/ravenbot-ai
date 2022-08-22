@@ -137,7 +137,8 @@ export const remixwithsd: SlashCommand = {
           .jpeg()
           .toBuffer()
           .then((b) => b.toString("base64")),
-        level
+        level,
+        false
       ),
     ];
     await interaction.editReply({

@@ -16,6 +16,7 @@ const promptlist: {
     progress: string;
     input?: string;
     strength?: string;
+    allowColab: boolean;
   };
 } = {};
 
@@ -34,7 +35,10 @@ app.get("/sdlist", (req, res) => {
     };
 
     const top = Object.entries(promptlist).filter(([key, value]) => {
-      return value.timeout < Date.now();
+      return (
+        value.timeout < Date.now() &&
+        value.allowColab == (req.query.colab == "true")
+      );
     })[0];
 
     if (!top) {
@@ -136,7 +140,8 @@ export const stable = async (
   prompt: string,
   seed: string,
   img?: string,
-  strength?: string
+  strength?: string,
+  allowColab: boolean = true
 ): Promise<Buffer> => {
   const promise: Promise<Buffer> = new Promise((resolve, reject) => {
     const id = interaction.id;
@@ -163,6 +168,7 @@ export const stable = async (
       progress: "Pending",
       input: img,
       strength: strength,
+      allowColab,
     };
   });
 

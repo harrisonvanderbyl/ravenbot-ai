@@ -24,7 +24,10 @@ export const stablediffusion: SlashCommand = {
     const data = await stable(
       interaction,
       interaction.options.get("prompt").value as string,
-      seed
+      seed,
+      undefined,
+      undefined,
+      interaction.options.get("colab").value == "true"
     );
     await interaction.editReply({
       content: null,
@@ -75,6 +78,17 @@ export const stablediffusion: SlashCommand = {
         required: true,
         type: 3,
         description: "What to ask stable diffusion",
+      },
+      {
+        name: "colab",
+        required: true,
+        type: 3,
+        choices: [
+          { name: "Yes", value: "true" },
+          { name: "No", value: "false" },
+        ],
+
+        description: "prefer colab completions",
       },
       {
         name: "seed",
