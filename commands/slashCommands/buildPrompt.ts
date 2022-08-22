@@ -55,9 +55,15 @@ export const stablediffusion: SlashCommand = {
             .setStyle("LINK")
             .setURL("https://patreon.com/unexplored_horizons"),
           new MessageButton()
-            .setLabel("Host Node")
+            .setLabel("Local(Nsfw) Node")
             .setStyle("LINK")
-            .setURL("https://github.com/harrisonvanderbyl/SD")
+            .setURL("https://github.com/harrisonvanderbyl/SD"),
+          new MessageButton()
+            .setLabel("Colab(Fast,Free,Anyone) Node")
+            .setStyle("LINK")
+            .setURL(
+              "https://colab.research.google.com/drive/1xxypspWywNT6IOnXdSQz9phL0MRPhPCp?usp=sharing"
+            )
         ),
       ],
     });
