@@ -98,13 +98,13 @@ export const remixwithsd: SlashCommand = {
       ) as any as MessageActionRow<TextInputComponent>;
     const modal = new Modal()
       .setCustomId("remixwithsd")
-      .setTitle("remix with wombo");
+      .setTitle("remix with stable diffusion");
 
     const level = new TextInputComponent()
       .setCustomId("level")
       .setLabel("Influence level (0.0-1.0)")
       .setStyle("SHORT")
-      .setValue("MEDIUM");
+      .setValue("0.8");
 
     const informationValueRow2: MessageActionRow<TextInputComponent> =
       new MessageActionRow<TextInputComponent>().addComponents(
