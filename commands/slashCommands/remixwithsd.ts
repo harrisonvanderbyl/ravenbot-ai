@@ -102,7 +102,7 @@ export const remixwithsd: SlashCommand = {
 
     const level = new TextInputComponent()
       .setCustomId("level")
-      .setLabel("HIGH|MEDIUM|LOW, What level?")
+      .setLabel("Influence level (0.0-1.0)")
       .setStyle("SHORT")
       .setValue("MEDIUM");
 
@@ -123,8 +123,8 @@ export const remixwithsd: SlashCommand = {
     const imageUrl = interaction.fields.getTextInputValue("imageUrl");
     const prompt = interaction.fields.getTextInputValue("prompt");
     const level = interaction.fields.getTextInputValue("level");
-    if (!["HIGH", "MEDIUM", "LOW"].includes(level)) {
-      await interaction.editReply("level must be one of HIGH, MEDIUM, LOW");
+    if (Number(level) < 0.0 || Number(level) > 1.0) {
+      await interaction.editReply("level must be between 0.0 and 1.0");
       return;
     }
 
@@ -133,7 +133,7 @@ export const remixwithsd: SlashCommand = {
         interaction,
         prompt,
         "12345",
-        level as "HIGH" | "MEDIUM" | "LOW",
+        level,
 
         await sharp(await downloadToBuffer(imageUrl))
           .jpeg()
