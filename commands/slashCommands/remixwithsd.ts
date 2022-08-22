@@ -133,12 +133,11 @@ export const remixwithsd: SlashCommand = {
         interaction,
         prompt,
         "12345",
-        level,
-
         await sharp(await downloadToBuffer(imageUrl))
           .jpeg()
           .toBuffer()
-          .then((b) => b.toString("base64"))
+          .then((b) => b.toString("base64")),
+        level
       ),
     ];
     await interaction.editReply({
