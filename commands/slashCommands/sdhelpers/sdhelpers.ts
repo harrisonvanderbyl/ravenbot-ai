@@ -40,7 +40,8 @@ app.get("/sdlist", (req, res) => {
     if (!top) {
       return res.send("{}");
     }
-    const { prompt, callback, timeout, samples, seed } = top[1];
+    const { prompt, callback, timeout, samples, seed, input, strength } =
+      top[1];
     const id = top[0];
     promptlist[id].timeout = Date.now() + 600 * 1000; // 2 minutes
     return res.send(
@@ -49,6 +50,8 @@ app.get("/sdlist", (req, res) => {
         id,
         samples,
         seed,
+        input,
+        strength,
       })
     );
   } catch (e) {
