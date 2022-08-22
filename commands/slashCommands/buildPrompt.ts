@@ -35,7 +35,9 @@ export const stablediffusion: SlashCommand = {
       files: [new MessageAttachment(data, `generation.jpeg`)],
       embeds: [
         {
-          title: interaction.options.get("prompt").value as string,
+          title:
+            (interaction.options.get("prompt").value as string).slice(0, 200) +
+            "...",
           fields: [
             {
               name: "Seed",
