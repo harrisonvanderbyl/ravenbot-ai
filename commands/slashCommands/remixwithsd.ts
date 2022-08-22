@@ -3,6 +3,7 @@ import * as WomboDreamApi from "wombo-dream-api";
 import {
   MessageActionRow,
   MessageAttachment,
+  MessageButton,
   MessageContextMenuInteraction,
   Modal,
   TextInputComponent,
@@ -99,22 +100,11 @@ export const remixwithsd: SlashCommand = {
       .setCustomId("remixwithsd")
       .setTitle("remix with wombo");
 
-    const style = new TextInputComponent()
-      .setCustomId("style")
-      .setLabel("What style? use /styles to view options")
-      .setStyle("SHORT")
-      .setValue("32");
-
     const level = new TextInputComponent()
       .setCustomId("level")
       .setLabel("HIGH|MEDIUM|LOW, What level?")
       .setStyle("SHORT")
       .setValue("MEDIUM");
-
-    const informationValueRow: MessageActionRow<TextInputComponent> =
-      new MessageActionRow<TextInputComponent>().addComponents(
-        style
-      ) as any as MessageActionRow<TextInputComponent>;
 
     const informationValueRow2: MessageActionRow<TextInputComponent> =
       new MessageActionRow<TextInputComponent>().addComponents(
@@ -122,7 +112,6 @@ export const remixwithsd: SlashCommand = {
       ) as any as MessageActionRow<TextInputComponent>;
 
     modal.addComponents(
-      informationValueRow,
       informationValueRow2,
       informationValueRow4,
       informationValueRow5
@@ -167,6 +156,18 @@ export const remixwithsd: SlashCommand = {
         (buffer, index) =>
           new MessageAttachment(buffer, `generation${index}.jpeg`)
       ),
+      components: [
+        new MessageActionRow().addComponents(
+          new MessageButton()
+            .setLabel("Patreon")
+            .setStyle("LINK")
+            .setURL("https://patreon.com/unexplored_horizons"),
+          new MessageButton()
+            .setLabel("Host Node")
+            .setStyle("LINK")
+            .setURL("https://github.com/harrisonvanderbyl/SD")
+        ),
+      ],
     });
   },
 };

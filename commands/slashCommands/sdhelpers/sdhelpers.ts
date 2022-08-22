@@ -156,7 +156,7 @@ export const stable = async (
       timeout: 0,
       // use rand to generate a seed for the generator
       seed,
-      samples: (interaction.options.get("samples")?.value as string) || "20",
+      samples: (interaction?.options?.get("samples")?.value as string) || "20",
       progress: "Pending",
       input: img,
       strength: strength,
