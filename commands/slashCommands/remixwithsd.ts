@@ -16,7 +16,7 @@ import { SlashCommand } from "./typing";
 import sharp from "sharp";
 import { stable } from "./sdhelpers/sdhelpers";
 
-export const remixwithwombo: SlashCommand = {
+export const remixwithsd: SlashCommand = {
   slashCommand: async (client, interaction) => {
     return;
   },

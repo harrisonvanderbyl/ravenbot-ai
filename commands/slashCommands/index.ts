@@ -5,6 +5,7 @@ import { heyCommand } from "./hey";
 import { inpaintwithdalle } from "./inpaintwithdalle";
 import { patreonCommand } from "./patreonData";
 import { picture } from "./dalle";
+import { remixwithsd } from "./remixwithsd";
 import { remixwithwombo } from "./remixwithwombo";
 import { scsquote } from "./scsquote";
 import { sharedallekey } from "./sharedallekey";
@@ -27,4 +28,5 @@ export default {
   patreonCommand,
   drivedata,
   stablediffusion,
+  remixwithsd,
 };
