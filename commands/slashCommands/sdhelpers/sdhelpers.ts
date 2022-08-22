@@ -14,6 +14,8 @@ const promptlist: {
     seed: string;
     samples: string;
     progress: string;
+    input?: string;
+    strength?: string;
   };
 } = {};
 
@@ -129,7 +131,9 @@ const updateNetworkStats = async () => {
 export const stable = async (
   interaction: CommandInteraction,
   prompt: string,
-  seed: string
+  seed: string,
+  img?: string,
+  strength?: string
 ): Promise<Buffer> => {
   const promise: Promise<Buffer> = new Promise((resolve, reject) => {
     const id = interaction.id;
@@ -154,6 +158,8 @@ export const stable = async (
       seed,
       samples: (interaction.options.get("samples")?.value as string) || "20",
       progress: "Pending",
+      input: img,
+      strength: strength,
     };
   });
 

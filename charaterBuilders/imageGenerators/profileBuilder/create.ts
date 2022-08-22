@@ -2,7 +2,6 @@ import { existsSync, readFileSync, writeFileSync } from "fs";
 
 import { createImage } from "../wombo";
 import express from "express";
-import { type } from "os";
 
 enum Age {
   //  TEENAGER = "teenage",
