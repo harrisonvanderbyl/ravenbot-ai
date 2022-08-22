@@ -122,18 +122,9 @@ export const remixwithsd: SlashCommand = {
   modalSubmit: async (client, interaction) => {
     const imageUrl = interaction.fields.getTextInputValue("imageUrl");
     const prompt = interaction.fields.getTextInputValue("prompt");
-    const style = interaction.fields.getTextInputValue("style");
     const level = interaction.fields.getTextInputValue("level");
     if (!["HIGH", "MEDIUM", "LOW"].includes(level)) {
       await interaction.editReply("level must be one of HIGH, MEDIUM, LOW");
-      return;
-    }
-    if (
-      await WomboDreamApi.buildDefaultInstance()
-        .fetchStyles()
-        .then((styles) => !styles.map((s: any) => `${s.id}`).includes(style))
-    ) {
-      await interaction.editReply("style must be one of the valid styles");
       return;
     }
 
