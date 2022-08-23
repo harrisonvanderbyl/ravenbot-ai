@@ -185,6 +185,7 @@ export const stable = async (
           " available, please try again later, or start your own node.",
       });
       reject("No peers available");
+      return null;
     }
 
     promptlist[id] = {
