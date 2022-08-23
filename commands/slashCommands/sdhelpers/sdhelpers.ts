@@ -33,7 +33,7 @@ app.get("/sdlist", (req, res) => {
     peers[req.ip ?? "unknown"] = {
       name: req.headers.name ?? "unknown",
       lastseen: Date.now(),
-      type: req.headers.colab == "true" ? "colab" : "local",
+      type: req.query.colab == "true" ? "colab" : "local",
     };
 
     const top = Object.entries(promptlist).filter(([key, value]) => {
