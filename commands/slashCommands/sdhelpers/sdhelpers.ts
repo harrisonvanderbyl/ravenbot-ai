@@ -180,10 +180,9 @@ export const stable = async (
     if (validPeers.length == 0) {
       await interaction.editReply({
         content:
-          "No peers of type " + allowColab
-            ? "colab"
-            : "local" +
-              " available, please try again later, or start your own node.",
+          "No peers of type " +
+          (allowColab ? "colab" : "local") +
+          " available, please try again later, or start your own node.",
       });
       reject("No peers available");
     }
