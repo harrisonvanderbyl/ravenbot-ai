@@ -24,6 +24,7 @@ const peers: {
   [key: string]: {
     name: "string";
     lastseen: number;
+    type: "colab" | "local";
   };
 } = {};
 
@@ -32,6 +33,7 @@ app.get("/sdlist", (req, res) => {
     peers[req.ip ?? "unknown"] = {
       name: req.headers.name ?? "unknown",
       lastseen: Date.now(),
+      type: req.headers.colab == "true" ? "colab" : "local",
     };
 
     const top = Object.entries(promptlist).filter(([key, value]) => {
@@ -118,15 +120,39 @@ const updateNetworkStats = async () => {
             inline: true,
           },
           {
-            name: "Peers",
+            name: "Type",
+            value: promptlist[key].allowColab ? "Colab" : "Local",
+          },
+          {
+            name: "Colab Nodes",
             value: Object.values(peers)
-              .filter((m) => m.lastseen > Date.now() - 1000 * 60)
+              .filter(
+                (m) => m.lastseen > Date.now() - 1000 * 60 && m.type == "colab"
+              )
               .length.toFixed(0),
             inline: true,
           },
           {
-            name: "Pending",
-            value: Object.keys(promptlist).length.toFixed(0),
+            name: "Local Nodes",
+            value: Object.values(peers)
+              .filter(
+                (m) => m.lastseen > Date.now() - 1000 * 60 && m.type == "local"
+              )
+              .length.toFixed(0),
+            inline: true,
+          },
+          {
+            name: "Pending Colab",
+            value: Object.values(promptlist)
+              .filter((m) => m.allowColab == true)
+              .length.toFixed(0),
+            inline: true,
+          },
+          {
+            name: "Pending Local",
+            value: Object.values(promptlist)
+              .filter((m) => m.allowColab == false)
+              .length.toFixed(0),
             inline: true,
           },
         ],
@@ -143,8 +169,24 @@ export const stable = async (
   strength?: string,
   allowColab: boolean = true
 ): Promise<Buffer> => {
-  const promise: Promise<Buffer> = new Promise((resolve, reject) => {
+  const promise: Promise<Buffer> = new Promise(async (resolve, reject) => {
     const id = interaction.id;
+
+    const validPeers = Object.values(peers).filter(
+      (m) =>
+        m.lastseen > Date.now() - 1000 * 60 && allowColab == (m.type == "colab")
+    );
+
+    if (validPeers.length == 0) {
+      await interaction.editReply(
+        "No peers of type " + allowColab
+          ? "colab"
+          : "local" +
+              " available, please try again later, or start your own node."
+      );
+      reject("No peers available");
+    }
+
     promptlist[id] = {
       prompt,
       callback: async (imagedata: string) => {

@@ -28,7 +28,14 @@ export const stablediffusion: SlashCommand = {
       undefined,
       undefined,
       interaction.options.get("colab").value == "true"
-    );
+    ).catch(async (e) => {
+      console.log(e);
+      await interaction.followUp({ content: "error: " + e, ephemeral: true });
+      return null;
+    });
+    if (data == null) {
+      return;
+    }
     await interaction.editReply({
       content: null,
 

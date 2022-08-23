@@ -128,25 +128,45 @@ export const remixwithsd: SlashCommand = {
       return;
     }
 
-    const buffers = [
-      await stable(
-        interaction,
-        prompt,
-        "12345",
-        await sharp(await downloadToBuffer(imageUrl))
-          .jpeg()
-          .toBuffer()
-          .then((b) => b.toString("base64")),
-        level,
-        false
-      ),
-    ];
+    const buff = await stable(
+      interaction,
+      prompt,
+      "12345",
+      await sharp(await downloadToBuffer(imageUrl))
+        .jpeg()
+        .toBuffer()
+        .then((b) => b.toString("base64")),
+      level,
+      false
+    ).catch(async (e) => {
+      console.log(e);
+      await interaction.followUp({ content: "error: " + e, ephemeral: true });
+      return null;
+    });
+    if (buff == null) {
+      return;
+    }
     await interaction.editReply({
-      content: prompt,
-      files: buffers.map(
-        (buffer, index) =>
-          new MessageAttachment(buffer, `generation${index}.jpeg`)
-      ),
+      content: null,
+
+      files: [new MessageAttachment(buff, `generation.jpeg`)],
+      embeds: [
+        {
+          title:
+            (interaction.options.get("prompt").value as string).slice(0, 200) +
+            "...",
+          fields: [
+            {
+              name: "Seed",
+              value: "remix",
+              inline: true,
+            },
+          ],
+          image: {
+            url: `attachment://generation.jpeg`,
+          },
+        },
+      ],
       components: [
         new MessageActionRow().addComponents(
           new MessageButton()
