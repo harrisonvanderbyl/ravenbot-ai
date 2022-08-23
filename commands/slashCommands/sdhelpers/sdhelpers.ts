@@ -17,6 +17,9 @@ const promptlist: {
     input?: string;
     strength?: string;
     allowColab: boolean;
+    width: string;
+    height: string;
+    iterations: string;
   };
 } = {};
 
@@ -46,8 +49,18 @@ app.get("/sdlist", (req, res) => {
     if (!top) {
       return res.send("{}");
     }
-    const { prompt, callback, timeout, samples, seed, input, strength } =
-      top[1];
+    const {
+      prompt,
+      callback,
+      timeout,
+      samples,
+      seed,
+      input,
+      strength,
+      width,
+      height,
+      iterations,
+    } = top[1];
     const id = top[0];
     promptlist[id].timeout = Date.now() + 600 * 1000; // 2 minutes
     return res.send(
@@ -58,6 +71,9 @@ app.get("/sdlist", (req, res) => {
         seed,
         input,
         strength,
+        width,
+        height,
+        iterations,
       })
     );
   } catch (e) {
@@ -167,7 +183,10 @@ export const stable = async (
   seed: string,
   img?: string,
   strength?: string,
-  allowColab: boolean = true
+  allowColab: boolean = true,
+  width = "512",
+  height = "512",
+  iterations = "1"
 ): Promise<Buffer> => {
   const promise: Promise<Buffer> = new Promise(async (resolve, reject) => {
     const id = interaction.id;
@@ -212,6 +231,9 @@ export const stable = async (
       input: img,
       strength: strength,
       allowColab,
+      width,
+      height,
+      iterations,
     };
   });
 

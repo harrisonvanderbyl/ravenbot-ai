@@ -22,6 +22,10 @@ export const stablediffusion: SlashCommand = {
       const seed =
         (interaction.options.get("seed")?.value as string) ||
         Math.random().toPrecision(5);
+
+      const width = interaction.options.get("width")?.value ?? "512";
+      const height = interaction.options.get("height")?.value ?? "512";
+      const iterations = interaction.options.get("iterations")?.value ?? "1";
       const data = await stable(
         interaction,
         interaction.options.get("prompt").value as string,
@@ -123,6 +127,37 @@ export const stablediffusion: SlashCommand = {
         required: false,
         type: 3,
         description: "The number of samples to use",
+      },
+      {
+        name: "iterations",
+        required: false,
+        type: 3,
+        description: "The number of images to generate(colab only)",
+        choices: [
+          { name: "single", value: "1" },
+          { name: "4 panel", value: "4" },
+          { name: "9 panel", value: "9" },
+        ],
+      },
+      {
+        name: "width",
+        required: false,
+        type: 3,
+        description: "The width of the image",
+        choices: [...Array(21).keys()].slice(1).map((i) => ({
+          name: (i * 64).toString(),
+          value: (i * 64).toString(),
+        })),
+      },
+      {
+        name: "height",
+        required: false,
+        type: 3,
+        description: "The height of the image",
+        choices: [...Array(21).keys()].slice(1).map((i) => ({
+          name: (i * 64).toString(),
+          value: (i * 64).toString(),
+        })),
       },
     ],
   },
