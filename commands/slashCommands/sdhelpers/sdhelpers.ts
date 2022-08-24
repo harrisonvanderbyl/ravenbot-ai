@@ -61,7 +61,7 @@ app.get("/sdlist", async (req, res) => {
       "Local Nodes: " +
         Object.values(peers)
           .filter(
-            (m) => m.lastseen > Date.now() - 1000 * 60 && m.type == "colab"
+            (m) => m.lastseen > Date.now() - 1000 * 60 && m.type != "colab"
           )
           .length.toFixed(0)
     );
