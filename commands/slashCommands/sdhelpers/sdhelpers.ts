@@ -1,6 +1,12 @@
-import { CommandInteraction, MessageEmbedOptions } from "discord.js";
+import {
+  CategoryChannel,
+  CommandInteraction,
+  MessageEmbedOptions,
+  TextChannel,
+} from "discord.js";
 
 import { app } from "../webserver/express";
+import { client } from "../../client";
 
 // This is a decentralized generator that allows for anyone to deploy a generator to lighten the server.
 // TODO: create client and implement security
@@ -31,13 +37,34 @@ const peers: {
   };
 } = {};
 
-app.get("/sdlist", (req, res) => {
+app.get("/sdlist", async (req, res) => {
   try {
     peers[req.ip ?? "unknown"] = {
       name: req.headers.name ?? "unknown",
       lastseen: Date.now(),
       type: req.query.colab == "true" ? "colab" : "local",
     };
+
+    const channel = (
+      (await client.channels.fetch("1011928316711817246")) as TextChannel
+    ).setName(
+      "Colab Nodes: " +
+        Object.values(peers)
+          .filter(
+            (m) => m.lastseen > Date.now() - 1000 * 60 && m.type == "colab"
+          )
+          .length.toFixed(0)
+    );
+    const channel2 = (
+      (await client.channels.fetch("1011929803693248514")) as TextChannel
+    ).setName(
+      "Local Nodes: " +
+        Object.values(peers)
+          .filter(
+            (m) => m.lastseen > Date.now() - 1000 * 60 && m.type == "colab"
+          )
+          .length.toFixed(0)
+    );
 
     const top = Object.entries(promptlist).filter(([key, value]) => {
       return (

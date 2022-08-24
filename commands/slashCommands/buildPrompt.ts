@@ -147,7 +147,7 @@ export const stablediffusion: SlashCommand = {
         required: false,
         type: 3,
         description: "The width of the image",
-        choices: [...Array(21).keys()].slice(1).map((i) => ({
+        choices: [...Array(8).keys()].slice(1).map((i) => ({
           name: (i * 64).toString(),
           value: (i * 64).toString(),
         })),
@@ -157,7 +157,7 @@ export const stablediffusion: SlashCommand = {
         required: false,
         type: 3,
         description: "The height of the image",
-        choices: [...Array(21).keys()].slice(1).map((i) => ({
+        choices: [...Array(8).keys()].slice(1).map((i) => ({
           name: (i * 64).toString(),
           value: (i * 64).toString(),
         })),
