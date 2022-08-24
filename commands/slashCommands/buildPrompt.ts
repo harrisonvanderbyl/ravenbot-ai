@@ -74,6 +74,10 @@ export const stablediffusion: SlashCommand = {
               .setStyle("LINK")
               .setURL("https://patreon.com/unexplored_horizons"),
             new MessageButton()
+              .setLabel("Writerbot home discord")
+              .setStyle("LINK")
+              .setURL("https://discord.gg/gKcREKcf"),
+            new MessageButton()
               .setLabel("Local(Nsfw) Node")
               .setStyle("LINK")
               .setURL("https://github.com/harrisonvanderbyl/SD"),
