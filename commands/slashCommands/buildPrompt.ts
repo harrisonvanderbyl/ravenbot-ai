@@ -78,11 +78,7 @@ export const stablediffusion: SlashCommand = {
               .setStyle("LINK")
               .setURL("https://discord.gg/gKcREKcf"),
             new MessageButton()
-              .setLabel("Local(Nsfw) Node")
-              .setStyle("LINK")
-              .setURL("https://github.com/harrisonvanderbyl/SD"),
-            new MessageButton()
-              .setLabel("Colab(Fast,Free,Anyone) Node")
+              .setLabel("Run Colab Node")
               .setStyle("LINK")
               .setURL(
                 "https://colab.research.google.com/drive/1xxypspWywNT6IOnXdSQz9phL0MRPhPCp?usp=sharing"
