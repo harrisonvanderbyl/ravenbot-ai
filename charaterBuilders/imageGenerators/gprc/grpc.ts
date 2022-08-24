@@ -38,17 +38,6 @@ const generationClient = new GenerationServiceClient(
 
 export { unaryPromise, dashboardClient, generationClient };
 
-const algorithms = {
-  ddim: generation.generation. SAMPLER_DDIM,
-  plms: generation.SAMPLER_DDPM,
-  k_euler: generation.SAMPLER_K_EULER,
-  k_euler_ancestral: generation.SAMPLER_K_EULER_ANCESTRAL,
-  k_heun: generation.SAMPLER_K_HEUN,
-  k_dpm_2: generation.SAMPLER_K_DPM_2,
-  k_dpm_2_ancestral: generation.SAMPLER_K_DPM_2_ANCESTRAL,
-  k_lms: generation.SAMPLER_K_LMS,
-};
-
 //dashboardClient.getMe(generation["metrics"], {}, console.log);
 console.log(Object.keys(generation["metrics"]));
 console.log(Object.keys(dashboard));

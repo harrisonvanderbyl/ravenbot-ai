@@ -32,7 +32,7 @@ export const stablediffusion: SlashCommand = {
         seed,
         undefined,
         undefined,
-        interaction.options.get("colab").value == "true",
+        (interaction.options.get("colab")?.value ?? "true") == "true",
         width as string,
         height as string,
         iterations as string
@@ -110,7 +110,7 @@ export const stablediffusion: SlashCommand = {
       },
       {
         name: "colab",
-        required: true,
+        required: false,
         type: 3,
         choices: [
           { name: "Yes", value: "true" },

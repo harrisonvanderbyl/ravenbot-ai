@@ -34,15 +34,14 @@ export const dalleusage: SlashCommand = {
           key
         ) as any as MessageActionRow<TextInputComponent>;
 
-  
       modal.addComponents(informationValueRow);
-     
+
       await interaction.showModal(modal);
 
       return;
     }
 
-    await interaction.deferReply()
+    await interaction.deferReply();
 
     const dallec = new Dalle(dalleKey);
 
@@ -82,13 +81,6 @@ export const dalleusage: SlashCommand = {
                 },
               ],
             },
-            {
-              title: "Want more credits?",
-              description: `
-                  You can become a supporter and increase the monthly credits [here! (patreon)](https://www.patreon.com/unexplored_Horizons/)
-                  (15$ = +50 credits per month)
-                  `,
-            },
           ],
         });
       } else {
@@ -124,13 +116,12 @@ export const dalleusage: SlashCommand = {
       const dalleKeys = JSON.parse(
         readFileSync("./dalleconfig.json").toString()
       );
-      
+
       // add dalle key to config file
       dalleKeys[interaction.user.id] = key;
 
       // write dalle key to config file
       writeFileSync("./dalleconfig.json", JSON.stringify(dalleKeys));
-      
     }
   },
 };
