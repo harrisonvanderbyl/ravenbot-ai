@@ -1,14 +1,13 @@
 import * as jspb from "google-protobuf";
 
 import {
-  DashboardService,
-  DashboardServiceClient,
-} from "../proto/dashboard/dashboard_pb_service";
+  GenerationServiceClient,
+  GenerationServiceService,
+} from "../proto/js/raw_grpc_pb";
 
-import { GenerationServiceClient } from "../proto/generation/generation_pb_service";
 import { NodeHttpTransport } from "@improbable-eng/grpc-web-node-http-transport";
-import dashboard from "../proto/dashboard/dashboard_pb";
-import generation from "../proto/generation/generation_pb";
+import generation_grpc from "../proto/js/raw_pb";
+import grpc from "grpc";
 
 type Message = jspb.Message;
 
@@ -27,17 +26,63 @@ const unaryPromise = <R extends jspb.Message>(
   });
 };
 
-const dashboardClient = new DashboardServiceClient(
-  "https://grpc.stability.ai/",
-  { transport: NodeHttpTransport() }
-);
-const generationClient = new GenerationServiceClient(
-  "https://grpc.stability.ai/",
-  { transport: NodeHttpTransport() }
-);
+// const generationClient = new GenerationServiceClient(
+//   "https://grpc.stability.ai/",
+//   { compose: [] },
+//   { transport: NodeHttpTransport() }
+// );
 
-export { unaryPromise, dashboardClient, generationClient };
+// export { unaryPromise, generationClient };
 
-//dashboardClient.getMe(generation["metrics"], {}, console.log);
-console.log(Object.keys(generation["metrics"]));
-console.log(Object.keys(dashboard));
+// export const client = (
+//         self,
+//         host: string = "grpc.stability.ai:443",
+//         key: string = "",
+//         engine: string = "stable-diffusion-v1",
+//         verbose=false,
+//         wait_for_ready: boolean = true,
+//     )=>{
+//         // :param host: Host to connect to.
+//         // :param key: Key to use for authentication.
+//         // :param engine: Engine to use.
+//         // :param verbose: Whether to print debug messages.
+//         // :param wait_for_ready: Whether to wait for the server to be ready, or
+//         //     to fail immediately.
+//         // """
+//         self.verbose = verbose
+//         self.engine = engine
+
+//         self.grpc_args = {"wait_for_ready": wait_for_ready}
+
+//         // if verbose:
+//         //     logger.info(f"Opening channel to {host}")
+
+//         const call_credentials:string[] = []
+
+//         if (host.includes("443")){
+//             if(key){
+//                 call_credentials.push(
+//                     grpc(key))
+//                 }
+//             else{
+//                 throw new Error("No key provided")
+//             }
+//             const channel_credentials = grpc.composite_channel_credentials(
+//                 grpc.ssl_channel_credentials(), *call_credentials
+//             )
+//             const channel = grpc.secure_channel(host, channel_credentials)
+//         }
+//         else{
+//             if(key){
+//                console.log(
+//                     "Not using authentication token due to non-secure transport"
+//                 )
+//             }
+//             const channel = grpc.insecure_channel(host)
+
+//         self.stub = generation_grpc.GenerationServiceStub(channel)
+//         return self
+//                 }
+
+//                 }
+//dashboardClient.getMe(generation["metrics"], {}, console.log);\

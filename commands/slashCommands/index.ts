@@ -3,6 +3,7 @@ import { dalleusage } from "./dalleusage";
 import { drivedata } from "./drivedata";
 import { heyCommand } from "./hey";
 import { inpaintwithdalle } from "./inpaintwithdalle";
+import { inpaintwithsd } from "./inpaintwithsd";
 import { patreonCommand } from "./patreonData";
 import { picture } from "./dalle";
 import { remixwithsd } from "./remixwithsd";
@@ -29,4 +30,5 @@ export default {
   drivedata,
   stablediffusion,
   remixwithsd,
+  inpaintwithsd,
 };

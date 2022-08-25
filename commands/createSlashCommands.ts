@@ -47,6 +47,10 @@ client.on("ready", async () => {
           name: "List all commands",
           value: "list",
         },
+        {
+          name: "Manage servers",
+          value: "servers",
+        },
       ],
     });
     const { scope } = await prompt({
@@ -100,13 +104,13 @@ client.on("ready", async () => {
       for (const command of commandlist) {
         // eait 1 second for the command to be deleted
         await new Promise((resolve) => setTimeout(resolve, 1000));
-        
+
         await axios
           .delete(details.url + "/" + command, { headers })
           .then((response) => console.log(JSON.stringify(response.data)))
           .catch((e) => console.log(JSON.stringify(e.response.data)));
       }
-    } else {
+    } else if (action === "list") {
       await axios
         .get(details.url, { headers })
         .then(({ data }) => ({
@@ -119,6 +123,42 @@ client.on("ready", async () => {
         .then((response) => {
           console.table(response.data);
         });
+    } else if (action === "servers") {
+      const { guildID } = await prompt({
+        type: "list",
+        name: "guildID",
+        message: "What is the guild ID?",
+        choices: (
+          await client.guilds.fetch()
+        ).map((g) => ({ value: g.id, name: g.name })),
+      });
+      const { action } = await prompt({
+        type: "list",
+        name: "action",
+        message: "What do you want to do?",
+        choices: [
+          {
+            name: "view channels",
+            value: "channels",
+          },
+          {
+            name: "leave",
+            value: "leave",
+          },
+        ],
+      });
+      if (action === "channels") {
+        const { channelID } = await prompt({
+          type: "list",
+          name: "channelID",
+          message: "What is the channel ID?",
+          choices: (
+            await (await client.guilds.fetch(guildID)).channels.fetch()
+          ).map((c) => ({ value: c.id, name: c.name })),
+        });
+      } else if (action === "leave") {
+        await client.guilds.fetch(guildID).then((g) => g.leave());
+      }
     }
     await runinterface();
   };

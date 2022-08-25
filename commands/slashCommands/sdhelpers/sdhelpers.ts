@@ -28,6 +28,7 @@ const promptlist: {
     width: string;
     height: string;
     iterations: string;
+    mask?: string;
   };
 } = {};
 
@@ -89,9 +90,10 @@ app.get("/sdlist", async (req, res) => {
       width,
       height,
       iterations,
+      mask,
     } = top[1];
     const id = top[0];
-    promptlist[id].timeout = Date.now() + 600 * 1000; // 2 minutes
+    promptlist[id].timeout = Date.now() + 120 * 1000; // 2 minutes
     return res.send(
       JSON.stringify({
         prompt,
@@ -103,6 +105,7 @@ app.get("/sdlist", async (req, res) => {
         width,
         height,
         iterations,
+        mask,
       })
     );
   } catch (e) {
@@ -215,7 +218,8 @@ export const stable = async (
   allowColab: boolean = true,
   width = "512",
   height = "512",
-  iterations = "1"
+  iterations = "1",
+  mask?: string
 ): Promise<Buffer> => {
   const promise: Promise<Buffer> = new Promise(async (resolve, reject) => {
     const id = interaction.id;
@@ -273,6 +277,7 @@ export const stable = async (
       width,
       height,
       iterations,
+      mask,
     };
   });
 
