@@ -157,6 +157,24 @@ export const inpaintwithsd: SlashCommand = {
       .clone()
       .composite([
         {
+          input: await sharp({
+            create: {
+              channels: 4,
+              height: 512,
+              width: 512,
+              background: { alpha: 0, r: 0, g: 0, b: 0 },
+              noise: {
+                mean: 255 / 2,
+                sigma: 255 / 2,
+                type: "gaussian",
+              },
+            },
+          })
+            .jpeg()
+            .toBuffer(),
+          blend: "multiply",
+        },
+        {
           input: await original
             .clone()
             .jpeg()
