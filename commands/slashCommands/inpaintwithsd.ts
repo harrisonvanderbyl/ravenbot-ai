@@ -157,11 +157,11 @@ export const inpaintwithsd: SlashCommand = {
       create: {
         background: { alpha: 0, r: 0, g: 0, b: 0 },
         channels: 4,
-        height: 64,
-        width: 64,
+        height: 128,
+        width: 128,
         noise: {
           mean: 255 / 2,
-          sigma: 3,
+          sigma: 255 / 2,
           type: "gaussian",
         },
       },
