@@ -153,20 +153,8 @@ export const inpaintwithsd: SlashCommand = {
 
     original.resize(512, 512, { fit: "fill" });
     // combine images
-    const combined = await sharp({
-      create: {
-        background: { alpha: 0, r: 0, g: 0, b: 0 },
-        channels: 4,
-        height: 128,
-        width: 128,
-        noise: {
-          mean: 255 / 2,
-          sigma: 255 / 2,
-          type: "gaussian",
-        },
-      },
-    })
-      .resize(512, 512, { fit: "fill" })
+    const combined = await original
+      .clone()
       .composite([
         {
           input: await original
