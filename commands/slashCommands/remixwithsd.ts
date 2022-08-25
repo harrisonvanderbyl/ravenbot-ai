@@ -152,9 +152,7 @@ export const remixwithsd: SlashCommand = {
       files: [new MessageAttachment(buff, `generation.jpeg`)],
       embeds: [
         {
-          title:
-            (interaction.options.get("prompt").value as string).slice(0, 200) +
-            "...",
+          title: prompt.slice(0, 200) + "...",
           fields: [
             {
               name: "Seed",
