@@ -90,37 +90,13 @@ export const inpaintwithsd: SlashCommand = {
       .setStyle("SHORT")
       .setValue("50");
 
-    const top = new TextInputComponent()
-      .setCustomId("top")
-      .setLabel("how far down is the top of the image?")
-      .setStyle("SHORT")
-      .setValue("25");
-
-    const left = new TextInputComponent()
-      .setCustomId("left")
-      .setLabel("how far to the right is the image?")
-      .setStyle("SHORT")
-      .setValue("25");
-
     const informationValueRow: MessageActionRow<TextInputComponent> =
       new MessageActionRow<TextInputComponent>().addComponents(
         shrink
       ) as any as MessageActionRow<TextInputComponent>;
 
-    const informationValueRow2: MessageActionRow<TextInputComponent> =
-      new MessageActionRow<TextInputComponent>().addComponents(
-        top
-      ) as any as MessageActionRow<TextInputComponent>;
-
-    const informationValueRow3: MessageActionRow<TextInputComponent> =
-      new MessageActionRow<TextInputComponent>().addComponents(
-        left
-      ) as any as MessageActionRow<TextInputComponent>;
-
     modal.addComponents(
       informationValueRow,
-      informationValueRow2,
-      informationValueRow3,
       informationValueRow4,
       informationValueRow5
     );
@@ -133,8 +109,6 @@ export const inpaintwithsd: SlashCommand = {
   },
   modalSubmit: async (client, interaction) => {
     const percent = interaction.fields.getTextInputValue("percent");
-    const top = interaction.fields.getTextInputValue("top");
-    const left = interaction.fields.getTextInputValue("left");
     const imageUrl = interaction.fields.getTextInputValue("imageUrl");
     const prompt = interaction.fields.getTextInputValue("prompt");
 
@@ -148,57 +122,72 @@ export const inpaintwithsd: SlashCommand = {
 
     // shrink image
     const sharpImage = sharp(imageBuffer).png();
-    const width = (await sharpImage.metadata()).width ?? 512;
-    const resize = sharpImage.extend({
-      background: { r: 255, g: 255, b: 255, alpha: 0 },
-      top: parseInt(
-        (
-          width *
-          (1.0 / (parseInt(percent) / 100)) *
-          (parseInt(top) / 100)
-        ).toFixed(0)
-      ),
-      left: parseInt(
-        (
-          width *
-          (1.0 / (parseInt(percent) / 100)) *
-          (parseInt(left) / 100)
-        ).toFixed(0)
-      ),
-      right: parseInt(
-        (
-          width *
-            (1.0 / (parseInt(percent) / 100)) *
-            (1 - parseInt(left) / 100) -
-          width * (0.5 / (parseInt(percent) / 100))
-        ).toFixed(0)
-      ),
-      bottom: parseInt(
-        (
-          width *
-            (1.0 / (parseInt(percent) / 100)) *
-            (1 - parseInt(top) / 100) -
-          width * (0.5 / (parseInt(percent) / 100))
-        ).toFixed(0)
-      ),
-    });
+    const original = sharpImage.clone();
+    // const width = (await sharpImage.metadata()).width ?? 512;
 
-    const mask = await resize
-      .clone()
-      .extractChannel("alpha")
+    const mask = await sharp({
+      create: {
+        background: { alpha: 0, r: 0, g: 0, b: 0 },
+        channels: 4,
+        height: 512,
+        width: 512,
+      },
+    })
+      .composite([
+        {
+          input: await sharp({
+            create: {
+              channels: 3,
+              height: 512 * (parseInt(percent) / 100),
+              width: 512 * (parseInt(percent) / 100),
+              background: { r: 255, g: 255, b: 255 },
+            },
+          })
+            .jpeg()
+            .toBuffer(),
+          blend: "over",
+        },
+      ])
       .jpeg()
-      .resize(512, 512, { fit: "fill" })
       .toBuffer();
-    const buffer = await resize
-      .removeAlpha()
+
+    original.resize(512, 512, { fit: "fill" });
+    // combine images
+    const combined = await sharp({
+      create: {
+        background: { alpha: 0, r: 0, g: 0, b: 0 },
+        channels: 4,
+        height: 512,
+        width: 512,
+        noise: {
+          mean: 255 / 2,
+          sigma: 255 / 2,
+          type: "gaussian",
+        },
+      },
+    })
+      .composite([
+        {
+          input: await original
+            .clone()
+            .jpeg()
+            .resize(
+              512 * (parseInt(percent) / 100),
+              512 * (parseInt(percent) / 100),
+              { fit: "fill" }
+            )
+            .toBuffer(),
+          blend: "over",
+        },
+      ])
       .jpeg()
-      .resize(512, 512, { fit: "fill" })
       .toBuffer();
+
     const buffers = await stable(
       interaction as any,
       prompt,
       "12345",
-      buffer.toString("base64"),
+      combined.toString("base64"),
       "0.75",
       true,
       "512",
@@ -218,7 +207,7 @@ export const inpaintwithsd: SlashCommand = {
     }
     await interaction.editReply({
       content: prompt,
-      files: [buffers].map(
+      files: buffers.map(
         (buffer, index) =>
           new MessageAttachment(buffer, `generation${index}.jpeg`)
       ),
