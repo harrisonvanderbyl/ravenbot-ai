@@ -1,0 +1,179 @@
+syntax = 'proto3';
+package gooseai;
+option go_package = "./;generation";
+
+enum FinishReason {
+  NULL = 0;
+  LENGTH = 1;
+  STOP = 2;
+  ERROR = 3;
+  FILTER = 4;
+}
+
+
+enum ArtifactType {
+  ARTIFACT_NONE = 0;
+  ARTIFACT_IMAGE = 1;
+  ARTIFACT_VIDEO = 2;
+  ARTIFACT_TEXT = 3;
+  ARTIFACT_TOKENS = 4;
+  ARTIFACT_EMBEDDING = 5;
+  ARTIFACT_CLASSIFICATIONS = 6;
+}
+
+message Token {
+  string text = 1;
+  uint32 id = 2;
+}
+
+message Tokens {
+  repeated Token tokens = 1;
+  string tokenizer_id = 2;
+}
+
+message Artifact {
+  uint64 id = 1;
+  ArtifactType type = 2;
+  string mime = 3;
+  string magic = 4;
+  oneof data {
+    bytes binary = 5;
+    string text = 6;
+    Tokens tokens = 7;
+    ClassifierParameters classifier = 11;
+  }
+  uint32 index = 8;
+  FinishReason finish_reason = 9;
+  uint32 seed = 10;
+}
+
+message PromptParameters {
+  bool init = 1;
+  float weight = 2;
+}
+
+message Prompt {
+  PromptParameters parameters = 1;
+  oneof prompt {
+    string text = 2;
+    Tokens tokens = 3;
+    Artifact artifact = 4;
+  }
+}
+
+message AnswerMeta {
+  string gpu_id = 1;
+  string cpu_id = 2;
+  string node_id = 3;
+  string engine_id = 4;
+}
+
+message Answer {
+  string answer_id = 1;
+  string request_id = 2;
+  uint64 received = 3;
+  uint64 created = 4;
+  AnswerMeta meta = 6;
+  repeated Artifact artifacts = 7;
+}
+
+enum DiffusionSampler {
+  SAMPLER_DDIM = 0;
+  SAMPLER_DDPM = 1;
+  SAMPLER_K_EULER = 2;
+  SAMPLER_K_EULER_ANCESTRAL = 3;
+  SAMPLER_K_HEUN = 4;
+  SAMPLER_K_DPM_2 = 5;
+  SAMPLER_K_DPM_2_ANCESTRAL = 6;
+  SAMPLER_K_LMS = 7;
+}
+
+message SamplerParameters {
+  float eta = 1;
+  uint64 sampling_steps = 2;
+  uint64 latent_channels = 3;
+  uint64 downsampling_factor = 4;
+  float cfg_scale = 5;
+}
+
+message ConditionerParameters {
+  string vector_adjust_prior = 1;
+}
+
+enum Upscaler {
+  UPSCALER_RGB = 0;
+  UPSCALER_GFPGAN = 1;
+  UPSCALER_ESRGAN = 2;
+}
+
+message StepParameter {
+  float scaled_step = 1;
+  SamplerParameters sampler = 2;
+}
+
+message TransformType {
+  oneof type {
+      DiffusionSampler diffusion = 1;
+      Upscaler upscaler = 2;
+  }
+}
+
+message ImageParameters {
+  uint64 height = 1;
+  uint64 width = 2;
+  repeated uint32 seed = 3;
+  uint64 samples = 4;
+  uint64 steps = 5;
+  TransformType transform = 6;
+  repeated StepParameter parameters = 7;
+}
+
+enum Action {
+  ACTION_PASSTHROUGH = 0;
+  ACTION_REGENERATE_DUPLICATE = 1;
+  ACTION_REGENERATE = 2;
+  ACTION_OBFUSCATE_DUPLICATE = 3;
+  ACTION_OBFUSCATE = 4;
+  ACTION_DISCARD = 5;
+}
+
+enum ClassifierMode {
+  CLSFR_MODE_ZEROSHOT = 0;
+  CLSFR_MODE_MULTICLASS = 1;
+  /*CLSFR_MODE_ODDSRATIO = 2;*/
+}
+
+message ClassifierConcept {
+  string concept = 1;
+  float threshold = 2;
+}
+
+message ClassifierCategory {
+  string name = 1;
+  repeated ClassifierConcept concepts = 2;
+  float adjustment = 3;
+  Action action = 4;
+  ClassifierMode classifier_mode = 5;
+}
+
+message ClassifierParameters {
+  repeated ClassifierCategory categories = 1;
+  repeated ClassifierCategory exceeds = 2;
+  Action realized_action = 3;
+}
+
+message Request {
+  string engine_id = 1;
+  string request_id = 2;
+  ArtifactType requested_type = 3;
+  repeated Prompt prompt = 4;
+  oneof params {
+    ImageParameters image = 5;
+  }
+  ConditionerParameters conditioner = 6;
+  ClassifierParameters classifier = 7;
+}
+
+service GenerationService {
+  rpc Generate (Request) returns (stream Answer) {};
+}
