@@ -6,6 +6,7 @@ import {
   MessageButton,
   MessageContextMenuInteraction,
   Modal,
+  ModalSubmitInteraction,
   TextInputComponent,
 } from "discord.js";
 import {
@@ -119,7 +120,7 @@ export const remixwithsd: SlashCommand = {
 
     await interaction.showModal(modal);
   },
-  modalSubmit: async (client, interaction) => {
+  modalSubmit: async (client, interaction: ModalSubmitInteraction) => {
     const imageUrl = interaction.fields.getTextInputValue("imageUrl");
     const prompt = interaction.fields.getTextInputValue("prompt");
     const level = interaction.fields.getTextInputValue("level");
@@ -129,7 +130,7 @@ export const remixwithsd: SlashCommand = {
     }
 
     const buff = await stable(
-      interaction,
+      interaction as any,
       prompt,
       "12345",
       await sharp(await downloadToBuffer(imageUrl))
@@ -174,7 +175,13 @@ export const remixwithsd: SlashCommand = {
           new MessageButton()
             .setLabel("Host Node")
             .setStyle("LINK")
-            .setURL("https://github.com/harrisonvanderbyl/SD")
+            .setURL(
+              "https://colab.research.google.com/drive/1xxypspWywNT6IOnXdSQz9phL0MRPhPCp?usp=sharing"
+            ),
+          new MessageButton()
+            .setLabel("Original Image")
+            .setStyle("LINK")
+            .setURL(imageUrl)
         ),
       ],
     });
