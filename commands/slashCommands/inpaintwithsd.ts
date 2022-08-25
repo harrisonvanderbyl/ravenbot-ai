@@ -195,7 +195,7 @@ export const inpaintwithsd: SlashCommand = {
       "512",
       "1",
       mask.toString("base64"),
-      "50"
+      "100"
     ).catch(async (e) => {
       console.log(e);
       await interaction.followUp({ content: "error: " + e, ephemeral: true });
