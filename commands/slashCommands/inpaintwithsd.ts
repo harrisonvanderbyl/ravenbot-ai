@@ -207,7 +207,7 @@ export const inpaintwithsd: SlashCommand = {
     }
     await interaction.editReply({
       content: prompt,
-      files: buffers.map(
+      files: [buffers].map(
         (buffer, index) =>
           new MessageAttachment(buffer, `generation${index}.jpeg`)
       ),
