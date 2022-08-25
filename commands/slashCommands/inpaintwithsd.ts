@@ -194,31 +194,31 @@ export const inpaintwithsd: SlashCommand = {
       .jpeg()
       .resize(512, 512, { fit: "fill" })
       .toBuffer();
-    // const buffers = await stable(
-    //   interaction as any,
-    //   prompt,
-    //   "12345",
-    //   buffer.toString("base64"),
-    //   "0.75",
-    //   true,
-    //   "512",
-    //   "512",
-    //   "1",
-    //   mask.toString("base64")
-    // ).catch(async (e) => {
-    //   console.log(e);
-    //   await interaction.followUp({ content: "error: " + e, ephemeral: true });
-    //   return null;
-    // });
-    // if (!buffers) {
-    //   await interaction.editReply({
-    //     content: "error: something went wrong",
-    //   });
-    //   return;
-    // }
+    const buffers = await stable(
+      interaction as any,
+      prompt,
+      "12345",
+      buffer.toString("base64"),
+      "0.75",
+      true,
+      "512",
+      "512",
+      "1",
+      mask.toString("base64")
+    ).catch(async (e) => {
+      console.log(e);
+      await interaction.followUp({ content: "error: " + e, ephemeral: true });
+      return null;
+    });
+    if (!buffers) {
+      await interaction.editReply({
+        content: "error: something went wrong",
+      });
+      return;
+    }
     await interaction.editReply({
       content: prompt,
-      files: [mask, buffer].map(
+      files: [buffers].map(
         (buffer, index) =>
           new MessageAttachment(buffer, `generation${index}.jpeg`)
       ),
