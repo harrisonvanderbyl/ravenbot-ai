@@ -138,7 +138,12 @@ export const remixwithsd: SlashCommand = {
         .toBuffer()
         .then((b) => b.toString("base64")),
       level,
-      true
+      true,
+      "512",
+      "512",
+      "1",
+      undefined,
+      "20"
     ).catch(async (e) => {
       console.log(e);
       await interaction.followUp({ content: "error: " + e, ephemeral: true });

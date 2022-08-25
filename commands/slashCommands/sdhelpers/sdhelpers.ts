@@ -219,7 +219,8 @@ export const stable = async (
   width = "512",
   height = "512",
   iterations = "1",
-  mask?: string
+  mask?: string,
+  samples = "20"
 ): Promise<Buffer> => {
   const promise: Promise<Buffer> = new Promise(async (resolve, reject) => {
     const id = interaction.id;
@@ -269,7 +270,7 @@ export const stable = async (
       timeout: 0,
       // use rand to generate a seed for the generator
       seed,
-      samples: (interaction?.options?.get("samples")?.value as string) || "20",
+      samples,
       progress: "Pending",
       input: img,
       strength: strength,

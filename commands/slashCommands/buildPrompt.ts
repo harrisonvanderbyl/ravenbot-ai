@@ -35,7 +35,9 @@ export const stablediffusion: SlashCommand = {
         (interaction.options.get("colab")?.value ?? "true") == "true",
         width as string,
         height as string,
-        iterations as string
+        iterations as string,
+        undefined,
+        (interaction?.options?.get("samples")?.value as string) ?? "20"
       ).catch(async (e) => {
         console.log(e);
         await interaction.followUp({ content: "error: " + e, ephemeral: true });
