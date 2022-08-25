@@ -157,15 +157,16 @@ export const inpaintwithsd: SlashCommand = {
       create: {
         background: { alpha: 0, r: 0, g: 0, b: 0 },
         channels: 4,
-        height: 512,
-        width: 512,
+        height: 64,
+        width: 64,
         noise: {
           mean: 255 / 2,
-          sigma: 255 / 2,
+          sigma: 3,
           type: "gaussian",
         },
       },
     })
+      .resize(512, 512, { fit: "fill" })
       .composite([
         {
           input: await original
