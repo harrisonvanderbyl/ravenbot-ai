@@ -8,5 +8,9 @@ export type ToolBarItem = {
   id: string;
   filter: (buffers: Buffer[]) => boolean;
   createToolbars: (buffers: Buffer[]) => MessageActionRowOptions[];
-  process: (buffers: Buffer[], i: MessageComponentInteraction) => Promise<void>;
+  process: (
+    buffers: Buffer[],
+    i: MessageComponentInteraction,
+    addons: MessageActionRowOptions[]
+  ) => Promise<void>;
 };

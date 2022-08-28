@@ -1,6 +1,10 @@
 import {
+  Message,
   MessageActionRow,
   MessageAttachment,
+  MessageButton,
+  MessageComponentInteraction,
+  MessageContextMenuInteraction,
   Modal,
   TextInputComponent,
 } from "discord.js";
@@ -8,16 +12,24 @@ import { existsSync, readFileSync, writeFileSync } from "fs";
 
 import { Dalle } from "../../charaterBuilders/imageGenerators/dalle";
 import { SlashCommand } from "./typing";
+import { addToolbar } from "./helpers/buttons";
 import axios from "axios";
+import joinImages from "join-images";
 import sharp from "sharp";
 
 export const inpaintwithdalle: SlashCommand = {
-  contextCommand: async (client, interaction) => {
+  contextCommand: async (
+    client,
+    interaction: MessageContextMenuInteraction | MessageComponentInteraction
+  ) => {
     const attachmentUrls: string[] = [];
-    for (const attachment of interaction.targetMessage.attachments.values()) {
+    const targetmessage = interaction.isContextMenu()
+      ? interaction.targetMessage
+      : interaction.message;
+    for (const attachment of targetmessage.attachments.values()) {
       attachmentUrls.push(attachment?.url ?? "");
     }
-    for (const embed of interaction.targetMessage.embeds.values()) {
+    for (const embed of targetmessage.embeds.values()) {
       attachmentUrls.push(embed.image?.url ?? "");
     }
 
@@ -35,10 +47,10 @@ export const inpaintwithdalle: SlashCommand = {
       .setValue(attachmentUrls[0]);
 
     //get value of prompt
-    const content = interaction.targetMessage.content?.length
-      ? interaction.targetMessage.content
+    const content = targetmessage.content?.length
+      ? targetmessage.content
       : interaction.channel.messages
-          .fetch(interaction.targetMessage.id)
+          .fetch(targetmessage.id)
           .then(async (message) => {
             console.log(message.content);
             return message.content.length
@@ -89,37 +101,13 @@ export const inpaintwithdalle: SlashCommand = {
       .setStyle("SHORT")
       .setValue("50");
 
-    const top = new TextInputComponent()
-      .setCustomId("top")
-      .setLabel("how far down is the top of the image?")
-      .setStyle("SHORT")
-      .setValue("25");
-
-    const left = new TextInputComponent()
-      .setCustomId("left")
-      .setLabel("how far to the right is the image?")
-      .setStyle("SHORT")
-      .setValue("25");
-
     const informationValueRow: MessageActionRow<TextInputComponent> =
       new MessageActionRow<TextInputComponent>().addComponents(
         shrink
       ) as any as MessageActionRow<TextInputComponent>;
 
-    const informationValueRow2: MessageActionRow<TextInputComponent> =
-      new MessageActionRow<TextInputComponent>().addComponents(
-        top
-      ) as any as MessageActionRow<TextInputComponent>;
-
-    const informationValueRow3: MessageActionRow<TextInputComponent> =
-      new MessageActionRow<TextInputComponent>().addComponents(
-        left
-      ) as any as MessageActionRow<TextInputComponent>;
-
     modal.addComponents(
       informationValueRow,
-      informationValueRow2,
-      informationValueRow3,
       informationValueRow4,
       informationValueRow5
     );
@@ -132,8 +120,6 @@ export const inpaintwithdalle: SlashCommand = {
   },
   modalSubmit: async (client, interaction) => {
     const percent = interaction.fields.getTextInputValue("percent");
-    const top = interaction.fields.getTextInputValue("top");
-    const left = interaction.fields.getTextInputValue("left");
     const imageUrl = interaction.fields.getTextInputValue("imageUrl");
     const prompt = interaction.fields.getTextInputValue("prompt");
 
@@ -147,41 +133,32 @@ export const inpaintwithdalle: SlashCommand = {
 
     // shrink image
     const sharpImage = sharp(imageBuffer).png();
-    const width = (await sharpImage.metadata()).width ?? 512;
-    const resize = sharpImage.extend({
-      background: { r: 255, g: 255, b: 255, alpha: 0 },
-      top: parseInt(
-        (
-          width *
-          (1.0 / (parseInt(percent) / 100)) *
-          (parseInt(top) / 100)
-        ).toFixed(0)
-      ),
-      left: parseInt(
-        (
-          width *
-          (1.0 / (parseInt(percent) / 100)) *
-          (parseInt(left) / 100)
-        ).toFixed(0)
-      ),
-      right: parseInt(
-        (
-          width *
-            (1.0 / (parseInt(percent) / 100)) *
-            (1 - parseInt(left) / 100) -
-          width * (0.5 / (parseInt(percent) / 100))
-        ).toFixed(0)
-      ),
-      bottom: parseInt(
-        (
-          width *
-            (1.0 / (parseInt(percent) / 100)) *
-            (1 - parseInt(top) / 100) -
-          width * (0.5 / (parseInt(percent) / 100))
-        ).toFixed(0)
-      ),
-    });
-    const buffer = await resize.toBuffer();
+    const combined = sharp({
+      create: {
+        channels: 4,
+        height: 1024,
+        width: 1024,
+        background: { alpha: 0, r: 0, g: 0, b: 0 },
+      },
+    })
+      .composite([
+        {
+          input: await sharpImage
+            .clone()
+            .jpeg()
+            .resize(
+              1024 * (parseInt(percent) / 100),
+              1024 * (parseInt(percent) / 100),
+              { fit: "fill" }
+            )
+            .toBuffer(),
+          blend: "over",
+        },
+      ])
+
+      .jpeg()
+      .toBuffer();
+    const buffer = await combined;
 
     if (!existsSync("./dalleconfig.json")) {
       writeFileSync("./dalleconfig.json", JSON.stringify({}));
@@ -200,33 +177,55 @@ export const inpaintwithdalle: SlashCommand = {
       return;
     }
 
-    const buffers = await new Dalle(dalleKey)
-      .generate(
-        prompt,
-        await sharp(buffer).png().resize(1024, 1024, { fit: "fill" }).toBuffer()
-      )
-      .then(
-        async (generations) =>
-          await Promise.all(
-            generations.map((gen, i) =>
-              axios.get(gen.generation.image_path, {
-                responseType: "arraybuffer",
-                responseEncoding: "binary",
-              })
-            )
-          ).then((buffers) => buffers.map((buff) => buff.data as Buffer))
-      )
-      .catch((e) => {
-        console.log(e);
-        throw e;
-      });
-    await interaction.editReply({
-      content: prompt,
-      files: buffers.map(
-        (buffer, index) =>
-          new MessageAttachment(buffer, `generation${index}.jpeg`)
-      ),
+    const buffers = [
+      buffer,
+      ...(await new Dalle(dalleKey)
+        .generate(prompt, buffer)
+        .then(
+          async (generations) =>
+            await Promise.all(
+              generations.map((gen, i) =>
+                axios.get(gen.generation.image_path, {
+                  responseType: "arraybuffer",
+                  responseEncoding: "binary",
+                })
+              )
+            ).then((buffers) => buffers.map((buff) => buff.data as Buffer))
+        )
+        .catch((e) => {
+          console.log(e);
+          throw e;
+        })),
+    ];
+
+    const message = await interaction.editReply({
+      content: null,
+
+      files: [
+        new MessageAttachment(await joinImages(buffers), `generation.jpeg`),
+      ],
+      embeds: [
+        {
+          title: (prompt as string).slice(0, 200) + "...",
+
+          image: {
+            url: `attachment://generation.jpeg`,
+          },
+        },
+      ],
     });
+    await addToolbar(message as Message, buffers, [
+      new MessageActionRow().addComponents(
+        new MessageButton()
+          .setLabel("Patreon")
+          .setStyle("LINK")
+          .setURL("https://patreon.com/unexplored_horizons"),
+        new MessageButton()
+          .setLabel("Writerbot home discord")
+          .setStyle("LINK")
+          .setURL("https://discord.gg/gKcREKcf")
+      ),
+    ]);
   },
   slashCommand: async (client, interaction) => {
     return;

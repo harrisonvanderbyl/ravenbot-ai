@@ -1,8 +1,11 @@
 import * as WomboDreamApi from "wombo-dream-api";
 
 import {
+  Message,
   MessageActionRow,
   MessageAttachment,
+  MessageButton,
+  MessageComponentInteraction,
   MessageContextMenuInteraction,
   Modal,
   TextInputComponent,
@@ -13,6 +16,7 @@ import {
 } from "../../charaterBuilders/imageGenerators/wombo";
 
 import { SlashCommand } from "./typing";
+import { addToolbar } from "./helpers/buttons";
 import sharp from "sharp";
 
 export const remixwithwombo: SlashCommand = {
@@ -24,12 +28,18 @@ export const remixwithwombo: SlashCommand = {
     type: 3,
   },
 
-  contextCommand: async (client, interaction:MessageContextMenuInteraction) => {
+  contextCommand: async (
+    client,
+    interaction: MessageContextMenuInteraction | MessageComponentInteraction
+  ) => {
+    const targetmessage = interaction.isContextMenu()
+      ? interaction.targetMessage
+      : interaction.message;
     const attachmentUrls: string[] = [];
-    for (const attachment of interaction.targetMessage.attachments.values()) {
+    for (const attachment of targetmessage.attachments.values()) {
       attachmentUrls.push(attachment?.url ?? "");
     }
-    for (const embed of interaction.targetMessage.embeds.values()) {
+    for (const embed of targetmessage.embeds.values()) {
       attachmentUrls.push(embed.image?.url ?? "");
     }
 
@@ -47,10 +57,10 @@ export const remixwithwombo: SlashCommand = {
       .setValue(attachmentUrls[0]);
 
     //get value of prompt
-    const content = interaction.targetMessage.content?.length
-      ? interaction.targetMessage.content
+    const content = targetmessage.content?.length
+      ? targetmessage.content
       : interaction.channel.messages
-          .fetch(interaction.targetMessage.id)
+          .fetch(targetmessage.id)
           .then(async (message) => {
             console.log(message.content);
             return message.content.length
@@ -153,12 +163,43 @@ export const remixwithwombo: SlashCommand = {
         .jpeg()
         .toBuffer()
     );
-    await interaction.editReply({
-      content: prompt,
-      files: buffers.map(
-        (buffer, index) =>
-          new MessageAttachment(buffer, `generation${index}.jpeg`)
-      ),
+    const message = await interaction.editReply({
+      content: null,
+
+      files: [new MessageAttachment(buffers[0], `generation.jpeg`)],
+      embeds: [
+        {
+          title: prompt.slice(0, 200) + "...",
+          fields: [
+            {
+              name: "Seed",
+              value: "remix",
+              inline: true,
+            },
+          ],
+          image: {
+            url: `attachment://generation.jpeg`,
+          },
+        },
+      ],
     });
+    await addToolbar(message as Message, buffers, [
+      new MessageActionRow().addComponents(
+        new MessageButton()
+          .setLabel("Patreon")
+          .setStyle("LINK")
+          .setURL("https://patreon.com/unexplored_horizons"),
+        new MessageButton()
+          .setLabel("Host Node")
+          .setStyle("LINK")
+          .setURL(
+            "https://colab.research.google.com/drive/1xxypspWywNT6IOnXdSQz9phL0MRPhPCp?usp=sharing"
+          ),
+        new MessageButton()
+          .setLabel("Original Image")
+          .setStyle("LINK")
+          .setURL(imageUrl)
+      ),
+    ]);
   },
 };

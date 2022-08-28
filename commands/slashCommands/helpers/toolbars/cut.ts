@@ -1,6 +1,11 @@
-import { MessageActionRowOptions, MessageAttachment } from "discord.js";
+import {
+  Message,
+  MessageActionRowOptions,
+  MessageAttachment,
+} from "discord.js";
 
 import { ToolBarItem } from "./common";
+import { addToolbar } from "../buttons";
 
 export const cutToolBar: ToolBarItem = {
   name: "✂️",
@@ -149,10 +154,11 @@ export const cutToolBar: ToolBarItem = {
         return [];
     }
   },
-  process: async (buffers, i) => {
+  process: async (buffers, i, addons) => {
     const number = i.customId;
     if (["1", "2", "3", "4", "5", "6", "7", "8", "9"].includes(number)) {
-      await i.followUp({
+      await i.deferUpdate();
+      const message = await i.followUp({
         files: [
           new MessageAttachment(buffers[Number(number) - 1], "buffer.jpeg"),
         ],
@@ -164,6 +170,11 @@ export const cutToolBar: ToolBarItem = {
           },
         ],
       });
+      await addToolbar(
+        message as Message,
+        [buffers[Number(number) - 1]],
+        addons
+      );
     }
   },
 };

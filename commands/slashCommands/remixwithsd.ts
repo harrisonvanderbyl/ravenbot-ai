@@ -1,9 +1,11 @@
 import * as WomboDreamApi from "wombo-dream-api";
 
 import {
+  Message,
   MessageActionRow,
   MessageAttachment,
   MessageButton,
+  MessageComponentInteraction,
   MessageContextMenuInteraction,
   Modal,
   ModalSubmitInteraction,
@@ -15,6 +17,7 @@ import {
 } from "../../charaterBuilders/imageGenerators/wombo";
 
 import { SlashCommand } from "./typing";
+import { addToolbar } from "./helpers/buttons";
 import sharp from "sharp";
 import { stable } from "./sdhelpers/sdhelpers";
 
@@ -29,13 +32,16 @@ export const remixwithsd: SlashCommand = {
 
   contextCommand: async (
     client,
-    interaction: MessageContextMenuInteraction
+    interaction: MessageContextMenuInteraction | MessageComponentInteraction
   ) => {
     const attachmentUrls: string[] = [];
-    for (const attachment of interaction.targetMessage.attachments.values()) {
+    const targetmessage = interaction.isContextMenu()
+      ? interaction.targetMessage
+      : interaction.message;
+    for (const attachment of targetmessage.attachments.values()) {
       attachmentUrls.push(attachment?.url ?? "");
     }
-    for (const embed of interaction.targetMessage.embeds.values()) {
+    for (const embed of targetmessage.embeds.values()) {
       attachmentUrls.push(embed.image?.url ?? "");
     }
 
@@ -53,10 +59,10 @@ export const remixwithsd: SlashCommand = {
       .setValue(attachmentUrls[0]);
 
     //get value of prompt
-    const content = interaction.targetMessage.content?.length
-      ? interaction.targetMessage.content
+    const content = targetmessage.content?.length
+      ? targetmessage.content
       : interaction.channel.messages
-          .fetch(interaction.targetMessage.id)
+          .fetch(targetmessage.id)
           .then(async (message) => {
             console.log(message.content);
             return message.content.length
@@ -107,14 +113,25 @@ export const remixwithsd: SlashCommand = {
       .setStyle("SHORT")
       .setValue("0.8");
 
+    const steps = new TextInputComponent()
+      .setCustomId("steps")
+      .setLabel("Number of steps")
+      .setStyle("SHORT")
+      .setValue("20");
+
     const informationValueRow2: MessageActionRow<TextInputComponent> =
       new MessageActionRow<TextInputComponent>().addComponents(
         level
       ) as any as MessageActionRow<TextInputComponent>;
 
+    const informationValueRow3: MessageActionRow<TextInputComponent> =
+      new MessageActionRow<TextInputComponent>().addComponents(
+        steps
+      ) as any as MessageActionRow<TextInputComponent>;
     modal.addComponents(
       informationValueRow2,
       informationValueRow4,
+      informationValueRow3,
       informationValueRow5
     );
 
@@ -124,6 +141,7 @@ export const remixwithsd: SlashCommand = {
     const imageUrl = interaction.fields.getTextInputValue("imageUrl");
     const prompt = interaction.fields.getTextInputValue("prompt");
     const level = interaction.fields.getTextInputValue("level");
+    const steps = interaction.fields.getTextInputValue("steps");
     if (Number(level) < 0.0 || Number(level) > 1.0) {
       await interaction.editReply("level must be between 0.0 and 1.0");
       return;
@@ -143,7 +161,7 @@ export const remixwithsd: SlashCommand = {
       "512",
       "1",
       undefined,
-      "20"
+      steps
     ).catch(async (e) => {
       console.log(e);
       await interaction.followUp({ content: "error: " + e, ephemeral: true });
@@ -152,7 +170,7 @@ export const remixwithsd: SlashCommand = {
     if (buff == null) {
       return;
     }
-    await interaction.editReply({
+    const message = await interaction.editReply({
       content: null,
 
       files: [new MessageAttachment(buff, `generation.jpeg`)],
@@ -171,7 +189,11 @@ export const remixwithsd: SlashCommand = {
           },
         },
       ],
-      components: [
+    });
+    await addToolbar(
+      message as Message,
+      [buff],
+      [
         new MessageActionRow().addComponents(
           new MessageButton()
             .setLabel("Patreon")
@@ -188,7 +210,7 @@ export const remixwithsd: SlashCommand = {
             .setStyle("LINK")
             .setURL(imageUrl)
         ),
-      ],
-    });
+      ]
+    );
   },
 };

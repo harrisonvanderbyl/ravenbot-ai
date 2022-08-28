@@ -48,10 +48,10 @@ export const addToolbar = async (
     });
   });
   collector.on("collect", async (i) => {
-    await i.deferUpdate();
     const number = i.customId;
     console.log(number);
     if (number === "home") {
+      await i.deferUpdate();
       await i.editReply({
         components: [...toolbar(buffers), ...addons].map(
           (m) => new MessageActionRow<MessageActionRowComponent>(m)
@@ -60,13 +60,14 @@ export const addToolbar = async (
     }
     toolbars.forEach(async (t) => {
       if (t.id === number) {
+        await i.deferUpdate();
         await i.editReply({
           components: [...t.createToolbars(buffers), ...addons].map(
             (m) => new MessageActionRow<MessageActionRowComponent>(m)
           ),
         });
       }
-      await t.process(buffers, i);
+      await t.process(buffers, i, addons);
     });
   });
 };
