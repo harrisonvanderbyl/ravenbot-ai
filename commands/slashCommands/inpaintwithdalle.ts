@@ -14,6 +14,7 @@ import { Dalle } from "../../charaterBuilders/imageGenerators/dalle";
 import { SlashCommand } from "./typing";
 import { addToolbar } from "./helpers/buttons";
 import axios from "axios";
+import { imageJoin } from "./helpers/imageJoin";
 import joinImages from "join-images";
 import sharp from "sharp";
 
@@ -202,10 +203,7 @@ export const inpaintwithdalle: SlashCommand = {
       content: null,
 
       files: [
-        new MessageAttachment(
-          await (await joinImages(buffers)).jpeg().toBuffer(),
-          `generation.jpeg`
-        ),
+        new MessageAttachment(await imageJoin(buffers), `generation.jpeg`),
       ],
       embeds: [
         {
