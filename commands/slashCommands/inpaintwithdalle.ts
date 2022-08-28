@@ -202,7 +202,10 @@ export const inpaintwithdalle: SlashCommand = {
       content: null,
 
       files: [
-        new MessageAttachment(await joinImages(buffers), `generation.jpeg`),
+        new MessageAttachment(
+          await (await joinImages(buffers)).jpeg().toBuffer(),
+          `generation.jpeg`
+        ),
       ],
       embeds: [
         {
