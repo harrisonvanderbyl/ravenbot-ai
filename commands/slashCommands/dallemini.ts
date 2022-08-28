@@ -1,37 +1,55 @@
-import { MessageAttachment } from "discord.js";
+import {
+  CommandInteraction,
+  Message,
+  MessageActionRow,
+  MessageAttachment,
+  MessageButton,
+} from "discord.js";
+
 import { SlashCommand } from "./typing";
+import { addToolbar } from "./helpers/buttons";
 import { dallemini } from "../../charaterBuilders/imageGenerators/dallemini";
+import { imageJoin } from "./helpers/imageJoin";
+import joinImages from "join-images";
 
 export const dalle_mini: SlashCommand = {
-  slashCommand: async (client, interaction) => {
+  slashCommand: async (client, interaction: CommandInteraction) => {
     console.log(JSON.stringify(interaction.options.data));
 
     const buffers = await dallemini(
       interaction,
       interaction.options.get("prompt").value as string
     );
-    await interaction.editReply({
+
+    const buffer = await imageJoin(buffers);
+    const message = await interaction.editReply({
+      files: [new MessageAttachment(buffer, `generation.jpeg`)],
+
       embeds: [
         {
           title:
             (("" + interaction.options.get("prompt").value) as string) + "",
+
+          image: {
+            url: "attachment://generation.jpeg",
+          },
         },
       ],
     });
-    for (const buffer of buffers) {
-      await interaction.webhook.send({
-        files: [new MessageAttachment(buffer, `generation.jpeg`)],
-
-        embeds: [
-          {
-            image: {
-              url: "attachment://generation.jpeg",
-            },
-          },
-        ],
-      });
-    }
+    addToolbar(message as Message, buffers, [
+      new MessageActionRow().addComponents(
+        new MessageButton()
+          .setLabel("Patreon")
+          .setStyle("LINK")
+          .setURL("https://patreon.com/unexplored_horizons"),
+        new MessageButton()
+          .setLabel("Writerbot home discord")
+          .setStyle("LINK")
+          .setURL("https://discord.gg/gKcREKcf")
+      ),
+    ]);
   },
+
   commandSchema: {
     name: "dallemini",
     description: "Use dallemini",

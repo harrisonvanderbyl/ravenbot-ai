@@ -3751,6 +3751,11 @@ is-number-object@^1.0.4:
   dependencies:
     has-tostringtag "^1.0.0"
 
+is-plain-obj@^3.0.0:
+  version "3.0.0"
+  resolved "https://registry.yarnpkg.com/is-plain-obj/-/is-plain-obj-3.0.0.tgz#af6f2ea14ac5a646183a5bbdb5baabbc156ad9d7"
+  integrity sha512-gwsOE28k+23GP1B6vFl1oVh/WOzmawBrKwo5Ev6wMKzPkaXaCDIQKzLnvsA42DRlbVTWorkgTKIviAKCWkfUwA==
+
 is-plain-object@^2.0.4:
   version "2.0.4"
   resolved "https://registry.yarnpkg.com/is-plain-object/-/is-plain-object-2.0.4.tgz#2c163b3fafb1b606d9d17928f05c2a1c38e07677"
@@ -3860,6 +3865,14 @@ isstream@~0.1.2:
   version "0.1.2"
   resolved "https://registry.yarnpkg.com/isstream/-/isstream-0.1.2.tgz#47e63f7af55afa6f92e1500e690eb8b8529c099a"
   integrity sha512-Yljz7ffyPbrLpLngrMtZ7NduUgVvi6wG9RJ9IUcyCd59YQ911PBJphODUcbOVbqYfxe1wuYf/LJ8PauMRwsM/g==
+
+join-images@^1.1.3:
+  version "1.1.3"
+  resolved "https://registry.yarnpkg.com/join-images/-/join-images-1.1.3.tgz#01c22aca385b963fcef3c73bae2d209ea903c7fc"
+  integrity sha512-TdIOA06ei3zANYImnyQ0hfmX0Zbj1mVf9Uw0+QJF/SIvn0aLb1Jrx5s1/vPhzXi38891eAbPfreUZGer7l1xMQ==
+  dependencies:
+    is-plain-obj "^3.0.0"
+    tslib "^2.3.1"
 
 jpeg-js@^0.1.2:
   version "0.1.2"

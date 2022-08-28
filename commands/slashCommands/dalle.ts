@@ -1,12 +1,19 @@
 import * as WomboDreamApi from "wombo-dream-api";
 
+import {
+  Message,
+  MessageActionRow,
+  MessageAttachment,
+  MessageButton,
+} from "discord.js";
 import { existsSync, readFileSync, writeFileSync } from "fs";
 
 import { Dalle } from "../../charaterBuilders/imageGenerators/dalle";
-import { MessageAttachment } from "discord.js";
 import { SlashCommand } from "./typing";
+import { addToolbar } from "./helpers/buttons";
 import axios from "axios";
 import { dallemini } from "../../charaterBuilders/imageGenerators/dallemini";
+import { imageJoin } from "./helpers/imageJoin";
 import styles from "../styles.json";
 import { wombo } from "../../charaterBuilders/imageGenerators/wombo";
 
@@ -51,7 +58,11 @@ export const picture: SlashCommand = {
         console.log("Error", JSON.stringify(e));
         throw e;
       });
-    await interaction.editReply({
+
+    const message = await interaction.editReply({
+      files: [
+        new MessageAttachment(await imageJoin(buffers), `generation.jpeg`),
+      ],
       embeds: [
         {
           title:
@@ -62,22 +73,24 @@ export const picture: SlashCommand = {
               value: `${(await dallec.getUsage()).aggregate_credits}`,
             },
           ],
+          image: {
+            url: "attachment://generation.jpeg",
+          },
         },
       ],
     });
-    for (const buffer of buffers) {
-      await interaction.webhook.send({
-        files: [new MessageAttachment(buffer, `generation.jpeg`)],
-
-        embeds: [
-          {
-            image: {
-              url: "attachment://generation.jpeg",
-            },
-          },
-        ],
-      });
-    }
+    addToolbar(message as Message, buffers, [
+      new MessageActionRow().addComponents(
+        new MessageButton()
+          .setLabel("Patreon")
+          .setStyle("LINK")
+          .setURL("https://patreon.com/unexplored_horizons"),
+        new MessageButton()
+          .setLabel("Writerbot home discord")
+          .setStyle("LINK")
+          .setURL("https://discord.gg/gKcREKcf")
+      ),
+    ]);
   },
   commandSchema: {
     name: "dalle",

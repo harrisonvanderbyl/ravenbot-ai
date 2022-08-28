@@ -1,11 +1,14 @@
 import {
   CommandInteraction,
+  Message,
   MessageActionRow,
   MessageAttachment,
   MessageButton,
 } from "discord.js";
 
 import { SlashCommand } from "./typing";
+import { addToolbar } from "./helpers/buttons";
+import { split } from "./helpers/imagesplit";
 import { stable } from "./sdhelpers/sdhelpers";
 
 export const stablediffusion: SlashCommand = {
@@ -46,7 +49,7 @@ export const stablediffusion: SlashCommand = {
       if (data == null) {
         return;
       }
-      await interaction.editReply({
+      const message = await interaction.editReply({
         content: null,
 
         files: [new MessageAttachment(data, `generation.jpeg`)],
@@ -69,7 +72,11 @@ export const stablediffusion: SlashCommand = {
             },
           },
         ],
-        components: [
+      });
+      await addToolbar(
+        message as Message,
+        await split(data, Number(iterations) as 1 | 4 | 9),
+        [
           new MessageActionRow().addComponents(
             new MessageButton()
               .setLabel("Patreon")
@@ -86,8 +93,8 @@ export const stablediffusion: SlashCommand = {
                 "https://colab.research.google.com/drive/1xxypspWywNT6IOnXdSQz9phL0MRPhPCp?usp=sharing"
               )
           ),
-        ],
-      });
+        ]
+      );
     } catch (e) {
       console.log(e);
       await interaction.followUp({ content: "error: " + e, ephemeral: true });
