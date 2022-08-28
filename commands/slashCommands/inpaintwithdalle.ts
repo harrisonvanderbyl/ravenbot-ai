@@ -156,7 +156,7 @@ export const inpaintwithdalle: SlashCommand = {
         },
       ])
 
-      .jpeg()
+      .png()
       .toBuffer();
     const buffer = await combined;
 
