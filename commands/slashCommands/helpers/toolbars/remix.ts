@@ -27,9 +27,9 @@ export const remixToolBar: ToolBarItem = {
           },
           {
             type: "BUTTON",
-            custom_id: "⤢inpaintdalle",
+            custom_id: "inpaintdalle",
             style: "SECONDARY",
-            label: "",
+            label: "⤢dalle",
           },
           {
             type: "BUTTON",
