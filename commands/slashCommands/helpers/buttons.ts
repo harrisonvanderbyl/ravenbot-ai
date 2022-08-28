@@ -24,7 +24,7 @@ const toolbar = (buffers: Buffer[]): MessageActionRowOptions[] => {
         }),
       type: "ACTION_ROW",
     },
-  ];
+  ].filter((row) => row.components.length > 0) as MessageActionRowOptions[];
 };
 
 export const addToolbar = async (
