@@ -1,9 +1,11 @@
 import {
+  Client,
   CommandInteraction,
   Message,
   MessageActionRow,
   MessageAttachment,
   MessageButton,
+  TextChannel,
 } from "discord.js";
 
 import { SlashCommand } from "./typing";
@@ -14,7 +16,7 @@ import { stable } from "./sdhelpers/sdhelpers";
 export const stablediffusion: SlashCommand = {
   skipDeferReply: true,
 
-  slashCommand: async (client, interaction: CommandInteraction) => {
+  slashCommand: async (client: Client, interaction: CommandInteraction) => {
     try {
       const optionsString = interaction.options.data
         .map((option) => `${option.name}: ${option.value}`)
@@ -49,7 +51,13 @@ export const stablediffusion: SlashCommand = {
       if (data == null) {
         return;
       }
-      const message = await interaction.editReply({
+      // ten minutes
+      const message = await (interaction.createdAt.getTime() <
+        Date.now() - 600000
+        ? interaction.editReply
+        : await client.channels
+            .fetch(interaction.channelId)
+            .then(async (channel: TextChannel) => channel.send))({
         content: null,
 
         files: [new MessageAttachment(data, `generation.jpeg`)],
@@ -73,6 +81,7 @@ export const stablediffusion: SlashCommand = {
           },
         ],
       });
+
       await addToolbar(
         message as Message,
         await split(data, Number(iterations) as 1 | 4 | 9),

@@ -123,10 +123,10 @@ app.post("/upload/:id", async (req, res) => {
     const id = req.params.id;
     const { prompt, callback } = promptlist[id];
     const imagedata = req.body;
-    await callback(imagedata);
+    await callback(imagedata).catch((e) => console.log(e));
 
     delete promptlist[id];
-    await updateNetworkStats();
+    await updateNetworkStats().catch((e) => console.log(e));
     res.send("ok");
   } catch (e) {
     console.log(e);
@@ -141,7 +141,7 @@ app.post("/update/:id", async (req, res) => {
 
     const id = req.params.id;
     promptlist[id].progress = req.body;
-    await updateNetworkStats();
+    await updateNetworkStats().catch((e) => console.log(e));
 
     res.send("ok");
   } catch (e) {
@@ -152,60 +152,64 @@ app.post("/update/:id", async (req, res) => {
 
 const updateNetworkStats = async () => {
   for (const [key, value] of Object.entries(promptlist)) {
-    await value.updateNetworkStats([
-      {
-        title: "Stats",
+    await value
+      .updateNetworkStats([
+        {
+          title: "Stats",
 
-        fields: [
-          {
-            name: "Status",
-            value: promptlist[key].progress,
-            inline: true,
-          },
-          {
-            name: "Seed",
-            value: promptlist[key].seed.replace(".", ""),
-            inline: true,
-          },
-          {
-            name: "Type",
-            value: promptlist[key].allowColab ? "Colab" : "Local",
-          },
-          {
-            name: "Colab Nodes",
-            value: Object.values(peers)
-              .filter(
-                (m) => m.lastseen > Date.now() - 1000 * 60 && m.type == "colab"
-              )
-              .length.toFixed(0),
-            inline: true,
-          },
-          {
-            name: "Local Nodes",
-            value: Object.values(peers)
-              .filter(
-                (m) => m.lastseen > Date.now() - 1000 * 60 && m.type == "local"
-              )
-              .length.toFixed(0),
-            inline: true,
-          },
-          {
-            name: "Pending Colab",
-            value: Object.values(promptlist)
-              .filter((m) => m.allowColab == true)
-              .length.toFixed(0),
-            inline: true,
-          },
-          {
-            name: "Pending Local",
-            value: Object.values(promptlist)
-              .filter((m) => m.allowColab == false)
-              .length.toFixed(0),
-            inline: true,
-          },
-        ],
-      },
-    ]);
+          fields: [
+            {
+              name: "Status",
+              value: promptlist[key].progress,
+              inline: true,
+            },
+            {
+              name: "Seed",
+              value: promptlist[key].seed.replace(".", ""),
+              inline: true,
+            },
+            {
+              name: "Type",
+              value: promptlist[key].allowColab ? "Colab" : "Local",
+            },
+            {
+              name: "Colab Nodes",
+              value: Object.values(peers)
+                .filter(
+                  (m) =>
+                    m.lastseen > Date.now() - 1000 * 60 && m.type == "colab"
+                )
+                .length.toFixed(0),
+              inline: true,
+            },
+            {
+              name: "Local Nodes",
+              value: Object.values(peers)
+                .filter(
+                  (m) =>
+                    m.lastseen > Date.now() - 1000 * 60 && m.type == "local"
+                )
+                .length.toFixed(0),
+              inline: true,
+            },
+            {
+              name: "Pending Colab",
+              value: Object.values(promptlist)
+                .filter((m) => m.allowColab == true)
+                .length.toFixed(0),
+              inline: true,
+            },
+            {
+              name: "Pending Local",
+              value: Object.values(promptlist)
+                .filter((m) => m.allowColab == false)
+                .length.toFixed(0),
+              inline: true,
+            },
+          ],
+        },
+      ])
+      .catch((e) => console.log(e));
   }
 };
 
@@ -280,9 +284,8 @@ export const stable = async (
       iterations,
       mask,
     };
+    await updateNetworkStats().catch((e) => console.log(e));
   });
-
-  await updateNetworkStats();
 
   return promise;
 };
