@@ -52,7 +52,7 @@ export const stablediffusion: SlashCommand = {
         return;
       }
       // ten minutes
-      const message = await (interaction.createdAt.getTime() <
+      const message = await (interaction.createdAt.getTime() >
         Date.now() - 600000
         ? interaction.editReply
         : await client.channels
