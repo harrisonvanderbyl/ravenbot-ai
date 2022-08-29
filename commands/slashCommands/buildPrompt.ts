@@ -52,12 +52,14 @@ export const stablediffusion: SlashCommand = {
         return;
       }
       // ten minutes
-      const message = await (interaction.createdAt.getTime() >
-        Date.now() - 600000
-        ? interaction.editReply
-        : await client.channels
-            .fetch(interaction.channelId)
-            .then(async (channel: TextChannel) => channel.send))({
+      const method =
+        interaction.createdAt.getTime() > Date.now() - 600000
+          ? interaction.editReply
+          : await client.channels
+              .fetch(interaction.channelId)
+              .then(async (channel: TextChannel) => channel.send);
+
+      const message = await method({
         content: null,
 
         files: [new MessageAttachment(data, `generation.jpeg`)],
