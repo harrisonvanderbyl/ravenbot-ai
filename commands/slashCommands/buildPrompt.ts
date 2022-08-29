@@ -77,12 +77,12 @@ export const stablediffusion: SlashCommand = {
       };
       // ten minutes
 
-      const message =
-        interaction.createdAt.getTime() > Date.now() - 600000
-          ? interaction.editReply(messageData)
-          : await client.channels
-              .fetch(interaction.channelId)
-              .then(async (channel: TextChannel) => channel.send(messageData));
+      const message = await (interaction.createdAt.getTime() >
+      Date.now() - 600000
+        ? interaction.editReply(messageData)
+        : await client.channels
+            .fetch(interaction.channelId)
+            .then(async (channel: TextChannel) => channel.send(messageData)));
 
       await addToolbar(
         message as Message,
