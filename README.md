@@ -1,5 +1,9 @@
 # this is writerbot, a bot for use in ai stuff
 
+### Example/Discord/Help
+
+You can test and use the current version [here](https://discord.gg/nDw6nFT4)
+
 ## Installation
 
 It's just a Node bot using [Discord.js](https://discord.js.org/), recently updated to its v9 API, with slash commands. Its installation process is simple, download and install its dependencies.
