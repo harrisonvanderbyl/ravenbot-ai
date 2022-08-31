@@ -29,6 +29,7 @@ const promptlist: {
     height: string;
     iterations: string;
     mask?: string;
+    upscale?: string;
   };
 } = {};
 
@@ -91,6 +92,7 @@ app.get("/sdlist", async (req, res) => {
       height,
       iterations,
       mask,
+      upscale
     } = top[1];
     const id = top[0];
     promptlist[id].timeout = Date.now() + 120 * 1000; // 2 minutes
@@ -106,6 +108,7 @@ app.get("/sdlist", async (req, res) => {
         height,
         iterations,
         mask,
+        upscale
       })
     );
   } catch (e) {
@@ -224,7 +227,8 @@ export const stable = async (
   height = "512",
   iterations = "1",
   mask?: string,
-  samples = "20"
+  samples = "20",
+  upscale?: string
 ): Promise<Buffer> => {
   const promise: Promise<Buffer> = new Promise(async (resolve, reject) => {
     const id = interaction.id;
@@ -283,6 +287,7 @@ export const stable = async (
       height,
       iterations,
       mask,
+      upscale
     };
     await updateNetworkStats().catch((e) => console.log(e));
   });
