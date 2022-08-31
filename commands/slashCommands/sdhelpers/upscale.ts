@@ -92,7 +92,7 @@ export const upscale = async (
     await interaction.followUp({ content: "error: " + e, ephemeral: true });
     return null;
   });
-  const message = await interaction.editReply({
+  const message = await interaction.followUp({
     content: null,
 
     files: [new MessageAttachment(buff, `generation.jpeg`)],
