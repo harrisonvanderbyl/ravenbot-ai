@@ -12,7 +12,7 @@ import { upscale } from "../../sdhelpers/upscale";
 export const upscaleToolBar: ToolBarItem = {
   name: "🔍",
   id: "upscale",
-  filter: (buffers: Buffer[]) => buffers.length > 1,
+  filter: (buffers: Buffer[]) => buffers.length == 1,
   createToolbars: (buffers: Buffer[]): MessageActionRowOptions[] => {
     // Different behaviors for different number of buffers
     switch (buffers.length) {
