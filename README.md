@@ -2,7 +2,7 @@
 
 ### Example/Discord/Help
 
-You can test and use the current version [here](https://discord.gg/nDw6nFT4)
+You can test and use the current version [here](https://discord.gg/eZqw6gMhf6)
 
 ## Installation
 
