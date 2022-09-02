@@ -19,6 +19,10 @@ const styles = {
     `${p} fantasy artwork epic detailed and intricate digital painting trending on artstation by wlop octane render`,
   rutkowski: (p) =>
     `${p} fantasy artwork epic detailed and intricate digital painting trending on artstation concept art by greg rutkowski`,
+  anime: (p) =>
+    `${p} digital 2d anime illustration, by Makoto Shinkai, by Hayao Miyazaki, detailed award-winning still frame`,
+  spooky: (p) =>
+    `${p} creepy hyperrealistic detailed horror fantasy concept art, by Wayne Barlowe, by Zdzislaw Beksinski, by Seb McKinnon`,
 };
 
 export const stablediffusion: SlashCommand = {
