@@ -13,6 +13,14 @@ import { addToolbar } from "./helpers/buttons";
 import { split } from "./helpers/imagesplit";
 import { stable } from "./sdhelpers/sdhelpers";
 
+const styles = {
+  raw: (p) => p,
+  fantasy: (p) =>
+    `${p} fantasy artwork epic detailed and intricate digital painting trending on artstation by wlop octane render`,
+  rutkowski: (p) =>
+    `${p} fantasy artwork epic detailed and intricate digital painting trending on artstation concept art by greg rutkowski`,
+};
+
 export const stablediffusion: SlashCommand = {
   skipDeferReply: true,
 
@@ -31,9 +39,12 @@ export const stablediffusion: SlashCommand = {
       const width = interaction.options.get("width")?.value ?? "512";
       const height = interaction.options.get("height")?.value ?? "512";
       const iterations = interaction.options.get("iterations")?.value ?? "1";
+      const prompt = styles[
+        (interaction.options.get("style")?.value as string) ?? "raw"
+      ](interaction.options.get("prompt").value as string);
       const data = await stable(
         interaction,
-        interaction.options.get("prompt").value as string,
+        prompt,
         seed,
         undefined,
         undefined,
@@ -127,6 +138,16 @@ export const stablediffusion: SlashCommand = {
         required: true,
         type: 3,
         description: "What to ask stable diffusion",
+      },
+      {
+        name: "style",
+        required: true,
+        type: 3,
+        description: "What style to use",
+        choices: Object.keys(styles).map((style) => ({
+          name: style,
+          value: style,
+        })),
       },
       {
         name: "colab",
