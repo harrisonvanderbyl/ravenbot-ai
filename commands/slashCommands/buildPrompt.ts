@@ -23,6 +23,12 @@ const styles = {
     `${p} digital 2d anime illustration, by Makoto Shinkai, by Hayao Miyazaki, detailed award-winning still frame`,
   spooky: (p) =>
     `${p} creepy hyperrealistic detailed horror fantasy concept art, by Wayne Barlowe, by Zdzislaw Beksinski, by Seb McKinnon`,
+  painting: (p) =>
+    `${p} digitized painting, highly detailed, sharp focus, impasto brush strokes, acclaimed artwork by gaston bussiere, by j. c. leyendecker`,
+  flat: (p) =>
+    `${p} ui art icon by victo ngai, kilian eng, lois van baarle, flat`,
+  butter: (p) =>
+    `${p} award-winning butter sculpture at the Minnesota State Fair, made of butter, dairy creation`,
 };
 
 export const stablediffusion: SlashCommand = {
