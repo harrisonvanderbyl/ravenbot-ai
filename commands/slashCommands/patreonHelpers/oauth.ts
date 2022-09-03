@@ -64,8 +64,6 @@ app.get("/", (req, res) => {
     });
 });
 
-const generateUserStats = async (data) => {};
-
 export const generateLoginButton = async (interaction: CommandInteraction) => {
   const loginUrl = url.format({
     protocol: "https",

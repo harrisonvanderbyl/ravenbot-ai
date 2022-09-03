@@ -39,6 +39,7 @@ export const stablediffusion: SlashCommand = {
       const optionsString = interaction.options.data
         .map((option) => `${option.name}: ${option.value}`)
         .join(", ");
+
       await interaction.reply(
         `Generating image with stable diffusion with options ${optionsString}. Ideal generation time is below 2 minutes`
       );
@@ -46,9 +47,18 @@ export const stablediffusion: SlashCommand = {
         (interaction.options.get("seed")?.value as string) ||
         Math.random().toPrecision(5);
 
-      const width = interaction.options.get("width")?.value ?? "512";
-      const height = interaction.options.get("height")?.value ?? "512";
-      const iterations = interaction.options.get("iterations")?.value ?? "1";
+      var width = (interaction.options.get("width")?.value as string) ?? "512";
+      var height =
+        (interaction.options.get("height")?.value as string) ?? "512";
+      var iterations =
+        (interaction.options.get("iterations")?.value as string) ?? "1";
+      var steps = (interaction?.options?.get("steps")?.value as string) ?? "20";
+      // remove anything non numeric
+      steps = steps.replace(/\D/g, "");
+      iterations = iterations.replace(/\D/g, "");
+      width = width.replace(/\D/g, "");
+      height = height.replace(/\D/g, "");
+
       const prompt = styles[
         (interaction.options.get("style")?.value as string) ?? "raw"
       ](interaction.options.get("prompt").value as string);
@@ -58,12 +68,12 @@ export const stablediffusion: SlashCommand = {
         seed,
         undefined,
         undefined,
-        (interaction.options.get("colab")?.value ?? "true") == "true",
+        true,
         width as string,
         height as string,
         iterations as string,
         undefined,
-        (interaction?.options?.get("samples")?.value as string) ?? "20"
+        steps
       ).catch(async (e) => {
         console.log(e);
         await interaction.followUp({ content: "error: " + e, ephemeral: true });
@@ -78,11 +88,7 @@ export const stablediffusion: SlashCommand = {
         files: [new MessageAttachment(data, `generation.jpeg`)],
         embeds: [
           {
-            title:
-              (interaction.options.get("prompt").value as string).slice(
-                0,
-                200
-              ) + "...",
+            title: prompt.slice(0, 200) + "...",
             fields: [
               {
                 name: "Seed",
@@ -160,27 +166,16 @@ export const stablediffusion: SlashCommand = {
         })),
       },
       {
-        name: "colab",
-        required: false,
-        type: 3,
-        choices: [
-          { name: "Yes", value: "true" },
-          { name: "No", value: "false" },
-        ],
-
-        description: "prefer colab completions",
-      },
-      {
         name: "seed",
         required: false,
         type: 3,
         description: "The seed to use",
       },
       {
-        name: "samples",
+        name: "steps",
         required: false,
         type: 3,
-        description: "The number of samples to use",
+        description: "The number of steps to use",
       },
       {
         name: "iterations",
@@ -198,7 +193,7 @@ export const stablediffusion: SlashCommand = {
         required: false,
         type: 3,
         description: "The width of the image",
-        choices: [...Array(8).keys()].slice(1).map((i) => ({
+        choices: [...Array(9).keys()].slice(1).map((i) => ({
           name: (i * 64).toString(),
           value: (i * 64).toString(),
         })),
@@ -208,7 +203,7 @@ export const stablediffusion: SlashCommand = {
         required: false,
         type: 3,
         description: "The height of the image",
-        choices: [...Array(8).keys()].slice(1).map((i) => ({
+        choices: [...Array(9).keys()].slice(1).map((i) => ({
           name: (i * 64).toString(),
           value: (i * 64).toString(),
         })),

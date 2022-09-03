@@ -69,7 +69,9 @@ export const upscale = async (
         });
 
   const image = sharp(await downloadToBuffer(attachmentUrls[0]));
-
+  const message = (await interaction.followUp({
+    content: "starting upscale",
+  })) as Message;
   const buff = await stable(
     interaction as any,
     "Upscale",
@@ -86,13 +88,14 @@ export const upscale = async (
     "1",
     undefined,
     "20",
-    upscale
+    upscale,
+    message
   ).catch(async (e) => {
     console.log(e);
     await interaction.followUp({ content: "error: " + e, ephemeral: true });
     return null;
   });
-  const message = await interaction.followUp({
+  await message.edit({
     content: null,
 
     files: [new MessageAttachment(buff, `generation.jpeg`)],

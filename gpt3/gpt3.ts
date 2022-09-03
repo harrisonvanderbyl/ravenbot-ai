@@ -3,28 +3,31 @@ import axios, { AxiosResponse } from "axios";
 
 import { apikey } from "../config/config.json";
 
-const configuration = new Configuration({
-  apiKey: apikey,
-});
-const openai = new OpenAIApi(configuration);
+export const gpt3personal =
+  (key) =>
+  async (
+    prompt = "",
+    stop: string[] | string | undefined = undefined, // Terminate at this string
+    requestor = "HarrisonVanderbyl@gmail.com", // For complience, all requests need to send identifying infomation
+    engine = "text-davinci-002"
+  ) =>
+    new OpenAIApi(
+      new Configuration({
+        apiKey: key,
+      })
+    ).createCompletion({
+      model: engine,
+      prompt,
+      temperature: 0.9,
+      max_tokens: 150,
+      top_p: 1,
+      stop: stop,
+      frequency_penalty: 1.2,
+      presence_penalty: 1.2,
+      user: requestor,
+    });
 
-export const gpt3 = async (
-  prompt = "",
-  stop: string[] | string | undefined = undefined, // Terminate at this string
-  requestor = "HarrisonVanderbyl@gmail.com", // For complience, all requests need to send identifying infomation
-  engine = "text-davinci-002"
-) =>
-  openai.createCompletion({
-    model: engine,
-    prompt,
-    temperature: 0.9,
-    max_tokens: 150,
-    top_p: 1,
-    stop: stop,
-    frequency_penalty: 1.2,
-    presence_penalty: 1.2,
-    user: requestor,
-  });
+export const gpt3 = gpt3personal(apikey);
 
 export const gptj = async (
   prompt = "",

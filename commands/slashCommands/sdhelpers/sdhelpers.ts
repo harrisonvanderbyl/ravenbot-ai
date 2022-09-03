@@ -1,6 +1,7 @@
 import {
   CategoryChannel,
   CommandInteraction,
+  Message,
   MessageActionRow,
   MessageButton,
   MessageEmbedOptions,
@@ -59,16 +60,6 @@ app.get("/sdlist", async (req, res) => {
           )
           .length.toFixed(0)
     );
-    const channel2 = (
-      (await client.channels.fetch("1011929803693248514")) as TextChannel
-    ).setName(
-      "Local Nodes: " +
-        Object.values(peers)
-          .filter(
-            (m) => m.lastseen > Date.now() - 1000 * 60 && m.type != "colab"
-          )
-          .length.toFixed(0)
-    );
 
     const top = Object.entries(promptlist).filter(([key, value]) => {
       return (
@@ -92,7 +83,7 @@ app.get("/sdlist", async (req, res) => {
       height,
       iterations,
       mask,
-      upscale
+      upscale,
     } = top[1];
     const id = top[0];
     promptlist[id].timeout = Date.now() + 120 * 1000; // 2 minutes
@@ -108,7 +99,7 @@ app.get("/sdlist", async (req, res) => {
         height,
         iterations,
         mask,
-        upscale
+        upscale,
       })
     );
   } catch (e) {
@@ -120,6 +111,12 @@ app.get("/sdlist", async (req, res) => {
 
 app.post("/upload/:id", async (req, res) => {
   try {
+    peers[req.ip ?? "unknown"] = {
+      name: req.headers.name ?? "unknown",
+      lastseen: Date.now(),
+      type: req.query.colab == "true" ? "colab" : "local",
+    };
+
     console.log(req.params.id, "upload");
     console.log(req.body, "upload");
 
@@ -185,27 +182,11 @@ const updateNetworkStats = async () => {
                 .length.toFixed(0),
               inline: true,
             },
-            {
-              name: "Local Nodes",
-              value: Object.values(peers)
-                .filter(
-                  (m) =>
-                    m.lastseen > Date.now() - 1000 * 60 && m.type == "local"
-                )
-                .length.toFixed(0),
-              inline: true,
-            },
+
             {
               name: "Pending Colab",
               value: Object.values(promptlist)
                 .filter((m) => m.allowColab == true)
-                .length.toFixed(0),
-              inline: true,
-            },
-            {
-              name: "Pending Local",
-              value: Object.values(promptlist)
-                .filter((m) => m.allowColab == false)
                 .length.toFixed(0),
               inline: true,
             },
@@ -228,7 +209,8 @@ export const stable = async (
   iterations = "1",
   mask?: string,
   samples = "20",
-  upscale?: string
+  upscale?: string,
+  updatemessage?: Message
 ): Promise<Buffer> => {
   const promise: Promise<Buffer> = new Promise(async (resolve, reject) => {
     const id = interaction.id;
@@ -237,7 +219,7 @@ export const stable = async (
       (m) =>
         m.lastseen > Date.now() - 1000 * 60 && allowColab == (m.type == "colab")
     );
-
+    await updateNetworkStats().catch((e) => console.log(e));
     if (validPeers.length == 0) {
       await interaction.editReply({
         content:
@@ -259,18 +241,21 @@ export const stable = async (
       return null;
     }
 
+    const updatemessaged =
+      updatemessage ?? ((await interaction.fetchReply()) as Message);
+
     promptlist[id] = {
       prompt,
       callback: async (imagedata: string) => {
         resolve(Buffer.from(imagedata, "base64"));
       },
       update: async (updatetext: string) => {
-        interaction.editReply({
+        await updatemessaged.edit({
           content: updatetext,
         });
       },
       updateNetworkStats: async (data) => {
-        await interaction.editReply({
+        await updatemessaged.edit({
           embeds: data,
         });
       },
@@ -287,9 +272,8 @@ export const stable = async (
       height,
       iterations,
       mask,
-      upscale
+      upscale,
     };
-    await updateNetworkStats().catch((e) => console.log(e));
   });
 
   return promise;
