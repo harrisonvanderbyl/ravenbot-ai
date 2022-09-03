@@ -45,6 +45,7 @@ async function parselout() {
   const next = awaiters.pop();
   if (next) {
     if (top) {
+      console.log("assigning:" + top[0]);
       promptlist[top[0]].timeout = Date.now() + 1200 * 1000; // 2 minutes
     }
     next(top);

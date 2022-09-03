@@ -62,7 +62,7 @@ export const addToolbar = async (
       if (t.id === number) {
         await i.deferUpdate();
         await i.editReply({
-          components: [...t.createToolbars(buffers), ...addons].map(
+          components: [...t.createToolbars(buffers, i), ...addons].map(
             (m) => new MessageActionRow<MessageActionRowComponent>(m)
           ),
         });
