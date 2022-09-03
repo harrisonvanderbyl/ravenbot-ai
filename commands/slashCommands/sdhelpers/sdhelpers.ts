@@ -44,7 +44,9 @@ async function parselout() {
   })[0];
   const next = awaiters.pop();
   if (next) {
-    promptlist[top[0]].timeout = Date.now() + 1200 * 1000; // 2 minutes
+    if (top) {
+      promptlist[top[0]].timeout = Date.now() + 1200 * 1000; // 2 minutes
+    }
     next(top);
   }
 }
