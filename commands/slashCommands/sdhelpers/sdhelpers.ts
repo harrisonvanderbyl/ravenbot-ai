@@ -143,7 +143,6 @@ app.post("/upload/:id", async (req, res) => {
     await callback(imagedata).catch((e) => console.log(e));
 
     delete promptlist[id];
-    await updateNetworkStats().catch((e) => console.log(e));
     res.send("ok");
   } catch (e) {
     console.log(e);
@@ -157,7 +156,6 @@ app.post("/update/:id", async (req, res) => {
 
     const id = req.params.id;
     promptlist[id].progress = req.body;
-    await updateNetworkStats().catch((e) => console.log(e));
 
     res.send("ok");
   } catch (e) {
@@ -176,17 +174,17 @@ const updateNetworkStats = async () => {
           fields: [
             {
               name: "Status",
-              value: promptlist[key].progress,
+              value: promptlist[key]?.progress,
               inline: true,
             },
             {
               name: "Seed",
-              value: promptlist[key].seed.replace(".", ""),
+              value: promptlist[key]?.seed.replace(".", ""),
               inline: true,
             },
             {
               name: "Type",
-              value: promptlist[key].allowColab ? "Colab" : "Local",
+              value: promptlist[key]?.allowColab ? "Colab" : "Local",
             },
             {
               name: "Colab Nodes",
@@ -212,6 +210,8 @@ const updateNetworkStats = async () => {
       .catch((e) => console.log(e));
   }
 };
+// Every 5 seconds
+setInterval(updateNetworkStats, 5 * 1000);
 
 export const stable = async (
   interaction: CommandInteraction,
@@ -235,7 +235,6 @@ export const stable = async (
       (m) =>
         m.lastseen > Date.now() - 1000 * 60 && allowColab == (m.type == "colab")
     );
-    await updateNetworkStats().catch((e) => console.log(e));
     if (validPeers.length == 0) {
       await interaction.editReply({
         content:
