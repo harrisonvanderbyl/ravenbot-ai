@@ -118,7 +118,6 @@ app.post("/upload/:id", async (req, res) => {
     };
 
     console.log(req.params.id, "upload");
-    console.log(req.body, "upload");
 
     const id = req.params.id;
     const { prompt, callback } = promptlist[id];
@@ -137,7 +136,6 @@ app.post("/upload/:id", async (req, res) => {
 app.post("/update/:id", async (req, res) => {
   try {
     console.log(req.params.id, "update");
-    console.log(req.body, "update");
 
     const id = req.params.id;
     promptlist[id].progress = req.body;
