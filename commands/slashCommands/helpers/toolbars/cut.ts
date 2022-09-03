@@ -160,12 +160,12 @@ export const cutToolBar: ToolBarItem = {
       await i.deferUpdate();
       const message = await i.followUp({
         files: [
-          new MessageAttachment(buffers[Number(number) - 1], "buffer.jpeg"),
+          new MessageAttachment(buffers[Number(number) - 1], "buffer.png"),
         ],
         embeds: [
           {
             image: {
-              url: "attachment://buffer.jpeg",
+              url: "attachment://buffer.png",
             },
           },
         ],

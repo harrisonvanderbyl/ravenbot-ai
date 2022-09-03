@@ -85,7 +85,7 @@ export const stablediffusion: SlashCommand = {
       const messageData = {
         content: null,
 
-        files: [new MessageAttachment(data, `generation.jpeg`)],
+        files: [new MessageAttachment(data, `generation.png`)],
         embeds: [
           {
             title: prompt.slice(0, 200) + "...",
@@ -97,7 +97,7 @@ export const stablediffusion: SlashCommand = {
               },
             ],
             image: {
-              url: `attachment://generation.jpeg`,
+              url: `attachment://generation.png`,
             },
           },
         ],

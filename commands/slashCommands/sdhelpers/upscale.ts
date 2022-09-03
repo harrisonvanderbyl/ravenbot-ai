@@ -78,7 +78,7 @@ export const upscale = async (
     "12345",
     await image
       .clone()
-      .jpeg()
+      .png()
       .toBuffer()
       .then((b) => b.toString("base64")),
     "1",
@@ -98,19 +98,27 @@ export const upscale = async (
   await message.edit({
     content: null,
 
-    files: [new MessageAttachment(buff, `generation.jpeg`)],
+    files: [new MessageAttachment(buff, `generation.png`)],
     embeds: [
       {
         title: ((await content) ?? "").slice(0, 200) + "...",
         fields: [
           {
             name: "Seed",
-            value: "remix",
+            value: "Upscale",
+
             inline: true,
+          },
+          {
+            name: "Resolution",
+            value: `
+            ${((await image.metadata()).width * 2).toFixed(0)}x${(
+              (await image.metadata()).height * 2
+            ).toFixed(0)}`,
           },
         ],
         image: {
-          url: `attachment://generation.jpeg`,
+          url: `attachment://generation.png`,
         },
       },
     ],

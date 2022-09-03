@@ -23,7 +23,7 @@ export const dalle_mini: SlashCommand = {
 
     const buffer = await imageJoin(buffers);
     const message = await interaction.editReply({
-      files: [new MessageAttachment(buffer, `generation.jpeg`)],
+      files: [new MessageAttachment(buffer, `generation.png`)],
 
       embeds: [
         {
@@ -31,7 +31,7 @@ export const dalle_mini: SlashCommand = {
             (("" + interaction.options.get("prompt").value) as string) + "",
 
           image: {
-            url: "attachment://generation.jpeg",
+            url: "attachment://generation.png",
           },
         },
       ],

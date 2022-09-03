@@ -146,7 +146,7 @@ export const inpaintwithdalle: SlashCommand = {
         {
           input: await sharpImage
             .clone()
-            .jpeg()
+            .png()
             .resize(
               1024 * (parseInt(percent) / 100),
               1024 * (parseInt(percent) / 100),
@@ -203,14 +203,14 @@ export const inpaintwithdalle: SlashCommand = {
       content: null,
 
       files: [
-        new MessageAttachment(await imageJoin(buffers), `generation.jpeg`),
+        new MessageAttachment(await imageJoin(buffers), `generation.png`),
       ],
       embeds: [
         {
           title: (prompt as string).slice(0, 200) + "...",
 
           image: {
-            url: `attachment://generation.jpeg`,
+            url: `attachment://generation.png`,
           },
         },
       ],

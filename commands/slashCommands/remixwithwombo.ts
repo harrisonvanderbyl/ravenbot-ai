@@ -160,13 +160,13 @@ export const remixwithwombo: SlashCommand = {
       level as "HIGH" | "MEDIUM" | "LOW",
       parseInt(style),
       await sharp(await downloadToBuffer(imageUrl))
-        .jpeg()
+        .png()
         .toBuffer()
     );
     const message = await interaction.editReply({
       content: null,
 
-      files: [new MessageAttachment(buffers[0], `generation.jpeg`)],
+      files: [new MessageAttachment(buffers[0], `generation.png`)],
       embeds: [
         {
           title: prompt.slice(0, 200) + "...",
@@ -178,7 +178,7 @@ export const remixwithwombo: SlashCommand = {
             },
           ],
           image: {
-            url: `attachment://generation.jpeg`,
+            url: `attachment://generation.png`,
           },
         },
       ],

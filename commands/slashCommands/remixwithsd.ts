@@ -152,7 +152,7 @@ export const remixwithsd: SlashCommand = {
       prompt,
       "12345",
       await sharp(await downloadToBuffer(imageUrl))
-        .jpeg()
+        .png()
         .toBuffer()
         .then((b) => b.toString("base64")),
       level,
@@ -173,7 +173,7 @@ export const remixwithsd: SlashCommand = {
     const message = await interaction.editReply({
       content: null,
 
-      files: [new MessageAttachment(buff, `generation.jpeg`)],
+      files: [new MessageAttachment(buff, `generation.png`)],
       embeds: [
         {
           title: prompt.slice(0, 200) + "...",
@@ -185,7 +185,7 @@ export const remixwithsd: SlashCommand = {
             },
           ],
           image: {
-            url: `attachment://generation.jpeg`,
+            url: `attachment://generation.png`,
           },
         },
       ],

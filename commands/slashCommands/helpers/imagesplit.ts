@@ -17,7 +17,7 @@ export const split = async (buffer: Buffer, num: 1 | 4 | 9) => {
             width: splitWidth,
             height: splitHeight,
           })
-          .jpeg()
+          .png()
           .toBuffer()
       );
     }

@@ -143,12 +143,12 @@ export const inpaintwithsd: SlashCommand = {
               background: { r: 255, g: 255, b: 255 },
             },
           })
-            .jpeg()
+            .png()
             .toBuffer(),
           blend: "over",
         },
       ])
-      .jpeg()
+      .png()
       .toBuffer();
 
     original.resize(512, 512, { fit: "fill" });
@@ -170,14 +170,14 @@ export const inpaintwithsd: SlashCommand = {
               },
             },
           })
-            .jpeg()
+            .png()
             .toBuffer(),
           blend: "multiply",
         },
         {
           input: await original
             .clone()
-            .jpeg()
+            .png()
             .resize(
               512 * (parseInt(percent) / 100),
               512 * (parseInt(percent) / 100),
@@ -187,7 +187,7 @@ export const inpaintwithsd: SlashCommand = {
           blend: "over",
         },
       ])
-      .jpeg()
+      .png()
       .toBuffer();
 
     const buffers = await stable(
@@ -217,7 +217,7 @@ export const inpaintwithsd: SlashCommand = {
       content: prompt,
       files: [buffers].map(
         (buffer, index) =>
-          new MessageAttachment(buffer, `generation${index}.jpeg`)
+          new MessageAttachment(buffer, `generation${index}.png`)
       ),
     });
   },
