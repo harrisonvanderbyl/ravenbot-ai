@@ -104,37 +104,37 @@ const createPerson = async (
 
 const app = express();
 
-app.get("/:filename/:name", async (req, res) => {
-  const filename = "./characters/" + req.params.filename + ".json";
-  if (!existsSync(filename)) {
-    await createPerson().then((d) =>
-      writeFileSync(filename, JSON.stringify(d))
-    );
-  }
+// app.get("/:filename/:name", async (req, res) => {
+//   const filename = "./characters/" + req.params.filename + ".json";
+//   if (!existsSync(filename)) {
+//     await createPerson().then((d) =>
+//       writeFileSync(filename, JSON.stringify(d))
+//     );
+//   }
 
-  const file = readFileSync(filename, {
-    encoding: "utf-8",
-  });
-  const data = JSON.parse(file);
+//   const file = readFileSync(filename, {
+//     encoding: "utf-8",
+//   });
+//   const data = JSON.parse(file);
 
-  res.send(
-    `
-    <div>
-    <div>
-    age:${data.age}
-    bloodline:${data.bloodline}
-    gender:${data.gender}
-    image:
-    </div>
-    <img src='data:image/jpeg;base64, ${data.picture}'>
-    </div>
-    `
-  );
-});
+//   res.send(
+//     `
+//     <div>
+//     <div>
+//     age:${data.age}
+//     bloodline:${data.bloodline}
+//     gender:${data.gender}
+//     image:
+//     </div>
+//     <img src='data:image/jpeg;base64, ${data.picture}'>
+//     </div>
+//     `
+//   );
+// });
 
-app.listen(3000, () => {
-  console.log("listen");
-});
+// app.listen(3000, () => {
+//   console.log("listen");
+// });
 
 // 200 people
 // 10 families of 10 people each

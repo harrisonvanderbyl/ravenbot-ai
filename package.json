@@ -43,6 +43,7 @@
     "request": "^2.88.2",
     "sharp": "^0.30.7",
     "showdown": "^1.9.1",
+    "stability-ts": "^1.2.0",
     "ts-node": "^10.8.2",
     "ts-protoc-gen": "^0.15.0",
     "turndown": "^6.0.0",

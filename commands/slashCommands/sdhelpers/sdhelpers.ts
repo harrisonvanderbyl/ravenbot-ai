@@ -86,7 +86,7 @@ app.get("/sdlist", async (req, res) => {
       upscale,
     } = top[1];
     const id = top[0];
-    promptlist[id].timeout = Date.now() + 120 * 1000; // 2 minutes
+    promptlist[id].timeout = Date.now() + 1200 * 1000; // 2 minutes
     return res.send(
       JSON.stringify({
         prompt,

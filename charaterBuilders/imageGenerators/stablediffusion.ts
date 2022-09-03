@@ -1,28 +1,47 @@
-// import { BaseCommandInteraction, MessageAttachment } from "discord.js";
-// import { Configuration, OpenAIApi } from "openai";
-// import { GenerationService, GenerationServiceClient } from "./bull/service";
-// import { writeFile, writeFileSync } from "fs";
+import { diffusionMap } from "stability-ts/build/utils";
+import { generate } from "stability-ts";
+import { writeFileSync } from "fs";
+export const StableDiffusion = async ({
+  key,
+  prompt,
+  cfgScale,
+  diffusion,
+  height,
+  samples,
+  seed,
+  steps,
+  width,
+}: {
+  key: string;
+  prompt: string;
+  samples?: number;
+  seed?: number;
+  cfgScale?: number;
+  diffusion?: keyof typeof diffusionMap;
+  height?: number;
+  width?: number;
+  steps?: number;
+}) => {
+  return new Promise((resolve, reject) => {
+    const api = generate({
+      prompt,
+      apiKey: key,
+      noStore: true,
+      samples,
+      seed,
+      cfgScale,
+      diffusion,
+      height,
+      width,
+      steps,
+    });
+    const buffers: Buffer[] = [];
+    api.on("image", ({ buffer, filePath }) => {
+      buffers.push(buffer);
+    });
 
-// import fetch from "node-fetch";
-
-// const configuration = new Configuration({
-//   apiKey: api,
-//   basePath: "https://lab.dreamstudio.ai/apl/v1",
-// });
-// const openai = new OpenAIApi(configuration);
-
-// openai.listEngines().then((data) => {
-//   console.log(data);
-// });
-
-// const client = new GenerationServiceClient(GenerationService, {});
-// client.generate("test").then((data) => {
-//   console.log(Object.keys(data));
-// });
-
-// openai
-//   .createCompletion("gpt-j-6b", {
-//     prompt: `Roses are red `,
-//     max_tokens: 25,
-//   })
-//   .then((completion) => console.log(completion.data.choices[0].text));
+    api.on("end", () => {
+      resolve(buffers);
+    });
+  });
+};
