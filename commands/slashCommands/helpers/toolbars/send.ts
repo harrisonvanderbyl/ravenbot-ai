@@ -179,7 +179,10 @@ export const sendToolBar: ToolBarItem = {
       const message = await i.user.createDM().then((t) =>
         t.send({
           files: [
-            new MessageAttachment(buffers[Number(number) - 1], "buffer.png"),
+            new MessageAttachment(
+              buffers[Number(number.split("mail")[1]) - 1],
+              "buffer.png"
+            ),
           ],
           embeds: [
             {

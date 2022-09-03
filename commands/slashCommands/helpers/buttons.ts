@@ -61,10 +61,12 @@ export const addToolbar = async (
     toolbars.forEach(async (t) => {
       if (t.id === number) {
         await i.deferUpdate();
+        const newtoolbar = t.createToolbars(buffers, i);
         await i.editReply({
-          components: [...t.createToolbars(buffers, i), ...addons].map(
-            (m) => new MessageActionRow<MessageActionRowComponent>(m)
-          ),
+          components: [
+            ...(newtoolbar.length > 0 ? newtoolbar : toolbar(buffers)),
+            ...addons,
+          ].map((m) => new MessageActionRow<MessageActionRowComponent>(m)),
         });
       }
       await t.process(buffers, i, addons);
