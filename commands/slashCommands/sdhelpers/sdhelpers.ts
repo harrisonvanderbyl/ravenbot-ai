@@ -52,7 +52,7 @@ async function parselout() {
 }
 
 // Do every 10 seconds
-setInterval(parselout, 1000 * 1);
+setInterval(parselout, 3 * 1);
 
 const peers: {
   [key: string]: {
