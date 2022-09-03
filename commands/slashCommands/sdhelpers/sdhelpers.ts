@@ -259,21 +259,26 @@ export const stable = async (
 
     const updatemessaged =
       updatemessage ?? ((await interaction.fetchReply()) as Message);
-
+    var resolved = false;
     promptlist[id] = {
       prompt,
       callback: async (imagedata: string) => {
+        resolved = true;
         resolve(Buffer.from(imagedata, "base64"));
       },
       update: async (updatetext: string) => {
-        await updatemessaged.edit({
-          content: updatetext,
-        });
+        if (!resolved) {
+          await updatemessaged.edit({
+            content: updatetext,
+          });
+        }
       },
       updateNetworkStats: async (data) => {
-        await updatemessaged.edit({
-          embeds: data,
-        });
+        if (!resolved) {
+          await updatemessaged.edit({
+            embeds: data,
+          });
+        }
       },
 
       timeout: 0,
