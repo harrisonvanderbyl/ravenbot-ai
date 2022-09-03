@@ -34,6 +34,23 @@ const promptlist: {
   };
 } = {};
 
+var lock = false;
+
+const awaiters: ((a: any) => void)[] = [];
+
+async function parselout() {
+  const top = Object.entries(promptlist).filter(([key, value]) => {
+    return value.timeout < Date.now();
+  })[0];
+  const next = awaiters.pop();
+  if (next) {
+    next(top);
+  }
+}
+
+// Do every 10 seconds
+setInterval(parselout, 1000 * 1);
+
 const peers: {
   [key: string]: {
     name: "string";
@@ -61,12 +78,9 @@ app.get("/sdlist", async (req, res) => {
           .length.toFixed(0)
     );
 
-    const top = Object.entries(promptlist).filter(([key, value]) => {
-      return (
-        value.timeout < Date.now() &&
-        value.allowColab == (req.query.colab == "true")
-      );
-    })[0];
+    const top:any = await new Promise((res, rej) => {
+      awaiters.push(res);
+    });
 
     if (!top) {
       return res.send("{}");
@@ -84,7 +98,7 @@ app.get("/sdlist", async (req, res) => {
       iterations,
       mask,
       upscale,
-    } = top[1];
+    } = top;
     const id = top[0];
     promptlist[id].timeout = Date.now() + 1200 * 1000; // 2 minutes
     return res.send(
