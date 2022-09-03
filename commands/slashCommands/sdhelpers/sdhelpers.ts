@@ -44,6 +44,7 @@ async function parselout() {
   })[0];
   const next = awaiters.pop();
   if (next) {
+    promptlist[top[0]].timeout = Date.now() + 1200 * 1000; // 2 minutes
     next(top);
   }
 }
@@ -78,7 +79,7 @@ app.get("/sdlist", async (req, res) => {
           .length.toFixed(0)
     );
 
-    const top:any = await new Promise((res, rej) => {
+    const top: any = await new Promise((res, rej) => {
       awaiters.push(res);
     });
 
@@ -98,9 +99,9 @@ app.get("/sdlist", async (req, res) => {
       iterations,
       mask,
       upscale,
-    } = top;
+    } = top[1];
     const id = top[0];
-    promptlist[id].timeout = Date.now() + 1200 * 1000; // 2 minutes
+
     return res.send(
       JSON.stringify({
         prompt,
