@@ -45,6 +45,8 @@ app.get("/twitter/", async (req, res) => {
   const client = new TwitterApi({
     appKey: twitter.key,
     appSecret: twitter.secret,
+    accessToken: authLink[1].oauth_token,
+    accessSecret: authLink[1].oauth_token_secret,
   });
   client
     .login(oauth_verifier)
