@@ -71,10 +71,12 @@ app.get("/twitter/", async (req, res) => {
         };
         writeFileSync("./twittercodes.json", JSON.stringify(codes));
         res.send("Logged in, you can return to discord now");
-        const { data: userObject } = await loggedClient.v2.me();
+        return;
       }
     )
-    .catch(() => res.status(403).send("Invalid verifier or access tokens!"));
+    .catch(() => {
+      console.log("error");
+    });
 });
 
 export const tweetPic = async (
