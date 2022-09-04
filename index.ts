@@ -5,6 +5,7 @@ import commands from "./commands/slashCommands";
 import config from "./config/config.json";
 import { debug } from "./offline.json";
 import { start } from "./commands/slashCommands/webserver/express";
+import { toolbarModalRecievers } from "./commands/slashCommands/helpers/toolbars/index";
 
 // Finally, WriterBot Begins
 client.on("ready", async () => {
@@ -68,6 +69,11 @@ const runCommands = async (interaction: Interaction): Promise<void> => {
         console.log("error: level: commands", e);
         reject(e);
       });
+      await Promise.all(
+        toolbarModalRecievers
+          .filter((c) => c.id == interaction.customId)
+          .map((c) => c.reciever(interaction))
+      );
     }
 
     resolve();
