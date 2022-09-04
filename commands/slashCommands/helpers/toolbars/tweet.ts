@@ -38,7 +38,7 @@ export const createTweetModal = async (
               type: "BUTTON",
               style: "LINK",
               label: "Login",
-              url: createOathLink(i.user.id),
+              url: (await createOathLink(i.user.id)).url,
             },
           ],
         },
