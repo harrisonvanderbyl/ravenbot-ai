@@ -7,6 +7,7 @@ import {
 export type ToolBarItem = {
   name: string;
   id: string;
+  skipDefer?: boolean;
   filter: (buffers: Buffer[]) => boolean;
   createToolbars: (
     buffers: Buffer[],

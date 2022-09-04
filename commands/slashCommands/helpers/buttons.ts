@@ -60,8 +60,13 @@ export const addToolbar = async (
     }
     toolbars.forEach(async (t) => {
       if (t.id === number) {
-        await i.deferUpdate();
+        if (!t.skipDefer) {
+          await i.deferUpdate();
+        }
         const newtoolbar = t.createToolbars(buffers, i);
+        if (t.skipDefer && (!i.deferred || i.replied)) {
+          await i.deferUpdate();
+        }
         await i.editReply({
           components: [
             ...(newtoolbar.length > 0 ? newtoolbar : toolbar(buffers)),

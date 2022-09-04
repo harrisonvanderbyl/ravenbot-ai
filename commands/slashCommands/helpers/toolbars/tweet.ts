@@ -75,6 +75,7 @@ export const createTweetModal = async (
 export const tweetToolBar: ToolBarItem = {
   name: "🐦",
   id: "tweet",
+  skipDefer: true,
   filter: (buffers: Buffer[]) => true,
   createToolbars: (buffers: Buffer[], i): MessageActionRowOptions[] => {
     // Different behaviors for different number of buffers
