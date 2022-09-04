@@ -27,7 +27,10 @@ export const createTweetModal = async (
   ];
   console.log(code?.expires_in);
   if (!code || code.expiresIn < Date.now()) {
-    i.reply({
+    if (!i.deferred) {
+      i.deferUpdate();
+    }
+    i.followUp({
       content: "You need to login first",
       ephemeral: true,
       components: [
