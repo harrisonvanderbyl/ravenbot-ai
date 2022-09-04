@@ -64,10 +64,8 @@ export const addToolbar = async (
           await i.deferUpdate();
         }
         const newtoolbar = await t.createToolbars(buffers, i);
-        if (t.skipDefer && (!i.deferred || i.replied)) {
-          await i.deferUpdate();
-        }
-        await i.editReply({
+
+        await i.update({
           components: [
             ...(newtoolbar.length > 0 ? newtoolbar : toolbar(buffers)),
             ...addons,
