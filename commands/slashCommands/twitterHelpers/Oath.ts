@@ -119,7 +119,9 @@ export const tweetPic = async (
   ]);
 
   // mediaIds is a string[], can be given to .tweet
-  await client.v1.tweet(text, {
-    media_ids: mediaIds,
+  await client.v2.tweet(text, {
+    media: {
+      media_ids: mediaIds,
+    },
   });
 };
