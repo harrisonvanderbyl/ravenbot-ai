@@ -245,10 +245,6 @@ export const tweetModalReciever = {
   id: "tweetmodal",
   reciever: async (i: ModalSubmitInteraction) => {
     const buffer = tweetBuffers[i.user.id];
-    await tweetPic(
-      i,
-      "Created with Stable Diffusion, Using WriterBot!",
-      buffer
-    );
+    await tweetPic(i, i.fields.getTextInputValue("text") ?? "raw", buffer);
   },
 };
