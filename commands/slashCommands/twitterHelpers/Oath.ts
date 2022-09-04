@@ -79,7 +79,7 @@ export const tweetPic = async (
     i.user.id
   ];
   if (!code) {
-    if (!i.deferred || !i.replied) {
+    if (!i.deferred && !i.replied) {
       i.deferUpdate();
     }
     i.followUp({
@@ -118,7 +118,7 @@ export const tweetPic = async (
     media_ids: mediaIds,
   });
 
-  if (!i.deferred || !i.replied) {
+  if (!i.deferred && !i.replied) {
     i.deferUpdate();
   }
   i.followUp({
