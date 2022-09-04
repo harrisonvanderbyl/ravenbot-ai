@@ -64,13 +64,16 @@ export const addToolbar = async (
           await i.deferUpdate();
         }
         const newtoolbar = await t.createToolbars(buffers, i);
-
-        await i.update({
-          components: [
-            ...(newtoolbar.length > 0 ? newtoolbar : toolbar(buffers)),
-            ...addons,
-          ].map((m) => new MessageActionRow<MessageActionRowComponent>(m)),
-        });
+        try {
+          await i.update({
+            components: [
+              ...(newtoolbar.length > 0 ? newtoolbar : toolbar(buffers)),
+              ...addons,
+            ].map((m) => new MessageActionRow<MessageActionRowComponent>(m)),
+          });
+        } catch (e) {
+          console.log(e);
+        }
       }
       await t.process(buffers, i, addons);
     });
