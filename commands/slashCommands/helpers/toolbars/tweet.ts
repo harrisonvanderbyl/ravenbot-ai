@@ -27,7 +27,7 @@ export const createTweetModal = async (
   ];
   console.log(code?.expires_in);
   if (!code || code.expiresIn < Date.now()) {
-    if (!i.deferred) {
+    if (!i.deferred || !i.replied) {
       i.deferUpdate();
     }
     i.followUp({
