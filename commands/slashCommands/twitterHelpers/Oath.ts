@@ -65,7 +65,10 @@ app.get("/twitter/", async (req, res) => {
 
         // Example request
         const codes = JSON.parse(readFileSync("./twittercodes.json", "utf8"));
-        codes[state] = { accessToken, expiresIn };
+        codes[state] = {
+          accessToken,
+          expiresIn: Date.now() + expiresIn * 1000,
+        };
         writeFileSync("./twittercodes.json", JSON.stringify(codes));
         res.send("Logged in, you can return to discord now");
         const { data: userObject } = await loggedClient.v2.me();
@@ -82,7 +85,7 @@ export const tweetPic = async (
   const code = JSON.parse(readFileSync("./twittercodes.json", "utf8"))[
     i.user.id
   ];
-  console.log(code?.expires_in);
+  console.log(code?.expiresIn);
   if (!code || code.expiresIn < Date.now()) {
     i.followUp({
       content: "You need to login first",
