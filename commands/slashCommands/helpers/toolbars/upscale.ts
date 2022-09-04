@@ -13,7 +13,7 @@ export const upscaleToolBar: ToolBarItem = {
   name: "🔍",
   id: "upscale",
   filter: (buffers: Buffer[]) => buffers.length == 1,
-  createToolbars: (buffers: Buffer[]): MessageActionRowOptions[] => {
+  createToolbars: async (buffers: Buffer[]) => {
     // Different behaviors for different number of buffers
     switch (buffers.length) {
       case 1:

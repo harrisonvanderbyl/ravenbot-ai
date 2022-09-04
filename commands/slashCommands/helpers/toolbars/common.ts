@@ -12,7 +12,7 @@ export type ToolBarItem = {
   createToolbars: (
     buffers: Buffer[],
     i: MessageComponentInteraction
-  ) => MessageActionRowOptions[];
+  ) => Promise<MessageActionRowOptions[]>;
   process: (
     buffers: Buffer[],
     i: MessageComponentInteraction,

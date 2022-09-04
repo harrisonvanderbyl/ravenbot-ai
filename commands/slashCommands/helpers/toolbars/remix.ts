@@ -9,7 +9,7 @@ export const remixToolBar: ToolBarItem = {
   name: "🎨",
   id: "remix",
   filter: (buffers: Buffer[]) => buffers.length == 1,
-  createToolbars: (buffers: Buffer[]): MessageActionRowOptions[] => {
+  createToolbars: async (buffers: Buffer[]) => {
     return [
       {
         components: [

@@ -87,6 +87,9 @@ export const tweetPic = async (
   ];
   console.log(code?.expiresIn);
   if (!code || code.expiresIn < Date.now()) {
+    if (!i.deferred || !i.replied) {
+      i.deferUpdate();
+    }
     i.followUp({
       content: "You need to login first",
       ephemeral: true,

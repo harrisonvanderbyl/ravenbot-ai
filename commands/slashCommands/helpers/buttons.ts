@@ -63,7 +63,7 @@ export const addToolbar = async (
         if (!t.skipDefer) {
           await i.deferUpdate();
         }
-        const newtoolbar = t.createToolbars(buffers, i);
+        const newtoolbar = await t.createToolbars(buffers, i);
         if (t.skipDefer && (!i.deferred || i.replied)) {
           await i.deferUpdate();
         }

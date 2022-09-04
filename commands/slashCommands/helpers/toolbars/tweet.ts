@@ -77,11 +77,14 @@ export const tweetToolBar: ToolBarItem = {
   id: "tweet",
   skipDefer: true,
   filter: (buffers: Buffer[]) => true,
-  createToolbars: (buffers: Buffer[], i): MessageActionRowOptions[] => {
+  createToolbars: async (
+    buffers: Buffer[],
+    i
+  ): Promise<MessageActionRowOptions[]> => {
     // Different behaviors for different number of buffers
     switch (buffers.length) {
       case 1:
-        createTweetModal(i, buffers[0]);
+        await createTweetModal(i, buffers[0]);
         return [];
       case 4:
         return [

@@ -12,7 +12,7 @@ export const sendToolBar: ToolBarItem = {
   name: "📩",
   id: "mail",
   filter: (buffers: Buffer[]) => true,
-  createToolbars: (buffers: Buffer[], i): MessageActionRowOptions[] => {
+  createToolbars: async (buffers: Buffer[], i) => {
     // Different behaviors for different number of buffers
     switch (buffers.length) {
       case 1:
