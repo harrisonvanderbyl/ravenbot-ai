@@ -119,9 +119,9 @@ export const tweetPic = async (
   });
 
   if (!i.deferred && !i.replied) {
-    i.deferUpdate();
+    await i.deferReply({ ephemeral: true });
   }
-  i.followUp({
+  await i.followUp({
     content: "Successfully tweeted",
     ephemeral: true,
   });
