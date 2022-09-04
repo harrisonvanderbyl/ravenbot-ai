@@ -115,7 +115,7 @@ export const tweetPic = async (
   // First, post all your images to Twitter
   const mediaIds = await Promise.all([
     // from a buffer, for example obtained with an image modifier package
-    client.v1.uploadMedia(pic, { type: "png" }),
+    client.v1.uploadMedia(pic, { mimeType: "image/png" }),
   ]);
 
   // mediaIds is a string[], can be given to .tweet
