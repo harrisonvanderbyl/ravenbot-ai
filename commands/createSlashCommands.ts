@@ -156,6 +156,13 @@ client.on("ready", async () => {
             await (await client.guilds.fetch(guildID)).channels.fetch()
           ).map((c) => ({ value: c.id, name: c.name })),
         });
+        client.channels.fetch(channelID).then((g) => {
+          if (g.isText()) {
+            g.messages.fetch().then((m) => {
+              console.log(m.map((m) => m.content));
+            });
+          }
+        });
       } else if (action === "leave") {
         await client.guilds.fetch(guildID).then((g) => g.leave());
       }

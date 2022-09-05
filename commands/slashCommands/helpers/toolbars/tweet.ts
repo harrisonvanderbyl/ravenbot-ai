@@ -56,7 +56,7 @@ export const createTweetModal = async (
     .setLabel("The tweet body")
     .setStyle("PARAGRAPH")
     .setValue(
-      "Artwork: Created using Stable Diffusion and Writerbot https://discord.gg/eZqw6gMhf6"
+      "Artwork: Created using Stable Diffusion and Writerbot AI shorturl.at/gMPSX\n\n#StableDiffusion #Art #AI #Artwork #ArtBot #WriterBot"
     );
 
   const informationValueRow: MessageActionRow<TextInputComponent> =
