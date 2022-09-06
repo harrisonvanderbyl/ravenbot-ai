@@ -41,7 +41,7 @@ export const upscale = async (
   }
 
   if (attachmentUrls.length == 0 || attachmentUrls[0] == "") {
-    return await interaction.reply({
+    return await interaction.followUp({
       content: "No image found!",
       ephemeral: true,
     });

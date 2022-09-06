@@ -101,29 +101,41 @@ export const tweetPic = async (
     });
     return;
   }
-  const client = new TwitterApi({
-    appKey: twitter.key,
-    appSecret: twitter.secret,
-    accessToken: code.accessToken,
-    accessSecret: code.accessSecret,
-  });
-  // First, post all your images to Twitter
-  const mediaIds = await Promise.all([
-    // from a buffer, for example obtained with an image modifier package
-    client.v1.uploadMedia(pic, { mimeType: "image/png" }),
-  ]);
+  try {
+    const client = new TwitterApi({
+      appKey: twitter.key,
+      appSecret: twitter.secret,
+      accessToken: code.accessToken,
+      accessSecret: code.accessSecret,
+    });
+    // First, post all your images to Twitter
+    const mediaIds = await Promise.all([
+      // from a buffer, for example obtained with an image modifier package
+      client.v1.uploadMedia(pic, { mimeType: "image/png" }),
+    ]);
 
-  // mediaIds is a string[], can be given to .tweet
-  await client.v1.tweet(text, {
-    media_ids: mediaIds,
-  });
+    // mediaIds is a string[], can be given to .tweet
+    await client.v1.tweet(text, {
+      media_ids: mediaIds,
+    });
 
-  if (!i.deferred && !i.replied) {
-    await i.deferReply({ ephemeral: true });
+    if (!i.deferred && !i.replied) {
+      await i.deferReply({ ephemeral: true });
+    }
+    await i.followUp({
+      content: "Successfully tweeted",
+      ephemeral: true,
+    });
+    return;
+  } catch (e) {
+    console.log(e);
+    if (!i.deferred && !i.replied) {
+      await i.deferReply({ ephemeral: true });
+    }
+    await i.followUp({
+      content: "Error tweeting(perhaps too big?)",
+      ephemeral: true,
+    });
+    return;
   }
-  await i.followUp({
-    content: "Successfully tweeted",
-    ephemeral: true,
-  });
-  return;
 };

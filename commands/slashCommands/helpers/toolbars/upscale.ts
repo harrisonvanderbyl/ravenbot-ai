@@ -71,15 +71,18 @@ export const upscaleToolBar: ToolBarItem = {
   process: async (buffers, i, addons) => {
     const number = i.customId;
     if (number == "upscale2x") {
-      await i.deferUpdate();
+      if (!i.deferred && !i.replied) await i.deferUpdate();
+
       const message = await upscale(client, i, "2");
     }
     if (number == "upscale4x") {
-      await i.deferUpdate();
+      if (!i.deferred && !i.replied) await i.deferUpdate();
+
       const message = await upscale(client, i, "4");
     }
     if (number == "upscale8x") {
-      await i.deferUpdate();
+      if (!i.deferred && !i.replied) await i.deferUpdate();
+
       const message = await upscale(client, i, "8");
     }
   },
