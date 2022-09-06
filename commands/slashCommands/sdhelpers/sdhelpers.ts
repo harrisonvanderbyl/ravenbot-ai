@@ -236,22 +236,6 @@ export const stable = async (
         m.lastseen > Date.now() - 1000 * 60 && allowColab == (m.type == "colab")
     );
     if (validPeers.length == 0) {
-      await interaction.editReply({
-        content:
-          "No peers of type " +
-          (allowColab ? "colab" : "local") +
-          " available, please try again later, or start your own free and fast remote node using the link below",
-        components: [
-          new MessageActionRow().addComponents(
-            new MessageButton()
-              .setLabel("Colab Node(free, remote)")
-              .setStyle("LINK")
-              .setURL(
-                "https://colab.research.google.com/drive/1xxypspWywNT6IOnXdSQz9phL0MRPhPCp?usp=sharing"
-              )
-          ),
-        ],
-      });
       reject("No peers available");
       return null;
     }

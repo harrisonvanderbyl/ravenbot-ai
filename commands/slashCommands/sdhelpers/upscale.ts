@@ -104,6 +104,7 @@ export const upscale = async (
     await interaction.followUp({ content: "error: " + e, ephemeral: true });
     return null;
   });
+  if (buff == null) return;
   const newsize = sharp(buff).metadata();
   try {
     await message.edit({
