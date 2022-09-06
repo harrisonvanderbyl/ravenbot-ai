@@ -16,18 +16,19 @@ export const sendToolBar: ToolBarItem = {
     // Different behaviors for different number of buffers
     switch (buffers.length) {
       case 1:
-        try {
-          i.user.createDM().then((dm) => {
-            dm.send({
+        i.user
+          .createDM()
+          .then(async (dm) => {
+            await dm.send({
               files: [new MessageAttachment(buffers[0], "image.png")],
             });
+          })
+          .catch((e) => {
+            i.followUp({
+              ephemeral: true,
+              content: "Error (File might be too large)",
+            });
           });
-        } catch (e) {
-          i.followUp({
-            ephemeral: true,
-            content: "Error (File might be too large)",
-          });
-        }
         return [];
       case 4:
         return [
