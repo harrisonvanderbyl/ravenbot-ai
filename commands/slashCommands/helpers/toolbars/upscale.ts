@@ -53,10 +53,10 @@ export const upscaleToolBar: ToolBarItem = {
                 customId: "home",
                 style: "SECONDARY",
                 label: "🏠",
-                max: 0,
+                max: 100000,
               },
             ]
-              .filter((m) => m.max <= maxsize)
+              .filter((m) => maxsize <= m.max)
               .map((m) => {
                 delete m.max;
                 return m;
