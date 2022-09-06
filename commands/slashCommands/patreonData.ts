@@ -1,5 +1,9 @@
 import { existsSync, readFileSync, writeFileSync } from "fs";
-import { generateLoginButton, getPatreonData } from "./patreonHelpers/oauth";
+import {
+  generateLoginButton,
+  getPatreonData,
+  getPatreonDiscordIDs,
+} from "./patreonHelpers/oauth";
 
 import { CommandInteraction } from "discord.js";
 import { SlashCommand } from "./typing";
@@ -13,9 +17,10 @@ export const patreonCommand: SlashCommand = {
     if (!existsSync("./patreonConfig.json")) {
       writeFileSync("./patreonConfig.json", JSON.stringify({}));
     }
-    const patreonInfo = JSON.parse(
+    const rawPatreonConfig = JSON.parse(
       readFileSync("./patreonConfig.json").toString()
-    )[interaction.user.id];
+    );
+    const patreonInfo = rawPatreonConfig[interaction.user.id];
     if (!patreonInfo) {
       return await generateLoginButton(interaction);
     } else {
@@ -25,6 +30,11 @@ export const patreonCommand: SlashCommand = {
         patreonInfo.token,
         "/current_user/campaigns"
       );
+      const camp = data.rawJson.data[0].id;
+
+      const mypatreons = await getPatreonDiscordIDs(patreonInfo.token, camp);
+      rawPatreonConfig[interaction.user.id].patreons = mypatreons;
+      writeFileSync("./patreonConfig.json", JSON.stringify(rawPatreonConfig));
 
       await interaction.editReply({
         embeds: [

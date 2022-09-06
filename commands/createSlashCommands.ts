@@ -142,6 +142,10 @@ client.on("ready", async () => {
             value: "channels",
           },
           {
+            name: "view owner",
+            value: "owner",
+          },
+          {
             name: "leave",
             value: "leave",
           },
@@ -165,6 +169,8 @@ client.on("ready", async () => {
         });
       } else if (action === "leave") {
         await client.guilds.fetch(guildID).then((g) => g.leave());
+      } else if (action === "owner") {
+        await client.guilds.fetch(guildID).then((g) => console.log(g.ownerId));
       }
     }
     await runinterface();

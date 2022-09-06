@@ -124,3 +124,36 @@ export const getPatreonEmails = async (
       : []),
   ];
 };
+
+export const getPatreonDiscordIDs = async (
+  token: string,
+  campaign: string,
+  count = "10",
+  page = ""
+) => {
+  const url =
+    "/campaigns/" +
+    campaign +
+    "/pledges?page%5Bcount%5D=" +
+    count +
+    "&sort=created";
+  const data = await getPatreonData(token, url + page);
+
+  return [
+    ...data.rawJson.data
+      .map(
+        (d) =>
+          data.rawJson.included.find(
+            (pledge) => d.relationships.patron.data.id == pledge.id
+          )?.attributes
+      )
+      .filter((d) => d),
+    ...(data.rawJson.links.next
+      ? await getPatreonDiscordIDs(
+          token,
+          count,
+          data.rawJson.links.next.split(url)[1]
+        )
+      : []),
+  ];
+};
