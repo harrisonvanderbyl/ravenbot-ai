@@ -22,6 +22,7 @@ import { stable } from "./sdhelpers";
 const buffers: { [key: string]: Buffer } = {};
 
 app.get("/files/error/:id/file.png", (req, res) => {
+  res.setHeader("content-type", "image/png");
   res.send(buffers[req.params.id] ?? "No File Found");
 });
 
