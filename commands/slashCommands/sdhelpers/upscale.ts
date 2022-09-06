@@ -95,6 +95,7 @@ export const upscale = async (
     await interaction.followUp({ content: "error: " + e, ephemeral: true });
     return null;
   });
+  const newsize = sharp(buff).metadata();
   await message.edit({
     content: null,
 
@@ -112,9 +113,7 @@ export const upscale = async (
           {
             name: "Resolution",
             value: `
-            ${((await image.metadata()).width * 2).toFixed(0)}x${(
-              (await image.metadata()).height * 2
-            ).toFixed(0)}`,
+            ${(await newsize).width}x${(await newsize).height.toFixed(0)}`,
           },
         ],
         image: {

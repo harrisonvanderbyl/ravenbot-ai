@@ -38,7 +38,7 @@ export const addToolbar = async (
     ),
   });
   const collector = message.createMessageComponentCollector({
-    time: 120000,
+    time: 60000 * 8,
   });
   collector.on("end", async (m) => {
     message.edit({
@@ -60,7 +60,6 @@ export const addToolbar = async (
     }
     toolbars.forEach(async (t) => {
       if (t.id === number) {
-        
         const newtoolbar = await t.createToolbars(buffers, i);
         if (!i.deferred && !i.replied) {
           await i.deferUpdate();
