@@ -21,7 +21,7 @@ import { stable } from "./sdhelpers";
 
 const buffers: { [key: string]: Buffer } = {};
 
-app.get("/files/error/:id", (req, res) => {
+app.get("/files/error/:id/file.png", (req, res) => {
   res.send(buffers[req.params.id] ?? "No File Found");
 });
 
@@ -153,7 +153,12 @@ export const upscale = async (
             },
           ],
           image: {
-            url: redirectUrl + "/files/error/" + message.id,
+            url:
+              "https://" +
+              redirectUrl +
+              "/files/error/" +
+              message.id +
+              "/file.png",
           },
         },
       ],
