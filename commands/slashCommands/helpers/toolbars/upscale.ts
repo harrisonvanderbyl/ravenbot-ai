@@ -1,5 +1,6 @@
 import {
   Message,
+  MessageActionRowComponentResolvable,
   MessageActionRowOptions,
   MessageAttachment,
 } from "discord.js";
@@ -59,7 +60,7 @@ export const upscaleToolBar: ToolBarItem = {
               .map((m) => {
                 delete m.max;
                 return m;
-              }),
+              }) as any[],
             type: "ACTION_ROW",
           },
         ];
