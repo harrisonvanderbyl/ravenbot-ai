@@ -13,9 +13,17 @@ import {
 
 import { SlashCommand } from "../typing";
 import { addToolbar } from "../helpers/buttons";
+import { app } from "../webserver/express";
 import { downloadToBuffer } from "../../../charaterBuilders/imageGenerators/wombo";
+import { redirectUrl } from "../../../config/config.json";
 import sharp from "sharp";
 import { stable } from "./sdhelpers";
+
+const buffers: { [key: string]: Buffer } = {};
+
+app.get("/files/error/:id", (req, res) => {
+  res.send(buffers[req.params.id] ?? "No File Found");
+});
 
 export const upscale = async (
   client,
@@ -96,32 +104,66 @@ export const upscale = async (
     return null;
   });
   const newsize = sharp(buff).metadata();
-  await message.edit({
-    content: null,
+  try {
+    await message.edit({
+      content: null,
 
-    files: [new MessageAttachment(buff, `generation.png`)],
-    embeds: [
-      {
-        title: ((await content) ?? "").slice(0, 200) + "...",
-        fields: [
-          {
-            name: "Seed",
-            value: "Upscale",
+      files: [new MessageAttachment(buff, `generation.png`)],
+      embeds: [
+        {
+          title: ((await content) ?? "").slice(0, 200) + "...",
+          fields: [
+            {
+              name: "Seed",
+              value: "Upscale",
 
-            inline: true,
-          },
-          {
-            name: "Resolution",
-            value: `
+              inline: true,
+            },
+            {
+              name: "Resolution",
+              value: `
             ${(await newsize).width}x${(await newsize).height.toFixed(0)}`,
+            },
+          ],
+          image: {
+            url: `attachment://generation.png`,
           },
-        ],
-        image: {
-          url: `attachment://generation.png`,
         },
-      },
-    ],
-  });
+      ],
+    });
+  } catch (e) {
+    buffers[message.id] = buff;
+    await message.edit({
+      content: "Could not upload, image only valid for 10 mins",
+      files: [new MessageAttachment(buff, `generation.png`)],
+      embeds: [
+        {
+          title: ((await content) ?? "").slice(0, 200) + "...",
+          fields: [
+            {
+              name: "Seed",
+              value: "Upscale",
+
+              inline: true,
+            },
+            {
+              name: "Resolution",
+              value: `
+              ${(await newsize).width}x${(await newsize).height.toFixed(0)}`,
+            },
+          ],
+          image: {
+            url: redirectUrl + "/files/error/" + message.id,
+          },
+        },
+      ],
+    });
+
+    // timeout to delete the file
+    setTimeout(() => {
+      delete buffers[message.id];
+    }, 600000);
+  }
   await addToolbar(
     message as Message,
     [buff],
