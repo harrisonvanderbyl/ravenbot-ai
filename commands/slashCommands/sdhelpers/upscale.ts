@@ -135,7 +135,6 @@ export const upscale = async (
     buffers[message.id] = buff;
     await message.edit({
       content: "Could not upload, image only valid for 10 mins",
-      files: [new MessageAttachment(buff, `generation.png`)],
       embeds: [
         {
           title: ((await content) ?? "").slice(0, 200) + "...",
