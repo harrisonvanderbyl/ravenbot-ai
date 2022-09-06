@@ -39,7 +39,7 @@ const runCommands = async (interaction: Interaction): Promise<void> => {
           patreonInfo["438605535323881486"].patreons &&
           patreonInfo["438605535323881486"].patreons
             .map((p) => p.social_connections.discord.user_id)
-            .includes(interaction.user.id)) ||
+            .includes(guildLeader)) ||
         guildLeader === "438605535323881486" ||
         guildLeader === "188122780678488065" ||
         guildLeader === "437694417676140577"
