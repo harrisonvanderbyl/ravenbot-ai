@@ -4,6 +4,7 @@ import { adminChannel, client } from "./commands/client";
 import commands from "./commands/slashCommands";
 import config from "./config/config.json";
 import { debug } from "./offline.json";
+import { readFileSync } from "fs";
 import { start } from "./commands/slashCommands/webserver/express";
 import { toolbarModalRecievers } from "./commands/slashCommands/helpers/toolbars/index";
 
@@ -24,6 +25,43 @@ client.on("ready", async () => {
 client.on("messageCreate", async (message) => {});
 const runCommands = async (interaction: Interaction): Promise<void> => {
   return await new Promise(async (resolve, reject) => {
+    const patreonInfo = JSON.parse(
+      readFileSync("./patreonConfig.json", "utf-8")
+    );
+    const guildLeader =
+      interaction.guild?.ownerId ??
+      (await client.guilds
+        .fetch(interaction.guildId)
+        .then((guild) => guild.ownerId));
+    if (
+      !(
+        (patreonInfo["438605535323881486"] &&
+          patreonInfo["438605535323881486"].patreons &&
+          patreonInfo["438605535323881486"].patreons
+            .map((p) => p.social_connections.discord.user_id)
+            .includes(interaction.user.id)) ||
+        guildLeader === "438605535323881486" ||
+        guildLeader === "188122780678488065"
+      )
+    ) {
+      console.log(
+        `User ${interaction.user.username} tried to use a command, but the guild
+        owner of ${await client.guilds
+          .fetch(interaction.guildId)
+          .then(
+            async (guild) =>
+              guild.name + " : " + (await guild.fetchOwner()).displayName
+          )} 
+        is not a patreon`
+      );
+      if (interaction.channel.isText()) {
+        interaction.isRepliable() &&
+          (await interaction.reply({
+            content: `The guild owner is not a patreon subscriber, so this command cannot be used here`,
+          }));
+        return;
+      }
+    }
     if (!debug == (interaction.channelId == adminChannel)) {
       console.log("not interacting");
       return;
