@@ -16,11 +16,18 @@ export const sendToolBar: ToolBarItem = {
     // Different behaviors for different number of buffers
     switch (buffers.length) {
       case 1:
-        i.user.createDM().then((dm) => {
-          dm.send({
-            files: [new MessageAttachment(buffers[0], "image.png")],
+        try {
+          i.user.createDM().then((dm) => {
+            dm.send({
+              files: [new MessageAttachment(buffers[0], "image.png")],
+            });
           });
-        });
+        } catch (e) {
+          i.followUp({
+            ephemeral: true,
+            content: "Error (File might be too large)",
+          });
+        }
         return [];
       case 4:
         return [
@@ -176,23 +183,30 @@ export const sendToolBar: ToolBarItem = {
       ].includes(number)
     ) {
       await i.deferUpdate();
-      const message = await i.user.createDM().then((t) =>
-        t.send({
-          files: [
-            new MessageAttachment(
-              buffers[Number(number.split("mail")[1]) - 1],
-              "buffer.png"
-            ),
-          ],
-          embeds: [
-            {
-              image: {
-                url: "attachment://buffer.png",
+      try {
+        const message = await i.user.createDM().then((t) =>
+          t.send({
+            files: [
+              new MessageAttachment(
+                buffers[Number(number.split("mail")[1]) - 1],
+                "buffer.png"
+              ),
+            ],
+            embeds: [
+              {
+                image: {
+                  url: "attachment://buffer.png",
+                },
               },
-            },
-          ],
-        })
-      );
+            ],
+          })
+        );
+      } catch (e) {
+        i.followUp({
+          ephemeral: true,
+          content: "Error (File might be too large)",
+        });
+      }
     }
   },
 };
