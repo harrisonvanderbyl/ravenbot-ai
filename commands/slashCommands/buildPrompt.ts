@@ -52,7 +52,7 @@ export const stablediffusion: SlashCommand = {
         (interaction.options.get("height")?.value as string) ?? "512";
       var iterations =
         (interaction.options.get("iterations")?.value as string) ?? "1";
-      var steps = (interaction?.options?.get("steps")?.value as string) ?? "20";
+      var steps = (interaction?.options?.get("steps")?.value as string) ?? "50";
       // remove anything non numeric
       steps = steps.replace(/\D/g, "");
       iterations = iterations.replace(/\D/g, "");
