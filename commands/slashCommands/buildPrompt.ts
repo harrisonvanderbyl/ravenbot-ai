@@ -135,7 +135,11 @@ export const stablediffusion: SlashCommand = {
       );
     } catch (e) {
       console.log(e);
-      await interaction.followUp({ content: "error: " + e, ephemeral: true });
+      if (!interaction.replied && !interaction.deferred) {
+        await interaction.reply({ content: "error: " + e, ephemeral: true });
+      } else {
+        await interaction.followUp({ content: "error: " + e, ephemeral: true });
+      }
     }
   },
   contextCommand: async (interaction) => {
