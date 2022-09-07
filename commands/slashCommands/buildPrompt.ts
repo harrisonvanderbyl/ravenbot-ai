@@ -84,6 +84,8 @@ export const stablediffusion: SlashCommand = {
         iterations as string,
         undefined,
         steps,
+        undefined,
+        undefined,
         cfg
       ).catch(async (e) => {
         console.log(e);
