@@ -31,6 +31,7 @@ const promptlist: {
     iterations: string;
     mask?: string;
     upscale?: string;
+    cfg?: string;
   };
 } = {};
 
@@ -101,6 +102,7 @@ app.get("/sdlist", async (req, res) => {
       height,
       iterations,
       mask,
+      cfg,
       upscale,
     } = top[1];
     const id = top[0];
@@ -115,6 +117,7 @@ app.get("/sdlist", async (req, res) => {
         strength,
         width,
         height,
+        cfg,
         iterations,
         mask,
         upscale,
@@ -226,7 +229,8 @@ export const stable = async (
   mask?: string,
   samples = "20",
   upscale?: string,
-  updatemessage?: Message
+  updatemessage?: Message,
+  cfg: string = "7.5"
 ): Promise<Buffer> => {
   const promise: Promise<Buffer> = new Promise(async (resolve, reject) => {
     const id = interaction.id;
@@ -277,6 +281,7 @@ export const stable = async (
       iterations,
       mask,
       upscale,
+      cfg,
     };
   });
 

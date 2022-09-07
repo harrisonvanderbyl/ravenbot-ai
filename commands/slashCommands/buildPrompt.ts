@@ -48,6 +48,16 @@ export const stablediffusion: SlashCommand = {
         Math.random().toPrecision(5);
 
       var width = (interaction.options.get("width")?.value as string) ?? "512";
+      var cfg = (interaction.options.get("cfg")?.value as string) ?? "7.5";
+      // Make sure cfg is a number
+      try {
+        if (isNaN(Number(cfg))) {
+          cfg = "7.5";
+        }
+      } catch (e) {
+        cfg = "7.5";
+      }
+
       var height =
         (interaction.options.get("height")?.value as string) ?? "512";
       var iterations =
@@ -73,7 +83,8 @@ export const stablediffusion: SlashCommand = {
         height as string,
         iterations as string,
         undefined,
-        steps
+        steps,
+        cfg
       ).catch(async (e) => {
         console.log(e);
         await interaction.followUp({ content: "error: " + e, ephemeral: true });
@@ -202,6 +213,7 @@ export const stablediffusion: SlashCommand = {
           value: (i * 64).toString(),
         })),
       },
+
       {
         name: "height",
         required: false,
@@ -211,6 +223,12 @@ export const stablediffusion: SlashCommand = {
           name: (i * 64).toString(),
           value: (i * 64).toString(),
         })),
+      },
+      {
+        name: "cfg",
+        required: false,
+        type: 3,
+        description: "The cfg to use",
       },
     ],
   },
