@@ -210,7 +210,7 @@ export const stablediffusion: SlashCommand = {
         required: false,
         type: 3,
         description: "The width of the image",
-        choices: [...Array(9).keys()].slice(1).map((i) => ({
+        choices: [...Array(17).keys()].slice(1).map((i) => ({
           name: (i * 64).toString(),
           value: (i * 64).toString(),
         })),

@@ -1,3 +1,4 @@
+import { createSubmission } from "./createSubmissionEntry";
 import { dalle_mini } from "./dallemini";
 import { dalleusage } from "./dalleusage";
 import { drivedata } from "./drivedata";
@@ -31,4 +32,5 @@ export default {
   stablediffusion,
   remixwithsd,
   inpaintwithsd,
+  createSubmission,
 };

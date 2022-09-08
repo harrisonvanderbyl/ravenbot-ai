@@ -146,6 +146,10 @@ client.on("ready", async () => {
             value: "owner",
           },
           {
+            name: "create invite",
+            value: "invite",
+          },
+          {
             name: "leave",
             value: "leave",
           },
@@ -171,6 +175,25 @@ client.on("ready", async () => {
         await client.guilds.fetch(guildID).then((g) => g.leave());
       } else if (action === "owner") {
         await client.guilds.fetch(guildID).then((g) => console.log(g.ownerId));
+      } else if (action === "invite") {
+        const url = await client.guilds
+          .fetch(guildID)
+          .then(
+            async (g) =>
+              (
+                await g.invites.create(
+                  await g.channels
+                    .fetch()
+                    .then(
+                      (c) =>
+                        c
+                          .map((c) => (c.isText() ? c : null))
+                          .filter((c) => c)[0]
+                    )
+                )
+              ).url
+          );
+        console.log(url);
       }
     }
     await runinterface();

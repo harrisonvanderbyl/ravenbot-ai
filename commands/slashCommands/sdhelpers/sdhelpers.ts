@@ -31,7 +31,7 @@ const promptlist: {
     iterations: string;
     mask?: string;
     upscale?: string;
-    cfg?: string;
+    cfg: string;
   };
 } = {};
 
