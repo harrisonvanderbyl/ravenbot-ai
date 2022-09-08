@@ -14,9 +14,16 @@ client.on("ready", async () => {
     `Bot has started, with ${client.users.cache.size} users, in ${client.channels.cache.size} channels of ${client.guilds.cache.size} guilds.`
   );
   client.user?.setPresence({ activities: [{ name: "Drawing/Writing" }] });
-  client.channels.fetch(adminChannel).then((channel) => {
-    (channel as TextChannel).send(`Bot has been started`);
-  });
+
+  const status = "1011284410345205820";
+  const guild = "989166996153323591";
+  client.guilds.fetch(guild).then((g) =>
+    g.channels.fetch(status).then((c: TextChannel) =>
+      c.send({
+        content: "Bot started",
+      })
+    )
+  );
   console.log("starting servers");
   start();
   console.log("fin started servers");
@@ -155,3 +162,16 @@ client.on("guildDelete", (guild) => {
 });
 
 client.login(config.token);
+
+process.on("uncaughtException", async (e) => {
+  console.log(e);
+  const status = "1011284410345205820";
+  const guild = "989166996153323591";
+  await client.guilds.fetch(guild).then((g) =>
+    g.channels.fetch(status).then((c: TextChannel) =>
+      c.send({
+        content: "Bot Crashed, attempting automatic restart",
+      })
+    )
+  );
+});
