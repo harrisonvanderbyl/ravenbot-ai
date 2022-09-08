@@ -13,6 +13,7 @@ import { getAIResponse } from "../../gpt3/parseCommand";
 import { getWebhookFromGuild } from "../common";
 
 export const createSubmission: SlashCommand = {
+  skipDeferReply: true,
   slashCommand: async (clien, interaction: BaseCommandInteraction) => {
     const name = interaction.options.get("name").value as string;
     const icon = interaction.options.get("icon").value as string;
