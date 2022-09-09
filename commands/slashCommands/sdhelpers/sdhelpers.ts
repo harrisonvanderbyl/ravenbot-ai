@@ -108,6 +108,7 @@ app.get("/sdlist", async (req, res) => {
     if (ret.hasOwnProperty("rwky")) {
       return res.send(
         JSON.stringify({
+          id: top[0],
           prompt: ret.prompt,
           temp: ret.temp,
           top: ret.top,
