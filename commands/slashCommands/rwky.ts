@@ -14,8 +14,8 @@ export const rwkyCommand: SlashCommand = {
     rwky(
       interaction,
       interaction.options.get("prompt").value as string,
-      clean((interaction.options.get("temperature").value as string) ?? "1.3"),
-      clean((interaction.options.get("top_p").value as string) ?? "0.8"),
+      clean((interaction.options.get("temperature")?.value as string) ?? "1.3"),
+      clean((interaction.options.get("top_p")?.value as string) ?? "0.8"),
       await interaction.editReply({
         content: "Generating...",
       })
