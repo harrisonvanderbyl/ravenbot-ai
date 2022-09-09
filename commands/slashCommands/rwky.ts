@@ -3,11 +3,16 @@ import { rwky } from "./sdhelpers/sdhelpers";
 
 export const rwkyCommand: SlashCommand = {
   slashCommand: async (client, interaction) => {
+    const clean = (str: string) => {
+      if (!isNaN(Number(str))) {
+        return str;
+      } else return "0.9";
+    };
     rwky(
       interaction,
       interaction.options.get("prompt").value as string,
-      ((interaction.options.get("temperature") as number) ?? 1.3).toFixed(3),
-      ((interaction.options.get("top") as number) ?? 0.8).toFixed(3),
+      clean((interaction.options.get("temperature") as string) ?? "1.3"),
+      clean((interaction.options.get("top_p") as string) ?? "0.8"),
       await interaction.editReply({
         content: "Generating...",
       })
@@ -25,13 +30,13 @@ export const rwkyCommand: SlashCommand = {
       },
       {
         name: "temperature",
-        type: 4,
+        type: 3,
         required: false,
         description: "Temperature",
       },
       {
         name: "top_p",
-        type: 4,
+        type: 3,
         required: false,
         description: "Top_p",
       },
