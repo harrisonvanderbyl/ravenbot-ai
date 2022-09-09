@@ -364,7 +364,7 @@ export const rwky = async (
 
     timeout: 0,
     // use rand to generate a seed for the generator
-    seed: "",
+    seed: "RWKV completion",
     temp,
     top,
 
