@@ -4,6 +4,7 @@ import { rwky } from "./sdhelpers/sdhelpers";
 export const rwkyCommand: SlashCommand = {
   slashCommand: async (client, interaction) => {
     const clean = (str: string) => {
+      console.log(str);
       if (!isNaN(Number(str))) {
         return str;
       } else return "0.9";
