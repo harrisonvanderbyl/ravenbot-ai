@@ -14,25 +14,39 @@ import { client } from "../../client";
 // This is a decentralized generator that allows for anyone to deploy a generator to lighten the server.
 // TODO: create client and implement security
 const promptlist: {
-  [key: string]: {
-    prompt: string;
-    callback: (imagedata: string) => Promise<void>;
-    update: (updatetext: string) => Promise<void>;
-    updateNetworkStats: (data: MessageEmbedOptions[]) => Promise<void>;
-    timeout: number;
-    seed: string;
-    samples: string;
-    progress: string;
-    input?: string;
-    strength?: string;
-    allowColab: boolean;
-    width: string;
-    height: string;
-    iterations: string;
-    mask?: string;
-    upscale?: string;
-    cfg: string;
-  };
+  [key: string]:
+    | {
+        prompt: string;
+        callback: (imagedata: string) => Promise<void>;
+        update: (updatetext: string) => Promise<void>;
+        updateNetworkStats: (data: MessageEmbedOptions[]) => Promise<void>;
+        timeout: number;
+        seed: string;
+        samples: string;
+        progress: string;
+        input?: string;
+        strength?: string;
+        allowColab: boolean;
+        width: string;
+        height: string;
+        iterations: string;
+        mask?: string;
+        upscale?: string;
+        cfg: string;
+      }
+    | {
+        rwky: true;
+        prompt: string;
+        callback: (imagedata: string) => Promise<void>;
+        update: (updatetext: string) => Promise<void>;
+        updateNetworkStats: (data: MessageEmbedOptions[]) => Promise<void>;
+        timeout: number;
+        temp: string;
+        top: string;
+        progress: string;
+        seed: string;
+        allowColab: boolean;
+      };
 } = {};
 
 var lock = false;
@@ -90,10 +104,22 @@ app.get("/sdlist", async (req, res) => {
     if (!top) {
       return res.send("{}");
     }
+    const ret = top[1];
+    if (ret.hasOwnProperty("rwky")) {
+      return res.send(
+        JSON.stringify({
+          prompt: ret.prompt,
+          temp: ret.temp,
+          top: ret.top,
+          rwky: true,
+        })
+      );
+    }
     const {
       prompt,
       callback,
       timeout,
+
       samples,
       seed,
       input,
@@ -104,7 +130,7 @@ app.get("/sdlist", async (req, res) => {
       mask,
       cfg,
       upscale,
-    } = top[1];
+    } = ret;
     const id = top[0];
 
     return res.send(
@@ -286,4 +312,63 @@ export const stable = async (
   });
 
   return promise;
+};
+
+export const rwky = async (
+  interaction: CommandInteraction,
+  prompt: string,
+  temp: string,
+  top: string,
+  updatemessage?: Message
+) => {
+  const id = interaction.id;
+
+  const validPeers = Object.values(peers).filter(
+    (m) => m.lastseen > Date.now() - 1000 * 60
+  );
+  if (validPeers.length == 0) {
+    return null;
+  }
+
+  const updatemessaged =
+    updatemessage ?? ((await interaction.fetchReply()) as Message);
+  var resolved = false;
+  promptlist[id] = {
+    prompt,
+    callback: async (ret: string) => {
+      resolved = true;
+      await updatemessaged.edit({
+        embeds: [
+          {
+            title: "Result",
+            description: ret,
+          },
+        ],
+      });
+    },
+    update: async (updatetext: string) => {
+      if (!resolved) {
+        await updatemessaged.edit({
+          content: updatetext,
+        });
+      }
+    },
+    updateNetworkStats: async (data) => {
+      if (!resolved) {
+        await updatemessaged.edit({
+          embeds: data,
+        });
+      }
+    },
+
+    timeout: 0,
+    // use rand to generate a seed for the generator
+    seed: "",
+    temp,
+    top,
+
+    progress: "Pending",
+    rwky: true,
+    allowColab: true,
+  };
 };
