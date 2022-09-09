@@ -7,7 +7,10 @@ export const rwkyCommand: SlashCommand = {
       interaction,
       interaction.options.get("prompt").value as string,
       ((interaction.options.get("temperature") as number) ?? 1.3).toFixed(3),
-      ((interaction.options.get("top") as number) ?? 0.8).toFixed(3)
+      ((interaction.options.get("top") as number) ?? 0.8).toFixed(3),
+      await interaction.editReply({
+        content: "Generating...",
+      })
     );
   },
   commandSchema: {
