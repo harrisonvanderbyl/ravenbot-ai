@@ -5,9 +5,11 @@ export const rwkyCommand: SlashCommand = {
   slashCommand: async (client, interaction) => {
     const clean = (str: string) => {
       console.log(str);
-      if (!isNaN(Number(str))) {
-        return str;
-      } else return "0.9";
+      const cs = str.split(".");
+      return (cs[0].replace(/[^0-9]/, "") + "." + cs.slice(1).join("")).replace(
+        /[^0-9]/,
+        ""
+      );
     };
     rwky(
       interaction,
