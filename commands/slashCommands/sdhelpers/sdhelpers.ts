@@ -186,7 +186,7 @@ app.post("/update/:id", async (req, res) => {
 
     const id = req.params.id;
     promptlist[id].progress = req.body;
-
+    promptlist[id].update(req.body).catch((e) => console.log(e));
     res.send("ok");
   } catch (e) {
     console.log(e);
@@ -282,9 +282,6 @@ export const stable = async (
       },
       update: async (updatetext: string) => {
         if (!resolved) {
-          await updatemessaged.edit({
-            content: updatetext,
-          });
         }
       },
       updateNetworkStats: async (data) => {
@@ -364,7 +361,12 @@ export const rwky = async (
     updateNetworkStats: async (data) => {
       if (!resolved) {
         await updatemessaged.edit({
-          embeds: data,
+          embeds: [
+            {
+              title: "Running...",
+              description: promptlist[id]?.progress,
+            },
+          ],
         });
       }
     },
