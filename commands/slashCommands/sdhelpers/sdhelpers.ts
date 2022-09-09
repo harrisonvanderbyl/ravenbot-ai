@@ -339,6 +339,7 @@ export const rwky = async (
     callback: async (ret: string) => {
       resolved = true;
       await updatemessaged.edit({
+        content: prompt,
         embeds: [
           {
             title: "Result",
