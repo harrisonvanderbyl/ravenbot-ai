@@ -339,10 +339,10 @@ export const rwky = async (
     callback: async (ret: string) => {
       resolved = true;
       await updatemessaged.edit({
-        content: prompt,
+        content: prompt + "...",
         embeds: [
           {
-            title: "Result",
+            title: "Result:",
             description: ret,
           },
         ],
@@ -351,7 +351,13 @@ export const rwky = async (
     update: async (updatetext: string) => {
       if (!resolved) {
         await updatemessaged.edit({
-          content: updatetext,
+          content: prompt + "...",
+          embeds: [
+            {
+              title: "Running...",
+              description: updatetext,
+            },
+          ],
         });
       }
     },
