@@ -136,7 +136,7 @@ export const stablediffusion: SlashCommand = {
             new MessageButton()
               .setLabel("Writerbot home discord")
               .setStyle("LINK")
-              .setURL("https://discord.gg/gKcREKcf"),
+              .setURL("https://discord.gg/eZqw6gMhf6"),
             new MessageButton()
               .setLabel("Run Colab Node")
               .setStyle("LINK")

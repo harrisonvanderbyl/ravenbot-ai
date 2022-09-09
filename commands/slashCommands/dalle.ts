@@ -88,7 +88,7 @@ export const picture: SlashCommand = {
         new MessageButton()
           .setLabel("Writerbot home discord")
           .setStyle("LINK")
-          .setURL("https://discord.gg/gKcREKcf")
+          .setURL("https://discord.gg/eZqw6gMhf6")
       ),
     ]);
   },
