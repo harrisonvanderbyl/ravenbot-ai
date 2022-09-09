@@ -9,6 +9,7 @@ import { patreonCommand } from "./patreonData";
 import { picture } from "./dalle";
 import { remixwithsd } from "./remixwithsd";
 import { remixwithwombo } from "./remixwithwombo";
+import { rwkyCommand } from "./rwky";
 import { scsquote } from "./scsquote";
 import { sharedallekey } from "./sharedallekey";
 import { speakas } from "./speakas";
@@ -33,4 +34,5 @@ export default {
   remixwithsd,
   inpaintwithsd,
   createSubmission,
+  rwkyCommand,
 };
