@@ -428,7 +428,7 @@ export const updateNetworkStats = async () => {
         const randomArray = (arr: any[]) => {
           return arr[Math.floor(Math.random() * arr.length)];
         };
-        const dream = `a ${randomArray([MovementStyles])} ${randomArray([
+        const dream = `a ${randomArray(MovementStyles)} ${randomArray([
           CreatureStyles,
         ])} ${randomArray([
           "dancing",
@@ -440,7 +440,7 @@ export const updateNetworkStats = async () => {
           "swimming",
           "crawling",
           "skithering",
-        ])} ${randomArray([Elements])} ${randomArray([
+        ])} ${randomArray(Elements)} ${randomArray([
           Enviroments,
         ])} in the ${randomArray([
           "past",
