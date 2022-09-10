@@ -377,10 +377,11 @@ const updateNetworkStats = async () => {
           "greg rutkowski",
           "ansel adams",
         ])} ${randomArray(["render", "painting", "sculpture", "sketch"])}`;
+        const seed = (Math.random() * 100000).toFixed(0);
         const buffers = await stable(
           { id: message.id, fetchReply: () => message } as any,
           dream,
-          (Math.random() * 100000).toFixed(0),
+          seed,
           undefined,
           undefined,
           true,
@@ -400,9 +401,23 @@ const updateNetworkStats = async () => {
           });
         } else {
           await message.edit({
-            content: dream,
-            files: [new MessageAttachment(buffers)],
-            embeds: null,
+            content: null,
+            files: [new MessageAttachment(buffers, "generation.png")],
+            embeds: [
+              {
+                title: dream,
+                fields: [
+                  {
+                    name: "Seed",
+                    value: seed,
+                    inline: true,
+                  },
+                ],
+                image: {
+                  url: `attachment://generation.png`,
+                },
+              },
+            ],
           });
         }
       };
