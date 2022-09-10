@@ -12,6 +12,101 @@ import {
 import { app } from "../webserver/express";
 import { client } from "../../client";
 
+const Sizes = ["small", "medium", "large"];
+
+const CreatureStyles = [
+  "tree",
+  "flower",
+  "fern",
+  "grass",
+  "mushroom",
+  "mammal",
+  "reptile",
+  "insect",
+  "fish",
+  "bird",
+  "amphibian",
+  "woman",
+  "man",
+  "canine",
+  "feline",
+  "thing",
+];
+
+const MovementStyles = [
+  "bipedal",
+  "quadrupedal",
+  "flying",
+  "aerial",
+  "aquatic",
+  "stationary",
+  "arboreal",
+  "burrowing",
+  "beautiful",
+  "handsome",
+  "magical",
+  "magical",
+  "mundane",
+  "pretty",
+  "ugly",
+  "old",
+  "young",
+];
+
+const Enviroments = [
+  "meadows",
+  "forest",
+  "desert",
+  "cave",
+  "field",
+  "mountain",
+  "oasis",
+  "river",
+  "swamp",
+  "city",
+  "house",
+  "mars",
+  "moon",
+  "home",
+  "lakeside",
+  "place",
+];
+
+const Elements = [
+  "fire",
+  "water",
+  "earth",
+  "air",
+  "magma",
+  "ice",
+  "light",
+  "dark",
+  "clockwork",
+  "mechanical",
+  "electric",
+  "poison",
+  "radiation",
+  "lightning",
+  "grassy",
+  "vivic",
+  "wooden",
+  "metal",
+  "stone",
+  "glass",
+  "crystal",
+  "gem",
+  "gold",
+  "silver",
+  "copper",
+  "bronze",
+  "steel",
+  "paper",
+  "plastic",
+  "etherial",
+  "demonic",
+  "undead",
+];
+
 const NoNodeError = async (updatemessaged: Message) => {
   const messageToEdit = await client.guilds
     .fetch(updatemessaged.guildId)
@@ -333,20 +428,8 @@ const updateNetworkStats = async () => {
         const randomArray = (arr: any[]) => {
           return arr[Math.floor(Math.random() * arr.length)];
         };
-        const dream = `a ${randomArray([
-          "magical",
-          "mundane",
-          "pretty",
-          "ugly",
-          "old",
-          "young",
-        ])} ${randomArray([
-          "cat",
-          "dog",
-          "man",
-          "woman",
-          "lizard",
-          "thing",
+        const dream = `a ${randomArray([MovementStyles])} ${randomArray([
+          CreatureStyles,
         ])} ${randomArray([
           "dancing",
           "running",
@@ -354,14 +437,11 @@ const updateNetworkStats = async () => {
           "sitting",
           "standing",
           "dreaming",
-        ])} ${randomArray([
-          "on the moon",
-          "in space",
-          "in the sky",
-          "on mars",
-          "at a lakeside",
-          "at home",
-          "in a city",
+          "swimming",
+          "crawling",
+          "skithering",
+        ])} ${randomArray([Elements])} ${randomArray([
+          Enviroments,
         ])} in the ${randomArray([
           "past",
           "future",
