@@ -340,12 +340,13 @@ const updateNetworkStats = async () => {
           "ugly",
           "old",
           "young",
-        ])}} ${randomArray([
+        ])} ${randomArray([
           "cat",
           "dog",
           "man",
           "woman",
           "lizard",
+          "thing",
         ])} ${randomArray([
           "dancing",
           "running",
@@ -384,7 +385,7 @@ const updateNetworkStats = async () => {
           undefined,
           true,
           "512",
-          "512",
+          randomArray(["512", "320", "768"]),
           "1",
           undefined,
           "30",
@@ -392,12 +393,20 @@ const updateNetworkStats = async () => {
           message,
           "12"
         );
-        await message.edit({
-          content: dream,
-          files: [new MessageAttachment(buffers)],
-        });
+        if (!buffers) {
+          await message.edit({
+            content: "failed to dream",
+            embeds: null,
+          });
+        } else {
+          await message.edit({
+            content: dream,
+            files: [new MessageAttachment(buffers)],
+            embeds: null,
+          });
+        }
       };
-      createDream();
+      createDream().catch(console.log);
     }
   } catch (e) {
     console.log(e);
