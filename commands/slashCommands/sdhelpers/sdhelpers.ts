@@ -349,7 +349,7 @@ app.post("/update/:id", async (req, res) => {
   }
 });
 
-const updateNetworkStats = async () => {
+export const updateNetworkStats = async () => {
   try {
     const channel = await (
       (await client.channels.fetch("1011928316711817246")) as TextChannel
@@ -507,8 +507,6 @@ const updateNetworkStats = async () => {
     console.log(e);
   }
 };
-// Every 5 seconds
-setInterval(updateNetworkStats, 5 * 1000);
 
 export const stable = async (
   interaction: CommandInteraction,

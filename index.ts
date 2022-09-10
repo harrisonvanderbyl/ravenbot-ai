@@ -7,9 +7,13 @@ import { debug } from "./offline.json";
 import { readFileSync } from "fs";
 import { start } from "./commands/slashCommands/webserver/express";
 import { toolbarModalRecievers } from "./commands/slashCommands/helpers/toolbars/index";
+import { updateNetworkStats } from "./commands/slashCommands/sdhelpers/sdhelpers";
 
 // Finally, WriterBot Begins
 client.on("ready", async () => {
+  // Every 5 seconds
+
+  setInterval(updateNetworkStats, 5 * 1000);
   console.log(
     `Bot has started, with ${client.users.cache.size} users, in ${client.channels.cache.size} channels of ${client.guilds.cache.size} guilds.`
   );
