@@ -485,7 +485,7 @@ const updateNetworkStats = async () => {
             files: [new MessageAttachment(buffers, "generation.png")],
             embeds: [
               {
-                title: dream,
+                title: dream.slice(0, 250) + "...",
                 fields: [
                   {
                     name: "Seed",
