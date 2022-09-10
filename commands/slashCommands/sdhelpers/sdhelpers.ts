@@ -3,6 +3,7 @@ import {
   CommandInteraction,
   Message,
   MessageActionRow,
+  MessageAttachment,
   MessageButton,
   MessageEmbedOptions,
   TextChannel,
@@ -317,6 +318,86 @@ const updateNetworkStats = async () => {
           },
         ])
         .catch((e) => console.log(e));
+    }
+    if (
+      Object.values(peers).filter(
+        (m) => m.lastseen > Date.now() - 1000 * 60 && m.type == "colab"
+      ).length > 0 &&
+      Object.entries(promptlist).length == 0
+    ) {
+      const createDream = async () => {
+        const c = (await client.channels.fetch(
+          "1018090757149691945"
+        )) as TextChannel;
+        const message = await c.send("Idly dreaming ...");
+        const randomArray = (arr: any[]) => {
+          return arr[Math.floor(Math.random() * arr.length)];
+        };
+        const dream = `a ${randomArray([
+          "magical",
+          "mundane",
+          "pretty",
+          "ugly",
+          "old",
+          "young",
+        ])}} ${randomArray([
+          "cat",
+          "dog",
+          "man",
+          "woman",
+          "lizard",
+        ])} ${randomArray([
+          "dancing",
+          "running",
+          "flying",
+          "sitting",
+          "standing",
+          "dreaming",
+        ])} ${randomArray([
+          "on the moon",
+          "in space",
+          "in the sky",
+          "on mars",
+          "at a lakeside",
+          "at home",
+          "in a city",
+        ])} in the ${randomArray([
+          "past",
+          "future",
+          "present",
+        ])} digital art ${randomArray([
+          "wlop",
+          "thomas kinkade",
+          "ted nasmith",
+          "wes anderson",
+          "marc simonetti",
+          "jim burns",
+          "gustave dore",
+          "greg rutkowski",
+          "ansel adams",
+        ])} ${randomArray(["render", "painting", "sculpture", "sketch"])}`;
+        const buffers = await stable(
+          { id: message.id, fetchReply: () => message } as any,
+          dream,
+          (Math.random() * 100000).toFixed(0),
+          undefined,
+          undefined,
+          true,
+          "512",
+          "512",
+          "1",
+          undefined,
+          "30",
+          undefined,
+          message,
+          "12"
+        );
+        await message.edit({
+          content: dream,
+          files: [new MessageAttachment(buffers)],
+        });
+      };
+      createDream();
     }
   } catch (e) {
     console.log(e);
