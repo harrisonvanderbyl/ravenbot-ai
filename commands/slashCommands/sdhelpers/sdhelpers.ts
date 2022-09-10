@@ -11,42 +11,52 @@ import {
 import { app } from "../webserver/express";
 import { client } from "../../client";
 
+type RwkyJob = {
+  rwky: true;
+  prompt: string;
+  callback: (imagedata: string) => Promise<void>;
+  update: (updatetext: string) => Promise<void>;
+  updateNetworkStats: (data: MessageEmbedOptions[]) => Promise<void>;
+  timeout: number;
+  temp: string;
+  top: string;
+  progress: string;
+  seed: string;
+  allowColab: boolean;
+  type: "rwkv";
+  message: {
+    guild: string;
+    channel: string;
+  };
+};
+type StableDiffusionJob = {
+  prompt: string;
+  callback: (imagedata: string) => Promise<void>;
+  update: (updatetext: string) => Promise<void>;
+  updateNetworkStats: (data: MessageEmbedOptions[]) => Promise<void>;
+  timeout: number;
+  seed: string;
+  samples: string;
+  progress: string;
+  type: "img2img" | "SD" | "upscale";
+  input?: string;
+  strength?: string;
+  allowColab: boolean;
+  width: string;
+  height: string;
+  iterations: string;
+  mask?: string;
+  upscale?: string;
+  cfg: string;
+  message: {
+    guild: string;
+    channel: string;
+  };
+};
 // This is a decentralized generator that allows for anyone to deploy a generator to lighten the server.
 // TODO: create client and implement security
 const promptlist: {
-  [key: string]:
-    | {
-        prompt: string;
-        callback: (imagedata: string) => Promise<void>;
-        update: (updatetext: string) => Promise<void>;
-        updateNetworkStats: (data: MessageEmbedOptions[]) => Promise<void>;
-        timeout: number;
-        seed: string;
-        samples: string;
-        progress: string;
-        input?: string;
-        strength?: string;
-        allowColab: boolean;
-        width: string;
-        height: string;
-        iterations: string;
-        mask?: string;
-        upscale?: string;
-        cfg: string;
-      }
-    | {
-        rwky: true;
-        prompt: string;
-        callback: (imagedata: string) => Promise<void>;
-        update: (updatetext: string) => Promise<void>;
-        updateNetworkStats: (data: MessageEmbedOptions[]) => Promise<void>;
-        timeout: number;
-        temp: string;
-        top: string;
-        progress: string;
-        seed: string;
-        allowColab: boolean;
-      };
+  [key: string]: StableDiffusionJob | RwkyJob;
 } = {};
 
 var lock = false;
@@ -74,6 +84,7 @@ const peers: {
   [key: string]: {
     name: "string";
     lastseen: number;
+    status: "running" | "idle";
     type: "colab" | "local";
   };
 } = {};
@@ -83,19 +94,9 @@ app.get("/sdlist", async (req, res) => {
     peers[req.ip ?? "unknown"] = {
       name: req.headers.name ?? "unknown",
       lastseen: Date.now(),
+      status: "idle",
       type: req.query.colab == "true" ? "colab" : "local",
     };
-
-    const channel = (
-      (await client.channels.fetch("1011928316711817246")) as TextChannel
-    ).setName(
-      "Colab Nodes: " +
-        Object.values(peers)
-          .filter(
-            (m) => m.lastseen > Date.now() - 1000 * 60 && m.type == "colab"
-          )
-          .length.toFixed(0)
-    );
 
     const top: any = await new Promise((res, rej) => {
       awaiters.push(res);
@@ -162,7 +163,8 @@ app.post("/upload/:id", async (req, res) => {
     peers[req.ip ?? "unknown"] = {
       name: req.headers.name ?? "unknown",
       lastseen: Date.now(),
-      type: req.query.colab == "true" ? "colab" : "local",
+      status: "idle",
+      type: "colab",
     };
 
     console.log(req.params.id, "upload");
@@ -182,10 +184,18 @@ app.post("/upload/:id", async (req, res) => {
 
 app.post("/update/:id", async (req, res) => {
   try {
+    peers[req.ip ?? "unknown"] = {
+      name: req.headers.name ?? "unknown",
+      lastseen: Date.now(),
+      status: "running",
+      type: "colab",
+    };
+
     console.log(req.params.id, "update");
 
     const id = req.params.id;
     promptlist[id].progress = req.body;
+    promptlist[id].timeout = Date.now() + 1200 * 1000;
     promptlist[id].update(req.body).catch((e) => console.log(e));
     res.send("ok");
   } catch (e) {
@@ -195,6 +205,14 @@ app.post("/update/:id", async (req, res) => {
 });
 
 const updateNetworkStats = async () => {
+  const channel = await (
+    (await client.channels.fetch("1011928316711817246")) as TextChannel
+  ).setName(
+    "Colab Nodes: " +
+      Object.values(peers)
+        .filter((m) => m.lastseen > Date.now() - 1000 * 60 && m.type == "colab")
+        .length.toFixed(0)
+  );
   for (const [key, value] of Object.entries(promptlist)) {
     await value
       .updateNetworkStats([
@@ -204,7 +222,10 @@ const updateNetworkStats = async () => {
           fields: [
             {
               name: "Status",
-              value: promptlist[key]?.progress,
+              value:
+                promptlist[key].type == "rwkv"
+                  ? "running"
+                  : promptlist[key]?.progress,
               inline: true,
             },
             {
@@ -213,11 +234,7 @@ const updateNetworkStats = async () => {
               inline: true,
             },
             {
-              name: "Type",
-              value: promptlist[key]?.allowColab ? "Colab" : "Local",
-            },
-            {
-              name: "Colab Nodes",
+              name: "Active Nodes",
               value: Object.values(peers)
                 .filter(
                   (m) =>
@@ -228,11 +245,21 @@ const updateNetworkStats = async () => {
             },
 
             {
-              name: "Pending Colab",
-              value: Object.values(promptlist)
-                .filter((m) => m.allowColab == true)
+              name: "Jobs In Queue",
+              value: Object.entries(promptlist)
+                .filter(([key, value]) => {
+                  return value.timeout < Date.now();
+                })
                 .length.toFixed(0),
               inline: true,
+            },
+            {
+              name: "Jobs In Progress",
+              value: Object.entries(promptlist)
+                .filter(([key, value]) => {
+                  return value.timeout > Date.now();
+                })
+                .length.toFixed(0),
             },
           ],
         },
@@ -266,15 +293,65 @@ export const stable = async (
       (m) =>
         m.lastseen > Date.now() - 1000 * 60 && allowColab == (m.type == "colab")
     );
+
+    const updatemessaged =
+      updatemessage ?? ((await interaction.fetchReply()) as Message);
+
     if (validPeers.length == 0) {
+      const messageToEdit = await client.guilds
+        .fetch(updatemessaged.guildId)
+        .then((g) =>
+          g.channels
+            .fetch(updatemessaged.channelId)
+            .then((c: TextChannel) => c.messages.fetch(updatemessaged.id))
+        );
+      const message = await messageToEdit.edit({
+        content: `
+        No Nodes Available. 
+        Please click on the link below, 
+        login to your coogle account, 
+        and select [runtime->run all] from the main menu(top right) to start a node. 
+        After 2-3 minutes, your node will be active and ready to take requests`,
+        components: [
+          {
+            type: "ACTION_ROW",
+            components: [
+              {
+                style: "LINK",
+                type: "BUTTON",
+                url: "https://colab.research.google.com/drive/1xxypspWywNT6IOnXdSQz9phL0MRPhPCp?usp=sharing",
+                label: "Run Node",
+              },
+              new MessageButton()
+                .setCustomId("deletemessage")
+                .setLabel("X")
+                .setStyle("DANGER"),
+            ],
+          },
+        ],
+      });
+      message
+        .awaitMessageComponent({
+          componentType: "BUTTON",
+          dispose: true,
+          filter: (i) => {
+            i.deferReply();
+            return i.customId == "deletemessage";
+          },
+          time: 60 * 1000,
+        })
+        .then((i) => {
+          message.delete();
+        })
+        .catch((i) => message.delete());
+
       reject("No peers available");
       return null;
     }
 
-    const updatemessaged =
-      updatemessage ?? ((await interaction.fetchReply()) as Message);
     var resolved = false;
     promptlist[id] = {
+      type: img ? (upscale ? "upscale" : "img2img") : "SD",
       prompt,
       callback: async (imagedata: string) => {
         resolved = true;
@@ -290,6 +367,10 @@ export const stable = async (
             embeds: data,
           });
         }
+      },
+      message: {
+        channel: updatemessage.channelId,
+        guild: updatemessage.guildId,
       },
 
       timeout: 0,
@@ -324,18 +405,75 @@ export const rwky = async (
   const validPeers = Object.values(peers).filter(
     (m) => m.lastseen > Date.now() - 1000 * 60
   );
-  if (validPeers.length == 0) {
-    return null;
-  }
 
   const updatemessaged =
     updatemessage ?? ((await interaction.fetchReply()) as Message);
+
+  if (validPeers.length == 0) {
+    const messageToEdit = await client.guilds
+      .fetch(updatemessaged.guildId)
+      .then((g) =>
+        g.channels
+          .fetch(updatemessaged.channelId)
+          .then((c: TextChannel) => c.messages.fetch(updatemessaged.id))
+      );
+    const message = await messageToEdit.edit({
+      content: `
+        No Nodes Available. 
+        Please click on the link below, 
+        login to your coogle account, 
+        and select [runtime->run all] from the main menu(top right) to start a node. 
+        After 2-3 minutes, your node will be active and ready to take requests`,
+      components: [
+        {
+          type: "ACTION_ROW",
+          components: [
+            {
+              style: "LINK",
+              type: "BUTTON",
+              url: "https://colab.research.google.com/drive/1xxypspWywNT6IOnXdSQz9phL0MRPhPCp?usp=sharing",
+              label: "Run Node",
+            },
+            new MessageButton()
+              .setCustomId("deletemessage")
+              .setLabel("X")
+              .setStyle("DANGER"),
+          ],
+        },
+      ],
+    });
+    message
+      .awaitMessageComponent({
+        componentType: "BUTTON",
+        dispose: true,
+        filter: (i) => {
+          i.deferReply();
+          return i.customId == "deletemessage";
+        },
+        time: 60 * 1000,
+      })
+      .then((i) => {
+        message.delete();
+      })
+      .catch((i) => message.delete());
+    return null;
+  }
+
   var resolved = false;
   promptlist[id] = {
+    type: "rwkv",
     prompt,
+
     callback: async (ret: string) => {
       resolved = true;
-      await updatemessaged.edit({
+      const messageToEdit = await client.guilds
+        .fetch(updatemessaged.guildId)
+        .then((g) =>
+          g.channels
+            .fetch(updatemessaged.channelId)
+            .then((c: TextChannel) => c.messages.fetch(updatemessaged.id))
+        );
+      await messageToEdit.edit({
         content: prompt + "...",
         embeds: [
           {
@@ -347,7 +485,14 @@ export const rwky = async (
     },
     update: async (updatetext: string) => {
       if (!resolved) {
-        await updatemessaged.edit({
+        const messageToEdit = await client.guilds
+          .fetch(updatemessaged.guildId)
+          .then((g) =>
+            g.channels
+              .fetch(updatemessaged.channelId)
+              .then((c: TextChannel) => c.messages.fetch(updatemessaged.id))
+          );
+        await messageToEdit.edit({
           content: prompt + "...",
           embeds: [
             {
@@ -360,17 +505,28 @@ export const rwky = async (
     },
     updateNetworkStats: async (data) => {
       if (!resolved) {
-        await updatemessaged.edit({
+        const messageToEdit = await client.guilds
+          .fetch(updatemessaged.guildId)
+          .then((g) =>
+            g.channels
+              .fetch(updatemessaged.channelId)
+              .then((c: TextChannel) => c.messages.fetch(updatemessaged.id))
+          );
+        await messageToEdit.edit({
           embeds: [
             {
               title: "Running...",
               description: promptlist[id]?.progress,
             },
+            ...data,
           ],
         });
       }
     },
-
+    message: {
+      channel: updatemessage.channelId,
+      guild: updatemessage.guildId,
+    },
     timeout: 0,
     // use rand to generate a seed for the generator
     seed: "RWKV completion",
