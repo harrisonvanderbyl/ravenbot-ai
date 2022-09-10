@@ -372,8 +372,8 @@ export const stable = async (
         }
       },
       message: {
-        channel: updatemessage.channelId,
-        guild: updatemessage.guildId,
+        channel: updatemessaged.channelId,
+        guild: updatemessaged.guildId,
       },
 
       timeout: 0,
@@ -482,8 +482,8 @@ export const rwky = async (
       }
     },
     message: {
-      channel: updatemessage.channelId,
-      guild: updatemessage.guildId,
+      channel: updatemessaged.channelId,
+      guild: updatemessaged.guildId,
     },
     timeout: 0,
     // use rand to generate a seed for the generator
