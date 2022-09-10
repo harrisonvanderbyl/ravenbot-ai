@@ -10,6 +10,7 @@ import {
 
 import { SlashCommand } from "./typing";
 import { addToolbar } from "./helpers/buttons";
+import sharp from "sharp";
 import { split } from "./helpers/imagesplit";
 import { stable } from "./sdhelpers/sdhelpers";
 
@@ -99,7 +100,14 @@ export const stablediffusion: SlashCommand = {
       const messageData = {
         content: null,
 
-        files: [new MessageAttachment(data, `generation.png`)],
+        files: [
+          new MessageAttachment(
+            iterations == "81"
+              ? await sharp(data).resize(1024, 1024).jpeg().toBuffer()
+              : data,
+            `generation.png`
+          ),
+        ],
         embeds: [
           {
             title: prompt.slice(0, 200) + "...",
@@ -124,29 +132,32 @@ export const stablediffusion: SlashCommand = {
         : await client.channels
             .fetch(interaction.channelId)
             .then(async (channel: TextChannel) => channel.send(messageData)));
-
-      await addToolbar(
-        message as Message,
-        await split(data, Number(iterations) as 1 | 4 | 9 | 81),
-        [
-          new MessageActionRow().addComponents(
-            new MessageButton()
-              .setLabel("Patreon")
-              .setStyle("LINK")
-              .setURL("https://patreon.com/unexplored_horizons"),
-            new MessageButton()
-              .setLabel("Writerbot home discord")
-              .setStyle("LINK")
-              .setURL("https://discord.gg/eZqw6gMhf6"),
-            new MessageButton()
-              .setLabel("Run Colab Node")
-              .setStyle("LINK")
-              .setURL(
-                "https://colab.research.google.com/drive/1xxypspWywNT6IOnXdSQz9phL0MRPhPCp?usp=sharing"
-              )
-          ),
-        ]
-      );
+      var dataend: Buffer[] = data;
+      if (iterations == "81") {
+        dataend = await split(data, 9).then((imgs) =>
+          Promise.all(imgs.flatMap((im) => split(im, 9))).then((i) => i.flat())
+        );
+      } else {
+        dataend = await split(data, Number(iterations) as 1 | 4 | 9 | 81);
+      }
+      await addToolbar(message as Message, dataend, [
+        new MessageActionRow().addComponents(
+          new MessageButton()
+            .setLabel("Patreon")
+            .setStyle("LINK")
+            .setURL("https://patreon.com/unexplored_horizons"),
+          new MessageButton()
+            .setLabel("Writerbot home discord")
+            .setStyle("LINK")
+            .setURL("https://discord.gg/eZqw6gMhf6"),
+          new MessageButton()
+            .setLabel("Run Colab Node")
+            .setStyle("LINK")
+            .setURL(
+              "https://colab.research.google.com/drive/1xxypspWywNT6IOnXdSQz9phL0MRPhPCp?usp=sharing"
+            )
+        ),
+      ]);
     } catch (e) {
       console.log(e);
       if (!interaction.replied && !interaction.deferred) {
@@ -204,6 +215,7 @@ export const stablediffusion: SlashCommand = {
           { name: "single", value: "1" },
           { name: "4 panel", value: "4" },
           { name: "9 panel", value: "9" },
+          { name: "81 panel(patreon only)", value: "81" },
         ],
       },
       {
