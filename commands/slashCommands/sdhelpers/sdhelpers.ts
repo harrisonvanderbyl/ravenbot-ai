@@ -258,7 +258,7 @@ const updateNetworkStats = async () => {
   try {
     const channel = await (
       (await client.channels.fetch("1011928316711817246")) as TextChannel
-    ).setName(
+    )?.setName(
       "Colab Nodes: " +
         Object.values(peers)
           .filter(
