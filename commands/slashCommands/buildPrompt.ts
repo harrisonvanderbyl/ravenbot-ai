@@ -104,7 +104,7 @@ export const stablediffusion: SlashCommand = {
           new MessageAttachment(
             iterations == "81"
               ? await sharp(data)
-                  .resize(1024, 1024, {
+                  .resize(Number(width) * 3, Number(height) * 3, {
                     fit: "fill",
                   })
                   .png()
