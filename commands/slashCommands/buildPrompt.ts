@@ -72,6 +72,7 @@ export const stablediffusion: SlashCommand = {
       const prompt = styles[
         (interaction.options.get("style")?.value as string) ?? "raw"
       ](interaction.options.get("prompt").value as string);
+
       const data = await stable(
         interaction,
         prompt,
@@ -126,7 +127,7 @@ export const stablediffusion: SlashCommand = {
 
       await addToolbar(
         message as Message,
-        await split(data, Number(iterations) as 1 | 4 | 9),
+        await split(data, Number(iterations) as 1 | 4 | 9 | 81),
         [
           new MessageActionRow().addComponents(
             new MessageButton()

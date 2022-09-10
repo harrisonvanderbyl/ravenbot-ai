@@ -1,6 +1,6 @@
 import sharp from "sharp";
 
-export const split = async (buffer: Buffer, num: 1 | 4 | 9) => {
+export const split = async (buffer: Buffer, num: 1 | 4 | 9 | 81) => {
   // Split using sharp
   const obj = sharp(buffer);
   const { width, height } = await obj.metadata();

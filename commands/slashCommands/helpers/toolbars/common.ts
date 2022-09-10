@@ -11,7 +11,8 @@ export type ToolBarItem = {
   filter: (buffers: Buffer[]) => boolean;
   createToolbars: (
     buffers: Buffer[],
-    i: MessageComponentInteraction
+    i: MessageComponentInteraction,
+    offset?: number
   ) => Promise<MessageActionRowOptions[]>;
   process: (
     buffers: Buffer[],
