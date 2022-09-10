@@ -21,7 +21,7 @@ export const getPatreonData = async (token: string, url = "/current_user") => {
 const funcBuffer: {
   [key: string]: () => Promise<void>;
 } = {};
-app.get("/", (req, res) => {
+app.get("/patreonlogin", (req, res) => {
   const { code, state } = req.query;
   if (!code) {
     return res.send("error loading patreon bot");
@@ -72,7 +72,7 @@ export const generateLoginButton = async (interaction: CommandInteraction) => {
     query: {
       response_type: "code",
       client_id: config.CLIENT_ID,
-      redirect_uri: "https://" + redirectURL,
+      redirect_uri: "https://" + redirectURL + "/patreonlogin",
       state: interaction.user.id,
     },
   });
