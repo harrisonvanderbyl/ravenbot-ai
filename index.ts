@@ -13,7 +13,10 @@ import { updateNetworkStats } from "./commands/slashCommands/sdhelpers/sdhelpers
 client.on("ready", async () => {
   // Every 5 seconds
 
-  setInterval(updateNetworkStats, 5 * 1000);
+  setInterval(() => {
+    console.log("starting loop");
+    updateNetworkStats();
+  }, 5 * 1000);
   console.log(
     `Bot has started, with ${client.users.cache.size} users, in ${client.channels.cache.size} channels of ${client.guilds.cache.size} guilds.`
   );
