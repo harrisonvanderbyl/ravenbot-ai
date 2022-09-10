@@ -254,66 +254,72 @@ app.post("/update/:id", async (req, res) => {
 });
 
 const updateNetworkStats = async () => {
-  const channel = await (
-    (await client.channels.fetch("1011928316711817246")) as TextChannel
-  ).setName(
-    "Colab Nodes: " +
-      Object.values(peers)
-        .filter((m) => m.lastseen > Date.now() - 1000 * 60 && m.type == "colab")
-        .length.toFixed(0)
-  );
-  for (const [key, value] of Object.entries(promptlist)) {
-    await value
-      .updateNetworkStats([
-        {
-          title: "Stats",
+  try {
+    const channel = await (
+      (await client.channels.fetch("1011928316711817246")) as TextChannel
+    ).setName(
+      "Colab Nodes: " +
+        Object.values(peers)
+          .filter(
+            (m) => m.lastseen > Date.now() - 1000 * 60 && m.type == "colab"
+          )
+          .length.toFixed(0)
+    );
+    for (const [key, value] of Object.entries(promptlist)) {
+      await value
+        .updateNetworkStats([
+          {
+            title: "Stats",
 
-          fields: [
-            {
-              name: "Status",
-              value:
-                promptlist[key].type == "rwkv"
-                  ? "running"
-                  : promptlist[key]?.progress,
-              inline: true,
-            },
-            {
-              name: "Seed",
-              value: promptlist[key]?.seed.replace(".", ""),
-              inline: true,
-            },
-            {
-              name: "Active Nodes",
-              value: Object.values(peers)
-                .filter(
-                  (m) =>
-                    m.lastseen > Date.now() - 1000 * 60 && m.type == "colab"
-                )
-                .length.toFixed(0),
-              inline: true,
-            },
+            fields: [
+              {
+                name: "Status",
+                value:
+                  promptlist[key].type == "rwkv"
+                    ? "running"
+                    : promptlist[key]?.progress,
+                inline: true,
+              },
+              {
+                name: "Seed",
+                value: promptlist[key]?.seed.replace(".", ""),
+                inline: true,
+              },
+              {
+                name: "Active Nodes",
+                value: Object.values(peers)
+                  .filter(
+                    (m) =>
+                      m.lastseen > Date.now() - 1000 * 60 && m.type == "colab"
+                  )
+                  .length.toFixed(0),
+                inline: true,
+              },
 
-            {
-              name: "Jobs In Queue",
-              value: Object.entries(promptlist)
-                .filter(([key, value]) => {
-                  return value.timeout < Date.now();
-                })
-                .length.toFixed(0),
-              inline: true,
-            },
-            {
-              name: "Jobs In Progress",
-              value: Object.entries(promptlist)
-                .filter(([key, value]) => {
-                  return value.timeout > Date.now();
-                })
-                .length.toFixed(0),
-            },
-          ],
-        },
-      ])
-      .catch((e) => console.log(e));
+              {
+                name: "Jobs In Queue",
+                value: Object.entries(promptlist)
+                  .filter(([key, value]) => {
+                    return value.timeout < Date.now();
+                  })
+                  .length.toFixed(0),
+                inline: true,
+              },
+              {
+                name: "Jobs In Progress",
+                value: Object.entries(promptlist)
+                  .filter(([key, value]) => {
+                    return value.timeout > Date.now();
+                  })
+                  .length.toFixed(0),
+              },
+            ],
+          },
+        ])
+        .catch((e) => console.log(e));
+    }
+  } catch (e) {
+    console.log(e);
   }
 };
 // Every 5 seconds
