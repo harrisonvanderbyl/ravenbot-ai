@@ -11,6 +11,55 @@ import {
 import { app } from "../webserver/express";
 import { client } from "../../client";
 
+const NoNodeError = async (updatemessaged: Message) => {
+  const messageToEdit = await client.guilds
+    .fetch(updatemessaged.guildId)
+    .then((g) =>
+      g.channels
+        .fetch(updatemessaged.channelId)
+        .then((c: TextChannel) => c.messages.fetch(updatemessaged.id))
+    );
+  const message = await messageToEdit.edit({
+    content: `
+No Nodes Available. 
+Please click on the link below, 
+login to your coogle account, 
+and select [runtime->run all] from the main menu(top right) to start a node. 
+After 2-3 minutes, your node will be active and ready to take requests`,
+    components: [
+      {
+        type: "ACTION_ROW",
+        components: [
+          {
+            style: "LINK",
+            type: "BUTTON",
+            url: "https://colab.research.google.com/drive/1xxypspWywNT6IOnXdSQz9phL0MRPhPCp?usp=sharing",
+            label: "Run Node",
+          },
+          new MessageButton()
+            .setCustomId("deletemessage")
+            .setLabel("X")
+            .setStyle("DANGER"),
+        ],
+      },
+    ],
+  });
+  message
+    .awaitMessageComponent({
+      componentType: "BUTTON",
+      dispose: true,
+      filter: (i) => {
+        return i.customId == "deletemessage";
+      },
+      time: 60 * 1000,
+    })
+    .then((i) => {
+      message.delete();
+    })
+    .catch((i) => message.delete());
+  return null;
+};
+
 type RwkyJob = {
   rwky: true;
   prompt: string;
@@ -298,54 +347,8 @@ export const stable = async (
       updatemessage ?? ((await interaction.fetchReply()) as Message);
 
     if (validPeers.length == 0) {
-      const messageToEdit = await client.guilds
-        .fetch(updatemessaged.guildId)
-        .then((g) =>
-          g.channels
-            .fetch(updatemessaged.channelId)
-            .then((c: TextChannel) => c.messages.fetch(updatemessaged.id))
-        );
-      const message = await messageToEdit.edit({
-        content: `
-        No Nodes Available. 
-        Please click on the link below, 
-        login to your coogle account, 
-        and select [runtime->run all] from the main menu(top right) to start a node. 
-        After 2-3 minutes, your node will be active and ready to take requests`,
-        components: [
-          {
-            type: "ACTION_ROW",
-            components: [
-              {
-                style: "LINK",
-                type: "BUTTON",
-                url: "https://colab.research.google.com/drive/1xxypspWywNT6IOnXdSQz9phL0MRPhPCp?usp=sharing",
-                label: "Run Node",
-              },
-              new MessageButton()
-                .setCustomId("deletemessage")
-                .setLabel("X")
-                .setStyle("DANGER"),
-            ],
-          },
-        ],
-      });
-      message
-        .awaitMessageComponent({
-          componentType: "BUTTON",
-          dispose: true,
-          filter: (i) => {
-            i.deferReply();
-            return i.customId == "deletemessage";
-          },
-          time: 60 * 1000,
-        })
-        .then((i) => {
-          message.delete();
-        })
-        .catch((i) => message.delete());
-
-      reject("No peers available");
+      await NoNodeError(updatemessaged);
+      reject("No Peers Available");
       return null;
     }
 
@@ -410,52 +413,7 @@ export const rwky = async (
     updatemessage ?? ((await interaction.fetchReply()) as Message);
 
   if (validPeers.length == 0) {
-    const messageToEdit = await client.guilds
-      .fetch(updatemessaged.guildId)
-      .then((g) =>
-        g.channels
-          .fetch(updatemessaged.channelId)
-          .then((c: TextChannel) => c.messages.fetch(updatemessaged.id))
-      );
-    const message = await messageToEdit.edit({
-      content: `
-        No Nodes Available. 
-        Please click on the link below, 
-        login to your coogle account, 
-        and select [runtime->run all] from the main menu(top right) to start a node. 
-        After 2-3 minutes, your node will be active and ready to take requests`,
-      components: [
-        {
-          type: "ACTION_ROW",
-          components: [
-            {
-              style: "LINK",
-              type: "BUTTON",
-              url: "https://colab.research.google.com/drive/1xxypspWywNT6IOnXdSQz9phL0MRPhPCp?usp=sharing",
-              label: "Run Node",
-            },
-            new MessageButton()
-              .setCustomId("deletemessage")
-              .setLabel("X")
-              .setStyle("DANGER"),
-          ],
-        },
-      ],
-    });
-    message
-      .awaitMessageComponent({
-        componentType: "BUTTON",
-        dispose: true,
-        filter: (i) => {
-          i.deferReply();
-          return i.customId == "deletemessage";
-        },
-        time: 60 * 1000,
-      })
-      .then((i) => {
-        message.delete();
-      })
-      .catch((i) => message.delete());
+    await NoNodeError(updatemessaged);
     return null;
   }
 
