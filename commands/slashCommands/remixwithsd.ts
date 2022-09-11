@@ -150,7 +150,7 @@ export const remixwithsd: SlashCommand = {
     const buff = await stable(
       interaction as any,
       prompt,
-      "12345",
+      (Math.random()*10000).toFixed(0),
       await sharp(await downloadToBuffer(imageUrl))
         .png()
         .toBuffer()

@@ -44,9 +44,23 @@ export const stablediffusion: SlashCommand = {
       await interaction.reply(
         `Generating image with stable diffusion with options ${optionsString}. Ideal generation time is below 2 minutes`
       );
+      var iterations =
+        (interaction.options.get("iterations")?.value as string) ?? "1";
+
+      const iseed = interaction.options.get("seed")?.value as string;
+
+      const createSeed =
+        iseed && !iseed.includes("[")
+          ? Number(iseed)
+          : Math.round(Math.random() * 10000);
+      var seeds = [];
+      for (var i = 0; i < Number(iterations); i++) {
+        seeds.push((createSeed + i).toFixed(0));
+      }
+      const newSeed = "[" + seeds.join(",") + "]";
+
       const seed =
-        (interaction.options.get("seed")?.value as string) ||
-        Math.random().toPrecision(5);
+        iseed && iseed.includes("[") && iseed.includes("]") ? iseed : newSeed;
 
       var width = (interaction.options.get("width")?.value as string) ?? "512";
       var cfg = (interaction.options.get("cfg")?.value as string) ?? "7.5";
@@ -61,8 +75,6 @@ export const stablediffusion: SlashCommand = {
 
       var height =
         (interaction.options.get("height")?.value as string) ?? "512";
-      var iterations =
-        (interaction.options.get("iterations")?.value as string) ?? "1";
       var steps = (interaction?.options?.get("steps")?.value as string) ?? "50";
       // remove anything non numeric
       steps = steps.replace(/\D/g, "");

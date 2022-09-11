@@ -180,7 +180,7 @@ type StableDiffusionJob = {
   update: (updatetext: string) => Promise<void>;
   updateNetworkStats: (data: MessageEmbedOptions[]) => Promise<void>;
   timeout: number;
-  seed: string;
+  seed: string[];
   samples: string;
   progress: string;
   type: "img2img" | "SD" | "upscale";
@@ -378,7 +378,7 @@ export const updateNetworkStats = async () => {
               },
               {
                 name: "Seed",
-                value: promptlist[key]?.seed.replace(".", ""),
+                value: promptlist[key]?.seed[0].replace(".", ""),
                 inline: true,
               },
               {
@@ -528,7 +528,7 @@ const stringInterp = (s, num) => {
 export const stable = async (
   interaction: CommandInteraction,
   promptRaw: string,
-  seed: string,
+  seedin: string,
   img?: string,
   strength?: string,
   allowColab: boolean = true,
@@ -542,7 +542,7 @@ export const stable = async (
   cfg: string = "7.5"
 ): Promise<Buffer> => {
   const prompt = stringInterp(promptRaw, Number(iterations));
-
+  const seed = stringInterp(seedin, Number(iterations));
   const promise: Promise<Buffer> = new Promise(async (resolve, reject) => {
     const id = interaction.id;
 
