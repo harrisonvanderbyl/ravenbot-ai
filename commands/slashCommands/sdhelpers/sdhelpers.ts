@@ -264,7 +264,7 @@ app.get("/sdlist", async (req, res) => {
       awaiters.push(res);
     });
     await PeerSeen(req.ip, {
-      name: req.params.name,
+      name: req.query.name,
       status: "idle",
     });
     if (!top) {
@@ -326,7 +326,7 @@ app.get("/sdlist", async (req, res) => {
 app.post("/upload/:id", async (req, res) => {
   try {
     await PeerSeen(req.ip, {
-      name: req.params.name,
+      name: req.query.name,
       status: "idle",
     });
 
@@ -347,12 +347,10 @@ app.post("/upload/:id", async (req, res) => {
 
 app.post("/update/:id", async (req, res) => {
   try {
-    peers[req.ip ?? "unknown"] = {
-      name: req.headers.name ?? "unknown",
-      lastseen: Date.now(),
+    await PeerSeen(req.ip, {
+      name: req.query.name,
       status: "running",
-      type: "colab",
-    };
+    });
 
     console.log(req.params.id, "update");
 
