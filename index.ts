@@ -27,7 +27,7 @@ client.on("ready", async () => {
   client.guilds.fetch(guild).then((g) =>
     g.channels.fetch(status).then((c: TextChannel) =>
       c.send({
-        content: "Bot started with version 2.0.0",
+        content: "Bot started with version 2.1.0",
       })
     )
   );
