@@ -159,7 +159,7 @@ export const stablediffusion: SlashCommand = {
             .setLabel("Run Colab Node")
             .setStyle("LINK")
             .setURL(
-              "https://colab.research.google.com/drive/1xxypspWywNT6IOnXdSQz9phL0MRPhPCp?usp=sharing"
+              "https://colab.research.google.com/github/harrisonvanderbyl/ravenbot-ai/blob/master/WriterBot_node.ipynb"
             )
         ),
       ]);
