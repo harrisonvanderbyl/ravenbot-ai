@@ -9,8 +9,8 @@ export const updateServer: SlashCommand = {
     process.exit();
   },
   commandSchema: {
-    name: "styles",
-    description: "list wombo styles",
+    name: "update",
+    description: "update the server",
   },
   contextCommand: async (interaction) => {
     return;
