@@ -514,10 +514,12 @@ const stringInterp = (s, num) => {
     var ss = s;
     try {
       ss = s.replace(/\[[^\]]*\]/g, (m, c) => {
-        return m.slice(1, -1).split(",")[n % m.split(",").length];
+        const r = m.slice(1, -1).split(",")[n % m.split(",").length];
+        return r ? r : "100";
       });
     } catch (e) {
-      ss = s;
+      ss = s.replace(/\[\]\[,]]/g, "");
+      ss = ss ? ss : "100";
     }
 
     ret.push(ss);
@@ -542,7 +544,11 @@ export const stable = async (
   cfg: string = "7.5"
 ): Promise<Buffer> => {
   const prompt = stringInterp(promptRaw, Number(iterations));
-  const seed = stringInterp(seedin, Number(iterations));
+
+  const seed = stringInterp(
+    seedin.replace(/[^\d\]\[,]/g, ""),
+    Number(iterations)
+  );
   const promise: Promise<Buffer> = new Promise(async (resolve, reject) => {
     const id = interaction.id;
 

@@ -5,7 +5,7 @@ import { SlashCommand } from "./typing";
 export const updateServer: SlashCommand = {
   slashCommand: async (client, interaction) => {
     // get styles
-    await interaction.reply("attempting update...");
+    await interaction.editReply("attempting update...");
     process.exit();
   },
   commandSchema: {
