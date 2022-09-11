@@ -175,7 +175,7 @@ type RwkyJob = {
   };
 };
 type StableDiffusionJob = {
-  prompt: string;
+  prompt: string[];
   callback: (imagedata: string) => Promise<void>;
   update: (updatetext: string) => Promise<void>;
   updateNetworkStats: (data: MessageEmbedOptions[]) => Promise<void>;
@@ -510,7 +510,7 @@ export const updateNetworkStats = async () => {
 
 export const stable = async (
   interaction: CommandInteraction,
-  prompt: string,
+  promptRaw: string,
   seed: string,
   img?: string,
   strength?: string,
@@ -524,6 +524,11 @@ export const stable = async (
   updatemessage?: Message,
   cfg: string = "7.5"
 ): Promise<Buffer> => {
+  const prompt = [];
+  for (var i = 0; i < Number(iterations); i++) {
+    prompt.push(promptRaw);
+  }
+
   const promise: Promise<Buffer> = new Promise(async (resolve, reject) => {
     const id = interaction.id;
 
