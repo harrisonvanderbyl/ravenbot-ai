@@ -508,6 +508,23 @@ export const updateNetworkStats = async () => {
   }
 };
 
+const stringInterp = (s, num) => {
+  const ret = [];
+  for (var n = 0; n < num; n++) {
+    var ss = s;
+    try {
+      ss = s.replace(/\[[^\]]*\]/g, (m, c) => {
+        return m.slice(1, -1).split(",")[n % m.split(",").length];
+      });
+    } catch (e) {
+      ss = s;
+    }
+
+    ret.push(ss);
+  }
+  return ret;
+};
+
 export const stable = async (
   interaction: CommandInteraction,
   promptRaw: string,
@@ -524,10 +541,7 @@ export const stable = async (
   updatemessage?: Message,
   cfg: string = "7.5"
 ): Promise<Buffer> => {
-  const prompt = [];
-  for (var i = 0; i < Number(iterations); i++) {
-    prompt.push(promptRaw);
-  }
+  const prompt = stringInterp(promptRaw, Number(iterations));
 
   const promise: Promise<Buffer> = new Promise(async (resolve, reject) => {
     const id = interaction.id;
