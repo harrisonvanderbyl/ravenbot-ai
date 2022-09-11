@@ -15,6 +15,7 @@ import { sharedallekey } from "./sharedallekey";
 import { speakas } from "./speakas";
 import { stablediffusion } from "./buildPrompt";
 import { styles } from "./styles";
+import { updateServer } from "./updateServer";
 import { womocommand } from "./wombo";
 export default {
   dalleusage,
@@ -35,4 +36,5 @@ export default {
   inpaintwithsd,
   createSubmission,
   rwkyCommand,
+  updateServer,
 };
