@@ -227,26 +227,46 @@ setInterval(parselout, 3 * 1);
 
 const peers: {
   [key: string]: {
-    name: "string";
+    name: string;
     lastseen: number;
     status: "running" | "idle";
     type: "colab" | "local";
   };
 } = {};
 
+const PeerSeen = async (
+  id,
+  peer: Omit<typeof peers["a"], "lastseen" | "type">
+) => {
+  const oldpeer = peers[id];
+  peers[id] = {
+    name: peer.name ?? "unknown",
+    lastseen: Date.now(),
+    status: peer.status,
+    type: "colab",
+  };
+  const status = "1011284410345205820";
+  const guild = "989166996153323591";
+  if (!oldpeer) {
+    await client.guilds.fetch(guild).then((g) =>
+      g.channels.fetch(status).then((c: TextChannel) =>
+        c.send({
+          content: peer.name + " has become active",
+        })
+      )
+    );
+  }
+};
+
 app.get("/sdlist", async (req, res) => {
   try {
-    peers[req.ip ?? "unknown"] = {
-      name: req.headers.name ?? "unknown",
-      lastseen: Date.now(),
-      status: "idle",
-      type: req.query.colab == "true" ? "colab" : "local",
-    };
-
     const top: any = await new Promise((res, rej) => {
       awaiters.push(res);
     });
-
+    await PeerSeen(req.ip, {
+      name: req.params.name,
+      status: "idle",
+    });
     if (!top) {
       return res.send("{}");
     }
@@ -305,12 +325,10 @@ app.get("/sdlist", async (req, res) => {
 
 app.post("/upload/:id", async (req, res) => {
   try {
-    peers[req.ip ?? "unknown"] = {
-      name: req.headers.name ?? "unknown",
-      lastseen: Date.now(),
+    await PeerSeen(req.ip, {
+      name: req.params.name,
       status: "idle",
-      type: "colab",
-    };
+    });
 
     console.log(req.params.id, "upload");
 
@@ -361,6 +379,21 @@ export const updateNetworkStats = async () => {
           )
           .length.toFixed(0)
     );
+    for (var [id, peer] of Object.entries(peers).filter(
+      ([id, m]) => m.lastseen < Date.now() - 2000 * 60 && m.type == "colab"
+    )) {
+      const status = "1011284410345205820";
+      const guild = "989166996153323591";
+      await client.guilds.fetch(guild).then((g) =>
+        g.channels.fetch(status).then((c: TextChannel) =>
+          c.send({
+            content:
+              peer.name + " not seen in 2 mins, possibly disconnected or busy",
+          })
+        )
+      );
+      delete peers[id];
+    }
     for (const [key, value] of Object.entries(promptlist)) {
       await value
         .updateNetworkStats([
