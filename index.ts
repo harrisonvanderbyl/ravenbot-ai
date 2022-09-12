@@ -113,12 +113,16 @@ const runCommands = async (interaction: Interaction): Promise<void> => {
       }
     }
     if (interaction.isModalSubmit()) {
-      await interaction.deferReply({ ephemeral: true });
-
       await Promise.all(
         Object.values(commands)
           .filter((c) => c.commandSchema.name == interaction.customId)
-          .map((c) => c.modalSubmit(client, interaction))
+          .map((c) =>
+            (async () => {
+              await interaction.deferReply();
+
+              await c.modalSubmit(client, interaction);
+            })()
+          )
       ).catch((e) => {
         console.log("error: level: commands", e);
         reject(e);
@@ -126,7 +130,12 @@ const runCommands = async (interaction: Interaction): Promise<void> => {
       await Promise.all(
         toolbarModalRecievers
           .filter((c) => c.id == interaction.customId)
-          .map((c) => c.reciever(interaction))
+          .map((c) =>
+            (async () => {
+              await interaction.deferReply({ ephemeral: true });
+              await c.reciever(interaction);
+            })()
+          )
       );
     }
 
