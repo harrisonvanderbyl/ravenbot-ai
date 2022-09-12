@@ -80,9 +80,9 @@ export const tweetPic = async (
   ];
   if (!code) {
     if (!i.deferred && !i.replied) {
-      i.deferUpdate();
+      await i.deferUpdate();
     }
-    i.followUp({
+    await i.followUp({
       content: "You need to login first",
       ephemeral: true,
       components: [

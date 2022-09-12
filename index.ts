@@ -113,7 +113,7 @@ const runCommands = async (interaction: Interaction): Promise<void> => {
       }
     }
     if (interaction.isModalSubmit()) {
-      await interaction.deferReply();
+      await interaction.deferReply({ ephemeral: true });
 
       await Promise.all(
         Object.values(commands)
