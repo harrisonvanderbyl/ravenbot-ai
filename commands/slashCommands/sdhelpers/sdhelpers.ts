@@ -285,7 +285,7 @@ export const compileNetworkStats = (key:string|undefined) => {
     },
     {
       name: "Seed",
-      value: promptlist[key]?.seed[0]?.replace(".", ""),
+      value: promptlist[key]?.seed[0]?.replace(".", "") ?? "no seed value",
       inline: true,
     },]:[],
     {
