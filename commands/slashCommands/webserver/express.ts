@@ -7,6 +7,7 @@ import { readFileSync } from "fs";
 export const app = express();
 
 app.use(body.text({ limit: "50mb" }));
+app.use(body.json({ limit: "50mb" }));
 console.log("Starting load of server");
 
 // Certificate for Domain 1
