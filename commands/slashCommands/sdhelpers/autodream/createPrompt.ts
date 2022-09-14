@@ -22,8 +22,7 @@ const mediums = [
 
 
 export const createDreamString = ()=>
-`a ${randomArray(mediums)} of ${randomArray(adjectives)} ${randomArray(nouns)} ${randomArray(verbs)} ${randomArray(adverbs)} 
-digital art by ${randomArray([
+`a ${randomArray(mediums)} of ${randomArray(adjectives)} ${randomArray(nouns)} ${randomArray(verbs)} ${randomArray(adverbs)} by ${randomArray([
     "wlop",
     "thomas kinkade",
     "ted nasmith",
