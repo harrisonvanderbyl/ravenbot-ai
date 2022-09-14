@@ -15,7 +15,7 @@ app.get("/webui/ping", (req, res) => {
 
 app.post("/webui/image",async (req,res)=>{
     const {prompt,num_outputs,num_inference_steps,guidance_scale,width,height,seed} = (req.body);
-
+    console.log({prompt,num_outputs,num_inference_steps,guidance_scale,width,height,seed});
     
     const c = (await client.channels.fetch(
         "1019524093067939882"
