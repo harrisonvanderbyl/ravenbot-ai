@@ -14,6 +14,7 @@ app.get("/webui/ping", (req, res) => {
 })
 
 app.post("/webui/image",async (req,res)=>{
+    
     const {prompt,num_outputs,num_inference_steps,guidance_scale,width,height,seed} = (req.body);
     console.log({prompt,num_outputs,num_inference_steps,guidance_scale,width,height,seed});
     
@@ -48,24 +49,24 @@ app.post("/webui/image",async (req,res)=>{
         res.send("failed to dream");
       } else {
         await message.edit({
-          content: null,
-          files: [new MessageAttachment(buffers, "generation.png")],
-          embeds: [
-            {
-              title: dream.slice(0, 250) + "...",
-              fields: [
-                {
-                  name: "Seed",
-                  value: seed,
-                  inline: true,
+            content: null,
+            files: [new MessageAttachment(buffers, "generation.png")],
+            embeds: [
+              {
+                title: dream.slice(0, 250) + "...",
+                fields: [
+                  {
+                    name: "Seed",
+                    value: `${seed}`,
+                    inline: true,
+                  },
+                ],
+                image: {
+                  url: `attachment://generation.png`,
                 },
-              ],
-              image: {
-                url: `attachment://generation.png`,
               },
-            },
-          ],
-        });
+            ],
+          });
         res.send("<img>"+message.embeds[0].image.url+"</img>");
     }
 

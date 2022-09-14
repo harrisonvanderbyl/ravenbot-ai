@@ -630,36 +630,6 @@ async function doMakeImage(reqBody) {
             body: JSON.stringify(reqBody)
         })
 
-        if (res.status != 200) {
-            if (serverStatus === 'online') {
-                logError('Stable Diffusion had an error: ' + await res.text() + '. This happens sometimes. Maybe modify the prompt or seed a little bit?', res)
-            } else {
-                logError("Stable Diffusion is still starting up, please wait. If this goes on beyond a few minutes, Stable Diffusion has probably crashed.", res)
-            }
-            res = undefined
-        } else {
-            res = await res.json()
-
-            if (res.status !== 'succeeded') {
-                let msg = ''
-                if (res.detail !== undefined) {
-                    msg = res.detail
-
-                    if (msg.toLowerCase().includes('out of memory')) {
-                        msg += `<br/><br/>
-                                <b>Suggestions</b>:
-                                <br/>
-                                1. If you have set an initial image, please try reducing its dimension to ${MAX_INIT_IMAGE_DIMENSION}x${MAX_INIT_IMAGE_DIMENSION} or smaller.<br/>
-                                2. Try disabling the '<em>Turbo mode</em>' under '<em>Advanced Settings</em>'.<br/>
-                                3. Try generating a smaller image.<br/>`
-                    }
-                } else {
-                    msg = res
-                }
-                logError(msg, res)
-                res = undefined
-            }
-        }
     } catch (e) {
         console.log('request error', e)
         setStatus('request', 'error', 'error')
@@ -671,79 +641,7 @@ async function doMakeImage(reqBody) {
 
     lastPromptUsed = reqBody['prompt']
 
-    for (let idx in res.output) {
-        let imgBody = ''
-        let seed = 0
-
-        try {
-            let imgData = res.output[idx]
-            imgBody = imgData.data
-            seed = imgData.seed
-        } catch (e) {
-            console.log(imgBody)
-            setStatus('request', 'invalid image', 'error')
-            continue
-        }
-
-        let imgItem = document.createElement('div')
-        imgItem.className = 'imgItem'
-
-        let img = document.createElement('img')
-        img.width = parseInt(reqBody.width)
-        img.height = parseInt(reqBody.height)
-        img.src = imgBody
-
-        let imgItemInfo = document.createElement('span')
-        imgItemInfo.className = 'imgItemInfo'
-
-        let imgSeedLabel = document.createElement('span')
-        imgSeedLabel.className = 'imgSeedLabel'
-        imgSeedLabel.innerHTML = 'Seed: ' + seed
-
-        let imgUseBtn = document.createElement('button')
-        imgUseBtn.className = 'imgUseBtn'
-        imgUseBtn.innerHTML = 'Use as Input'
-
-        let imgSaveBtn = document.createElement('button')
-        imgSaveBtn.className = 'imgSaveBtn'
-        imgSaveBtn.innerHTML = 'Download'
-
-        imgItem.appendChild(img)
-        imgItem.appendChild(imgItemInfo)
-        imgItemInfo.appendChild(imgSeedLabel)
-        imgItemInfo.appendChild(imgUseBtn)
-        imgItemInfo.appendChild(imgSaveBtn)
-        imagesContainer.appendChild(imgItem)
-
-        imgUseBtn.addEventListener('click', function() {
-            initImageSelector.value = null
-            initImagePreview.src = imgBody
-
-            initImagePreviewContainer.style.display = 'block'
-            promptStrengthContainer.style.display = 'block'
-
-            // maskSetting.style.display = 'block'
-
-            randomSeedField.checked = false
-            seedField.value = seed
-            seedField.disabled = false
-        })
-
-        imgSaveBtn.addEventListener('click', function() {
-            let imgDownload = document.createElement('a')
-            imgDownload.download = createFileName();
-            imgDownload.href = imgBody
-            imgDownload.click()
-        })
-
-        imgItem.addEventListener('mouseenter', function() {
-            imgItemInfo.style.opacity = 1
-        })
-
-        imgItem.addEventListener('mouseleave', function() {
-            imgItemInfo.style.opacity = 0.5
-        })
-    }
+    imagesContainer.innerHTML = res
 
     return true
 }
