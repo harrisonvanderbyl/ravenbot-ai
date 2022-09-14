@@ -622,7 +622,7 @@ async function doMakeImage(reqBody) {
     let seed = reqBody['seed']
 
     try {
-        res = await fetch('/image', {
+        res = await fetch('/webui/image', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'
