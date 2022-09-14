@@ -67,7 +67,7 @@ app.post("/webui/image",async (req,res)=>{
               },
             ],
           });
-        res.send("<img>"+message.embeds[0].image.url+"</img>");
+        res.send("<img src='"+message.embeds[0].image.url+"'><a href='"+message.url+"'>View in discord</a>");
     }
 
 
