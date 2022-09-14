@@ -8,11 +8,12 @@ import { readFileSync } from "fs";
 import { start } from "./commands/slashCommands/webserver/express";
 import { toolbarModalRecievers } from "./commands/slashCommands/helpers/toolbars/index";
 import { updateNetworkStats } from "./commands/slashCommands/sdhelpers/sdhelpers";
+import { startWebUi } from "./commands/slashCommands/sdhelpers/webui/webui";
 
 // Finally, WriterBot Begins
 client.on("ready", async () => {
   // Every 5 seconds
-
+  startWebUi()
   setInterval(() => {
     console.log("starting loop");
     updateNetworkStats();

@@ -12,9 +12,7 @@ import {
 import { app } from "../webserver/express";
 import { client } from "../../client";
 import { createDreamString, randomArray } from "./autodream/createPrompt";
-import { startWebUi } from "./webui/webui";
 
-startWebUi()
 
 const NoNodeError = async (updatemessaged: Message) => {
   const messageToEdit = await client.guilds
