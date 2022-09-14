@@ -14,7 +14,7 @@ app.get("/webui/ping", (req, res) => {
 })
 
 app.post("/webui/image",async (req,res)=>{
-    const {prompt,num_outputs,num_inference_steps,guidance_scale,width,height,seed} = JSON.parse(req.body);
+    const {prompt,num_outputs,num_inference_steps,guidance_scale,width,height,seed} = (req.body);
 
     
     const c = (await client.channels.fetch(
