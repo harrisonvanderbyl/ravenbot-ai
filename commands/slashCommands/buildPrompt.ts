@@ -13,6 +13,7 @@ import { addToolbar } from "./helpers/buttons";
 import sharp from "sharp";
 import { split } from "./helpers/imagesplit";
 import { stable } from "./sdhelpers/sdhelpers";
+import { main } from "ts-node/dist/bin";
 
 const styles = {
   raw: (p) => p,
@@ -75,6 +76,9 @@ export const stablediffusion: SlashCommand = {
 
       var height =
         (interaction.options.get("height")?.value as string) ?? "512";
+      if(Math.min(Number(width), Number(height))>512){
+        throw ("Image size too large. Maximum size for small side is 512")
+      }
       var steps = (interaction?.options?.get("steps")?.value as string) ?? "50";
       // remove anything non numeric
       steps = steps.replace(/\D/g, "");
