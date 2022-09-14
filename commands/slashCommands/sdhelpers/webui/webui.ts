@@ -1,6 +1,8 @@
 import { MessageAttachment, TextChannel } from "discord.js";
 import { readFileSync } from "fs";
 import { client } from "../../../client";
+import { addToolbar } from "../../helpers/buttons";
+import { split } from "../../helpers/imagesplit";
 import { app } from "../../webserver/express";
 import { compileNetworkStats, stable } from "../sdhelpers";
 export const startWebUi = ()=>{
@@ -67,6 +69,18 @@ app.post("/webui/image",async (req,res)=>{
               },
             ],
           });
+        await addToolbar(message,  await split(buffers, Number(num_outputs) as 1 | 4 | 9 | 81), [
+            {type: "ACTION_ROW",
+            components: [
+                {
+                    type: "BUTTON",
+                    style: "LINK",
+                    label: "Webui",
+                    url: "https://writerbot.selkiemyth.com/webui/"
+                }]
+            
+            }
+        ]);
         res.send("<img src='"+message.embeds[0].image.url+"'><a href='"+message.url+"'>View in discord</a>");
     }
 

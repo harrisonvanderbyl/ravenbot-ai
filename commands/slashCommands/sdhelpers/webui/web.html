@@ -295,7 +295,11 @@
                 <h4 class="collapsible">Advanced Settings</h4>
                 <ul id="editor-settings-entries" class="collapsible-content">
                     <li><label for="seed">Seed:</label> <input id="seed" name="seed" size="10" value="30000"> <input id="random_seed" name="random_seed" type="checkbox" checked> <label for="random_seed">Random Image</label></li>
-                    <li><label for="num_outputs_total">Number of images to make:</label> <input id="num_outputs_total" name="num_outputs_total" value="1" size="4"> <label for="num_outputs_parallel">Generate in parallel:</label> <input id="num_outputs_parallel" name="num_outputs_parallel" value="1" size="4"> (images at once)</li>
+                    <li><label for="num_outputs_total">Number of images to make:</label> <select id="num_outputs_total" name="num_outputs_total" value="1">
+                        <option value="1">1</option>
+                        <option value="4">4</option>
+                        <option value="9">9</option>
+                    </select></li>
                     <li><label for="width">Width:</label> 
                         <select id="width" name="width" value="512">
                             <option value="128">128 (*)</option>
@@ -628,8 +632,6 @@ async function makeImage() {
     let numOutputsTotal = parseInt(numOutputsTotalField.value)
     let numOutputsParallel = parseInt(numOutputsParallelField.value)
     let batchCount = Math.ceil(numOutputsTotal / numOutputsParallel)
-    let batchSize = numOutputsParallel
-
     let prompt = promptField.value
     if (activeTags.length > 0) {
         let promptTags = activeTags.join(", ")
@@ -640,7 +642,7 @@ async function makeImage() {
 
     let reqBody = {
         prompt: prompt,
-        num_outputs: batchSize,
+        num_outputs: batchCount,
         num_inference_steps: numInferenceStepsField.value,
         guidance_scale: parseInt(guidanceScaleField.value) / 10,
         width: widthField.value,
@@ -656,16 +658,11 @@ async function makeImage() {
 
     let successCount = 0
 
-    for (let i = 0; i < batchCount; i++) {
-        reqBody['seed'] = seed + (i * batchSize)
+    reqBody['seed'] = seed 
 
-        let success = await doMakeImage(reqBody)
+    let success = await doMakeImage(reqBody)
 
-        if (success) {
-            outputMsg.innerHTML = 'Processed batch ' + (i+1) + '/' + batchCount
-            successCount++
-        }
-    }
+    
 
     makeImageBtn.innerHTML = 'Make Image'
     makeImageBtn.disabled = false
