@@ -732,41 +732,8 @@ function createFileName() {
 }
 
 
-soundToggle.addEventListener('click', handleBoolSettingChange(SOUND_ENABLED_KEY))
-soundToggle.checked = isSoundEnabled()
 
-saveToDiskField.checked = isSaveToDiskEnabled()
-diskPathField.disabled = !saveToDiskField.checked
 
-useFaceCorrectionField.addEventListener('click', handleBoolSettingChange(USE_FACE_CORRECTION_KEY))
-useFaceCorrectionField.checked = isFaceCorrectionEnabled()
-
-useUpscalingField.checked = isUpscalingEnabled()
-upscaleModelField.disabled = !useUpscalingField.checked
-
-showOnlyFilteredImageField.addEventListener('click', handleBoolSettingChange(SHOW_ONLY_FILTERED_IMAGE_KEY))
-showOnlyFilteredImageField.checked = isShowOnlyFilteredImageEnabled()
-
-useCPUField.addEventListener('click', handleBoolSettingChange(USE_CPU_KEY))
-useCPUField.checked = isUseCPUEnabled()
-
-useFullPrecisionField.addEventListener('click', handleBoolSettingChange(USE_FULL_PRECISION_KEY))
-useFullPrecisionField.checked = isUseFullPrecisionEnabled()
-
-turboField.addEventListener('click', handleBoolSettingChange(USE_TURBO_MODE_KEY))
-turboField.checked = isUseTurboModeEnabled()
-
-diskPathField.addEventListener('change', handleStringSettingChange(DISK_PATH_KEY))
-
-saveToDiskField.addEventListener('click', function(e) {
-    diskPathField.disabled = !this.checked
-    handleBoolSettingChange(SAVE_TO_DISK_KEY)(e)
-})
-
-useUpscalingField.addEventListener('click', function(e) {
-    upscaleModelField.disabled = !this.checked
-    handleBoolSettingChange(USE_UPSCALING_KEY)(e)
-})
 
 function setPanelOpen(panelHandle) {
     let panelContents = panelHandle.nextElementSibling
@@ -796,36 +763,6 @@ function updatePromptStrength() {
     promptStrengthValueLabel.innerHTML = promptStrengthField.value / 10
 }
 
-promptStrengthField.addEventListener('input', updatePromptStrength)
-updatePromptStrength()
-
-useBetaChannelField.addEventListener('click', async function(e) {
-    if (serverStatus !== 'online') {
-        logError('The server is still starting up..')
-        alert('The server is still starting up..')
-        e.preventDefault()
-        return false
-    }
-
-    let updateBranch = (this.checked ? 'beta' : 'main')
-
-    try {
-        let res = await fetch('/app_config', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({
-                'update_branch': updateBranch
-            })
-        })
-        res = await res.json()
-
-        console.log('set config status response', res)
-    } catch (e) {
-        console.log('set config status error', e)
-    }
-})
 
 async function getAppConfig() {
     try {
@@ -854,47 +791,7 @@ function checkRandomSeed() {
 randomSeedField.addEventListener('input', checkRandomSeed)
 checkRandomSeed()
 
-function showInitImagePreview() {
-    if (initImageSelector.files.length === 0) {
-        initImagePreviewContainer.style.display = 'none'
-        promptStrengthContainer.style.display = 'none'
-        // maskSetting.style.display = 'none'
-        return
-    }
 
-    let reader = new FileReader()
-    let file = initImageSelector.files[0]
-
-    reader.addEventListener('load', function() {
-        // console.log(file.name, reader.result)
-        initImagePreview.src = reader.result
-        initImagePreviewContainer.style.display = 'block'
-        promptStrengthContainer.style.display = 'block'
-
-        // maskSetting.style.display = 'block'
-    })
-
-    if (file) {
-        reader.readAsDataURL(file)
-    }
-}
-initImageSelector.addEventListener('change', showInitImagePreview)
-showInitImagePreview()
-
-initImageClearBtn.addEventListener('click', function() {
-    initImageSelector.value = null
-    // maskImageSelector.value = null
-
-    initImagePreview.src = ''
-    // maskImagePreview.src = ''
-
-    initImagePreviewContainer.style.display = 'none'
-    // maskImagePreviewContainer.style.display = 'none'
-
-    // maskSetting.style.display = 'none'
-
-    promptStrengthContainer.style.display = 'none'
-})
 
 // function showMaskImagePreview() {
 //     if (maskImageSelector.files.length === 0) {
