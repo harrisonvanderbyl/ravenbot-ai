@@ -18,9 +18,9 @@ app.post("/webui/image",async (req,res)=>{
 
     
     const c = (await client.channels.fetch(
-        "1018090757149691945"
+        "1019524093067939882"
       )) as TextChannel;
-      const message = await c.send("Someone used the webui ...");
+      const message = await c.send("Someone used the webui to generate a picture...");
      
       const dream = prompt
       
@@ -39,7 +39,7 @@ app.post("/webui/image",async (req,res)=>{
         undefined,
         message,
         `${guidance_scale}`
-      );
+      ).catch(e=>null);
       if (!buffers) {
         await message.edit({
           content: "failed to dream",
