@@ -346,7 +346,7 @@
         </div>
 
         <div id="preview" class="col-50">
-            <div id="preview-prompt">Type a prompt and press the "Make Image" button.<br/><br/>You can set an "Initial Image" if you want to guide the AI.<br/><br/>You can also add modifiers like "Realistic", "Pencil Sketch", "ArtStation" etc by browsing through the "Image Modifiers" section and selecting the desired modifiers.<br/><br/>Click "Advanced Settings" for additional settings like seed, image size, number of images to generate etc.<br/><br/>Enjoy! :)</div>
+            <div id="preview-prompt">Type a prompt and press the "Make Image" button.<br/><br/>You can also add modifiers like "Realistic", "Pencil Sketch", "ArtStation" etc by browsing through the "Image Modifiers" section and selecting the desired modifiers.<br/><br/>Click "Advanced Settings" for additional settings like seed, image size, number of images to generate etc.<br/><br/>Enjoy! :)</div>
 
             <div id="outputMsg"></div>
             <div id="current-images" class="img-preview">
@@ -395,14 +395,9 @@ let randomSeedField = document.querySelector("#random_seed")
 let seedField = document.querySelector('#seed')
 let widthField = document.querySelector('#width')
 let heightField = document.querySelector('#height')
-let initImageSelector = document.querySelector("#init_image")
-let initImagePreview = document.querySelector("#init_image_preview")
-
 let makeImageBtn = document.querySelector('#makeImage')
 
 let imagesContainer = document.querySelector('#current-images')
-let initImagePreviewContainer = document.querySelector('#init_image_preview_container')
-let initImageClearBtn = document.querySelector('#init_image_clear')
 let promptStrengthContainer = document.querySelector('#prompt_strength_container')
 
 
@@ -597,13 +592,6 @@ function validateInput() {
     let width = parseInt(widthField.value)
     let height = parseInt(heightField.value)
 
-    if (IMAGE_REGEX.test(initImagePreview.src)) {
-        if (initImagePreview.naturalWidth > MAX_INIT_IMAGE_DIMENSION || initImagePreview.naturalHeight > MAX_INIT_IMAGE_DIMENSION) {
-            return {'isValid': false, 'warning': `The dimensions of your initial image are very large, and can cause 'Out of Memory' errors! Please ensure that its dimensions are equal (or smaller) than the desired output image.
-                    <br/><br/>
-                    Your initial image size is ${initImagePreview.naturalWidth}x${initImagePreview.naturalHeight} pixels. Please try to keep it smaller than ${MAX_INIT_IMAGE_DIMENSION}x${MAX_INIT_IMAGE_DIMENSION}.`}
-        }
-    }
 
     return {'isValid': true}
 }
