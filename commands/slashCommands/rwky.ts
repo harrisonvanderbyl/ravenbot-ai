@@ -13,7 +13,7 @@ export const rwkyCommand: SlashCommand = {
     };
     rwky(
       interaction,
-      (interaction.options.get("prompt").value as string).replace("\\n","\n"),
+      (interaction.options.get("prompt").value as string).split("\\n").join("\n"),
       clean((interaction.options.get("temperature")?.value as string) ?? "1.3"),
       clean((interaction.options.get("top_p")?.value as string) ?? "0.8"),
       await interaction.editReply({
