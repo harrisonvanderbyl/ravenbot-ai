@@ -277,13 +277,7 @@
                     <textarea id="prompt" class="col-free">a photograph of an astronaut riding a horse</textarea>
                 </div>
 
-                <div id="editor-inputs-init-image" class="row">
-                    <label for="init_image"><b>Initial Image:</b> (optional) </label> <input id="init_image" name="init_image" type="file" /> </button><br/>
-                    <div id="init_image_preview_container" class="image_preview_container">
-                        <img id="init_image_preview" src="" width="100" height="100" />
-                        <button id="init_image_clear" class="image_clear_btn">X</button>
-                    </div>
-                </div>
+               
 
                 <div id="editor-inputs-tags-container" class="row">
                     <label>Tags: <small>(click a tag to remove it)</small></label>
@@ -299,7 +293,6 @@
             <div id="editor-settings" class="panel-box">
                 <h4 class="collapsible">Advanced Settings</h4>
                 <ul id="editor-settings-entries" class="collapsible-content">
-                    
                     <li><label for="seed">Seed:</label> <input id="seed" name="seed" size="10" value="30000"> <input id="random_seed" name="random_seed" type="checkbox" checked> <label for="random_seed">Random Image</label></li>
                     <li><label for="num_outputs_total">Number of images to make:</label> <input id="num_outputs_total" name="num_outputs_total" value="1" size="4"> <label for="num_outputs_parallel">Generate in parallel:</label> <input id="num_outputs_parallel" name="num_outputs_parallel" value="1" size="4"> (images at once)</li>
                     <li><label for="width">Width:</label> 
@@ -342,7 +335,6 @@
                     </li>
                     <li><label for="num_inference_steps">Number of inference steps:</label> <input id="num_inference_steps" name="num_inference_steps" size="4" value="50"></li>
                     <li><label for="guidance_scale">Guidance Scale:</label> <input id="guidance_scale" name="guidance_scale" value="75" type="range" min="10" max="200"> <span id="guidance_scale_value"></span></li>
-                    <li><span id="prompt_strength_container"><label for="prompt_strength">Prompt Strength:</label> <input id="prompt_strength" name="prompt_strength" value="8" type="range" min="0" max="10"> <span id="prompt_strength_value"></span><br/></span></li>
                    </ul>
             </div>
 
@@ -405,22 +397,6 @@ let widthField = document.querySelector('#width')
 let heightField = document.querySelector('#height')
 let initImageSelector = document.querySelector("#init_image")
 let initImagePreview = document.querySelector("#init_image_preview")
-// let maskImageSelector = document.querySelector("#mask")
-// let maskImagePreview = document.querySelector("#mask_preview")
-let turboField = document.querySelector('#turbo')
-let useCPUField = document.querySelector('#use_cpu')
-let useFullPrecisionField = document.querySelector('#use_full_precision')
-let saveToDiskField = document.querySelector('#save_to_disk')
-let diskPathField = document.querySelector('#diskPath')
-// let allowNSFWField = document.querySelector("#allow_nsfw")
-let useBetaChannelField = document.querySelector("#use_beta_channel")
-let promptStrengthField = document.querySelector('#prompt_strength')
-let promptStrengthValueLabel = document.querySelector('#prompt_strength_value')
-let useFaceCorrectionField = document.querySelector("#use_face_correction")
-let useUpscalingField = document.querySelector("#use_upscale")
-let upscaleModelField = document.querySelector("#upscale_model")
-let showOnlyFilteredImageField = document.querySelector("#show_only_filtered_image")
-let updateBranchLabel = document.querySelector("#updateBranchLabel")
 
 let makeImageBtn = document.querySelector('#makeImage')
 
@@ -429,9 +405,6 @@ let initImagePreviewContainer = document.querySelector('#init_image_preview_cont
 let initImageClearBtn = document.querySelector('#init_image_clear')
 let promptStrengthContainer = document.querySelector('#prompt_strength_container')
 
-// let maskSetting = document.querySelector('#mask_setting')
-// let maskImagePreviewContainer = document.querySelector('#mask_preview_container')
-// let maskImageClearBtn = document.querySelector('#mask_clear')
 
 let editorModifierEntries = document.querySelector('#editor-modifiers-entries')
 let editorModifierTagsList = document.querySelector('#editor-inputs-tags-list')
@@ -679,36 +652,11 @@ async function makeImage() {
         guidance_scale: parseInt(guidanceScaleField.value) / 10,
         width: widthField.value,
         height: heightField.value,
-        // allow_nsfw: allowNSFWField.checked,
-        turbo: turboField.checked,
-        use_cpu: useCPUField.checked,
-        use_full_precision: useFullPrecisionField.checked
     }
 
-    if (IMAGE_REGEX.test(initImagePreview.src)) {
-        reqBody['init_image'] = initImagePreview.src
-        reqBody['prompt_strength'] = parseInt(promptStrengthField.value) / 10
+    
 
-        // if (IMAGE_REGEX.test(maskImagePreview.src)) {
-        //     reqBody['mask'] = maskImagePreview.src
-        // }
-    }
-
-    if (saveToDiskField.checked && diskPathField.value.trim() !== '') {
-        reqBody['save_to_disk_path'] = diskPathField.value.trim()
-    }
-
-    if (useFaceCorrectionField.checked) {
-        reqBody['use_face_correction'] = 'GFPGANv1.3'
-    }
-
-    if (useUpscalingField.checked) {
-        reqBody['use_upscale'] = upscaleModelField.value
-    }
-
-    if (showOnlyFilteredImageField.checked && (useUpscalingField.checked || useFaceCorrectionField.checked)) {
-        reqBody['show_only_filtered_image'] = showOnlyFilteredImageField.checked
-    }
+   
 
     let time = new Date().getTime()
     imagesContainer.innerHTML = ''
