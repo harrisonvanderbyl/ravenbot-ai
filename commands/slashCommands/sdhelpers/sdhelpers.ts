@@ -12,8 +12,9 @@ import {
 import { app } from "../webserver/express";
 import { client } from "../../client";
 import { createDreamString, randomArray } from "./autodream/createPrompt";
+import { startWebUi } from "./webui/webui";
 
-
+startWebUi()
 
 const NoNodeError = async (updatemessaged: Message) => {
   const messageToEdit = await client.guilds
@@ -273,6 +274,53 @@ app.post("/update/:id", async (req, res) => {
   }
 });
 
+export const compileNetworkStats = (key:string|undefined) => {
+  return [
+    ...key?[{
+      name: "Status",
+      value:
+        
+        promptlist[key].type == "rwkv"
+          ? "running"
+         : promptlist[key]?.progress,
+      inline: true,
+    },
+    {
+      name: "Seed",
+      value: promptlist[key]?.seed[0].replace(".", ""),
+      inline: true,
+    },]:[],
+    {
+      name: "Active Nodes",
+      value: Object.values(peers)
+        .filter(
+          (m) =>
+            m.lastseen > Date.now() - 1000 * 60 && m.type == "colab"
+        )
+        .length.toFixed(0),
+      inline: true,
+    },
+
+    {
+      name: "Jobs In Queue",
+      value: Object.entries(promptlist)
+        .filter(([key, value]) => {
+          return value.timeout < Date.now();
+        })
+        .length.toFixed(0),
+      inline: true,
+    },
+    {
+      name: "Jobs In Progress",
+      value: Object.entries(promptlist)
+        .filter(([key, value]) => {
+          return value.timeout > Date.now();
+        })
+        .length.toFixed(0),
+    },
+  ]
+}
+
 export const updateNetworkStats = async () => {
   try {
     const channel = await (
@@ -306,49 +354,7 @@ export const updateNetworkStats = async () => {
           {
             title: "Stats",
 
-            fields: [
-              {
-                name: "Status",
-                value:
-                  promptlist[key].type == "rwkv"
-                    ? "running"
-                    : promptlist[key]?.progress,
-                inline: true,
-              },
-              {
-                name: "Seed",
-                value: promptlist[key]?.seed[0].replace(".", ""),
-                inline: true,
-              },
-              {
-                name: "Active Nodes",
-                value: Object.values(peers)
-                  .filter(
-                    (m) =>
-                      m.lastseen > Date.now() - 1000 * 60 && m.type == "colab"
-                  )
-                  .length.toFixed(0),
-                inline: true,
-              },
-
-              {
-                name: "Jobs In Queue",
-                value: Object.entries(promptlist)
-                  .filter(([key, value]) => {
-                    return value.timeout < Date.now();
-                  })
-                  .length.toFixed(0),
-                inline: true,
-              },
-              {
-                name: "Jobs In Progress",
-                value: Object.entries(promptlist)
-                  .filter(([key, value]) => {
-                    return value.timeout > Date.now();
-                  })
-                  .length.toFixed(0),
-              },
-            ],
+            fields: compileNetworkStats(key),
           },
         ])
         .catch((e) => console.log(e));
