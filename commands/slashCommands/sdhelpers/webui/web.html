@@ -609,11 +609,8 @@ async function healthCheck() {
         let res = await fetch('/webui/ping')
         res = await res.json()
 
-        if (res[0] == 'OK') {
-            setStatus('server', JSON.parse(res.body.toString()), 'network')
-        } else {
-            setStatus('server', 'offline', 'error')
-        }
+        setStatus('server', JSON.parse(res.body.toString()), 'network')
+        
     } catch (e) {
         setStatus('server', 'offline', 'error')
     }
