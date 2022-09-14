@@ -396,7 +396,6 @@ const IMAGE_REGEX = new RegExp('data:image/[A-Za-z]+;base64')
 
 let promptField = document.querySelector('#prompt')
 let numOutputsTotalField = document.querySelector('#num_outputs_total')
-let numOutputsParallelField = document.querySelector('#num_outputs_parallel')
 let numInferenceStepsField = document.querySelector('#num_inference_steps')
 let guidanceScaleField = document.querySelector('#guidance_scale')
 let guidanceScaleValueLabel = document.querySelector('#guidance_scale_value')
@@ -630,8 +629,7 @@ async function makeImage() {
 
     let seed = (randomSeedField.checked ? Math.floor(Math.random() * 10000000) : parseInt(seedField.value))
     let numOutputsTotal = parseInt(numOutputsTotalField.value)
-    let numOutputsParallel = parseInt(numOutputsParallelField.value)
-    let batchCount = Math.ceil(numOutputsTotal / numOutputsParallel)
+    let batchCount = Math.ceil(numOutputsTotal)
     let prompt = promptField.value
     if (activeTags.length > 0) {
         let promptTags = activeTags.join(", ")
