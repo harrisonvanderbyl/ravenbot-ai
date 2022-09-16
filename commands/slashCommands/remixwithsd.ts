@@ -163,7 +163,7 @@ export const remixwithsd: SlashCommand = {
         .then((b) => b.toString("base64")),
       level,
       true,
-      w,h,
+      h,w,
       "1",
       undefined,
       steps
