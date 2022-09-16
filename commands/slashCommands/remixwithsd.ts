@@ -146,19 +146,24 @@ export const remixwithsd: SlashCommand = {
       await interaction.editReply("level must be between 0.0 and 1.0");
       return;
     }
+    const image = sharp(await downloadToBuffer(imageUrl))
 
+    const [w,h] =  await image.metadata().then((m) => [m.width,m.height]).then(([w,h])=>{
+      const ww = Math.min(w,512)
+      // Resize to keep aspect ratio
+      return [ww,Math.min(Math.round(h*(ww/w)),1024)]
+    }).then(m=>m.map(w=>Math.floor(w/64)*64)).then(([w,h])=>[`${w}`,`${h}`])
     const buff = await stable(
       interaction as any,
       prompt,
       (Math.random()*10000).toFixed(0),
-      await sharp(await downloadToBuffer(imageUrl))
+        await image
         .png()
         .toBuffer()
         .then((b) => b.toString("base64")),
       level,
       true,
-      "512",
-      "512",
+      w,h,
       "1",
       undefined,
       steps
