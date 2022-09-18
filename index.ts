@@ -13,10 +13,10 @@ import { startWebUi } from "./commands/slashCommands/sdhelpers/webui/webui";
 // Finally, WriterBot Begins
 client.on("ready", async () => {
   // Every 5 seconds
-  startWebUi()
+  startWebUi();
   setInterval(() => {
     console.log("starting loop");
-    updateNetworkStats();
+    updateNetworkStats().catch((e) => console.log(e));
   }, 5 * 1000);
   console.log(
     `Bot has started, with ${client.users.cache.size} users, in ${client.channels.cache.size} channels of ${client.guilds.cache.size} guilds.`

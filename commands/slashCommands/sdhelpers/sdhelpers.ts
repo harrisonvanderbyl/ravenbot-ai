@@ -13,7 +13,6 @@ import { app } from "../webserver/express";
 import { client } from "../../client";
 import { createDreamString, randomArray } from "./autodream/createPrompt";
 
-
 const NoNodeError = async (updatemessaged: Message) => {
   const messageToEdit = await client.guilds
     .fetch(updatemessaged.guildId)
@@ -272,29 +271,30 @@ app.post("/update/:id", async (req, res) => {
   }
 });
 
-export const compileNetworkStats = (key:string|undefined) => {
+export const compileNetworkStats = (key: string | undefined) => {
   return [
-    ...key?[{
-      name: "Status",
-      value:
-        
-        promptlist[key].type == "rwkv"
-          ? "running"
-         : promptlist[key]?.progress,
-      inline: true,
-    },
-    {
-      name: "Seed",
-      value: promptlist[key]?.seed[0]?.replace(".", "") ?? "no seed value",
-      inline: true,
-    },]:[],
+    ...(key
+      ? [
+          {
+            name: "Status",
+            value:
+              promptlist[key].type == "rwkv"
+                ? "running"
+                : promptlist[key]?.progress,
+            inline: true,
+          },
+          {
+            name: "Seed",
+            value:
+              promptlist[key]?.seed[0]?.replace(".", "") ?? "no seed value",
+            inline: true,
+          },
+        ]
+      : []),
     {
       name: "Active Nodes",
       value: Object.values(peers)
-        .filter(
-          (m) =>
-            m.lastseen > Date.now() - 1000 * 60 && m.type == "colab"
-        )
+        .filter((m) => m.lastseen > Date.now() - 1000 * 60 && m.type == "colab")
         .length.toFixed(0),
       inline: true,
     },
@@ -316,38 +316,46 @@ export const compileNetworkStats = (key:string|undefined) => {
         })
         .length.toFixed(0),
     },
-  ]
-}
+  ];
+};
 
 export const updateNetworkStats = async () => {
   try {
-    const channel = await (
-      (await client.channels.fetch("1011928316711817246")) as TextChannel
-    )?.setName(
-      "Colab Nodes: " +
-        Object.values(peers)
-          .filter(
-            (m) => m.lastseen > Date.now() - 1000 * 60 && m.type == "colab"
-          )
-          .length.toFixed(0)
-    );
+    const channel = client.channels
+      .fetch("1011928316711817246")
+      .then((c) => c as TextChannel)
+      .then((c) =>
+        c?.setName(
+          "Colab Nodes: " +
+            Object.values(peers)
+              .filter(
+                (m) => m.lastseen > Date.now() - 1000 * 60 && m.type == "colab"
+              )
+              .length.toFixed(0)
+        )
+      )
+      .catch((e) => console.log(e));
     for (var [id, peer] of Object.entries(peers).filter(
       ([id, m]) => m.lastseen < Date.now() - 2000 * 60 && m.type == "colab"
     )) {
       const status = "1011284410345205820";
       const guild = "989166996153323591";
-      await client.guilds.fetch(guild).then((g) =>
-        g.channels.fetch(status).then((c: TextChannel) =>
-          c.send({
-            content:
-              peer.name + " not seen in 2 mins, possibly disconnected or busy",
-          })
+      client.guilds
+        .fetch(guild)
+        .then((g) =>
+          g.channels.fetch(status).then((c: TextChannel) =>
+            c.send({
+              content:
+                peer.name +
+                " not seen in 2 mins, possibly disconnected or busy",
+            })
+          )
         )
-      );
+        .catch((e) => console.log(e));
       delete peers[id];
     }
     for (const [key, value] of Object.entries(promptlist)) {
-      await value
+      value
         .updateNetworkStats([
           {
             title: "Stats",
@@ -368,8 +376,8 @@ export const updateNetworkStats = async () => {
           "1018090757149691945"
         )) as TextChannel;
         const message = await c.send("Idly dreaming ...");
-       
-        const dream = createDreamString()
+
+        const dream = createDreamString();
         const seed = (Math.random() * 100000).toFixed(0);
         const buffers = await stable(
           { id: message.id, fetchReply: () => message } as any,
