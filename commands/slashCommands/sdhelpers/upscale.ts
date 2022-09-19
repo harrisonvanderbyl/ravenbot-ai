@@ -18,12 +18,16 @@ import { downloadToBuffer } from "../../../charaterBuilders/imageGenerators/womb
 import { redirectUrl } from "../../../config/config.json";
 import sharp from "sharp";
 import { stable } from "./sdhelpers";
+import { readFileSync } from "fs";
 
 const buffers: { [key: string]: Buffer } = {};
 
 app.get("/files/error/:id/file.png", (req, res) => {
   res.setHeader("content-type", "image/png");
-  res.send(buffers[req.params.id] ?? "No File Found");
+  res.send(
+    buffers[req.params.id] ??
+      readFileSync(__dirname + "./placeholder/placeholder.png")
+  );
 });
 
 export const upscale = async (
