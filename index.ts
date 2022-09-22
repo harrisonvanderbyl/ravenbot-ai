@@ -101,7 +101,8 @@ const runCommands = async (interaction: Interaction): Promise<void> => {
         guildLeader === "438605535323881486" ||
         guildLeader === "188122780678488065" ||
         guildLeader === "437694417676140577" ||
-        guildLeader === "870137517020688415"
+        guildLeader === "870137517020688415" ||
+        guildLeader === "690421291517214722"
       )
     ) {
       console.log(
