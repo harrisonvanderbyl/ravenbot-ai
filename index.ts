@@ -9,6 +9,7 @@ import { start } from "./commands/slashCommands/webserver/express";
 import { toolbarModalRecievers } from "./commands/slashCommands/helpers/toolbars/index";
 import { updateNetworkStats } from "./commands/slashCommands/sdhelpers/sdhelpers";
 import { startWebUi } from "./commands/slashCommands/sdhelpers/webui/webui";
+import { getGuildCommands } from "./commands/createSlashCommands";
 
 // Finally, WriterBot Begins
 client.on("ready", async () => {
@@ -37,7 +38,30 @@ client.on("ready", async () => {
   console.log("fin started servers");
 });
 
-client.on("messageCreate", async (message) => {});
+client.on("messageCreate", async (message) => {
+  if (message.content == "!help") {
+    getGuildCommands(message.guildId).then((commands) => {
+      message.channel.send({
+        content: `Commands available in this server, either slash or context menu commands: ${commands
+          .map(
+            (c) => `
+          \`${c.name}\` - ${c.description}
+          Options:
+          ${
+            c.options
+              .map(
+                (o) => `
+            \`${o.name}\` - ${o.description}
+          `
+              )
+              .join("\n") || "No options"
+          }`
+          )
+          .join("\n\n")}`,
+      });
+    });
+  }
+});
 const runCommands = async (interaction: Interaction): Promise<void> => {
   return await new Promise(async (resolve, reject) => {
     const patreonInfo = JSON.parse(
