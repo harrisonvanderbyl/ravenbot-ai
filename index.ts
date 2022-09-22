@@ -43,14 +43,24 @@ client.on("messageCreate", async (message) => {
     getGuildCommands(undefined).then((commands) => {
       message.channel.send({
         content: `Commands available globally, either slash or context menu commands:\n${commands
-          .map((c) => `**${c.name}** - *${c.description ?? "Context Command"}*`)
+          .map(
+            (c) =>
+              `**${c.name}** - *${
+                c.description?.length ? c.description : "Context Command"
+              }*`
+          )
           .join("\n")}`,
       });
     });
     getGuildCommands(message.guildId).then((commands) => {
       message.channel.send({
         content: `Commands available only in this server, either slash or context menu commands:\n${commands
-          .map((c) => `**${c.name}** - *${c.description ?? "Context Command"}*`)
+          .map(
+            (c) =>
+              `**${c.name}** - *${
+                c.description?.length ? c.description : "Context Command"
+              }*`
+          )
           .join("\n")}`,
       });
     });
@@ -59,7 +69,9 @@ client.on("messageCreate", async (message) => {
     if (message.content.startsWith("!help " + c.commandSchema.name)) {
       message.channel.send({
         content: `Help for command\n**${c.commandSchema.name}**: *${
-          c.commandSchema.description ?? "Context Command"
+          c.commandSchema.description?.length
+            ? c.commandSchema.description
+            : "Context Command"
         }*\n${
           c.commandSchema?.options
             ?.map((o) => `\t**${o.name}** - *${o.description}*`)
