@@ -45,19 +45,15 @@ client.on("messageCreate", async (message) => {
         content: `Commands available in this server, either slash or context menu commands: ${commands
           .map(
             (c) => `
-          \`${c.name}\` - ${c.description}
+            \`${c.name}\` - ${c.description}
           Options:
           ${
             c.options
-              .map(
-                (o) => `
-            \`${o.name}\` - ${o.description}
-          `
-              )
+              .map((o) => `\`${o.name}\` - ${o.description}`)
               .join("\n") || "No options"
           }`
           )
-          .join("\n\n")}`,
+          .join("\n")}`,
       });
     });
   }
