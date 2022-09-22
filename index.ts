@@ -40,9 +40,25 @@ client.on("ready", async () => {
 
 client.on("messageCreate", async (message) => {
   if (message.content == "!help") {
+    getGuildCommands(undefined).then((commands) => {
+      message.channel.send({
+        content: `Commands available globally, either slash or context menu commands: ${commands
+          .map(
+            (c) => `
+            \`${c.name}\` - ${c.description}
+          Options:
+          ${
+            c.options
+              .map((o) => `\`${o.name}\` - ${o.description}`)
+              .join("\n") || "No options"
+          }`
+          )
+          .join("\n")}`,
+      });
+    });
     getGuildCommands(message.guildId).then((commands) => {
       message.channel.send({
-        content: `Commands available in this server, either slash or context menu commands: ${commands
+        content: `Commands available only in this server, either slash or context menu commands: ${commands
           .map(
             (c) => `
             \`${c.name}\` - ${c.description}
