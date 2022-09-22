@@ -44,14 +44,12 @@ client.on("messageCreate", async (message) => {
       message.channel.send({
         content: `Commands available globally, either slash or context menu commands: ${commands
           .map(
-            (c) => `
-            \`${c.name}\` - ${c.description}
-          Options:
-          ${
-            c.options
-              .map((o) => `\`${o.name}\` - ${o.description}`)
-              .join("\n") || "No options"
-          }`
+            (c) =>
+              `\`${c.name}\` - ${c.description}\nOptions:\n${
+                c.options
+                  .map((o) => `\`${o.name}\` - ${o.description}`)
+                  .join("\n") || "No options"
+              }`
           )
           .join("\n")}`,
       });
@@ -60,14 +58,12 @@ client.on("messageCreate", async (message) => {
       message.channel.send({
         content: `Commands available only in this server, either slash or context menu commands: ${commands
           .map(
-            (c) => `
-            \`${c.name}\` - ${c.description}
-          Options:
-          ${
-            c.options
-              .map((o) => `\`${o.name}\` - ${o.description}`)
-              .join("\n") || "No options"
-          }`
+            (c) =>
+              `\`${c.name}\` - ${c.description}Options:\n${
+                c.options
+                  .map((o) => `\`${o.name}\` - ${o.description}`)
+                  .join("\n") || "No options"
+              }`
           )
           .join("\n")}`,
       });
