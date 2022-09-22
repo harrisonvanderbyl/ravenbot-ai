@@ -13,7 +13,7 @@ const generateUserStats = async (data) => {};
 
 const giveRole = async (userid) => {
   const g = await client.guilds.fetch("989166996153323591");
-  const member = await g.members.fetch(userid);
+  const member = await g.members.fetch(userid).catch((e) => null);
   if (!member) {
     console.log("Member not found");
     return;
