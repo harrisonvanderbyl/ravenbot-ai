@@ -42,14 +42,14 @@ client.on("messageCreate", async (message) => {
   if (message.content == "!help") {
     getGuildCommands(undefined).then((commands) => {
       message.channel.send({
-        content: `Commands available globally, either slash or context menu commands: ${commands
+        content: `Commands available globally, either slash or context menu commands:\n ${commands
           .map((c) => `\`${c.name}\` - ${c.description}`)
           .join("\n")}`,
       });
     });
     getGuildCommands(message.guildId).then((commands) => {
       message.channel.send({
-        content: `Commands available only in this server, either slash or context menu commands: ${commands
+        content: `Commands available only in this server, either slash or context menu commands:\n ${commands
           .map((c) => `\`${c.name}\` - ${c.description}`)
           .join("\n")}`,
       });
@@ -60,11 +60,10 @@ client.on("messageCreate", async (message) => {
       message.channel.send({
         content: `Help for command \`${c.commandSchema.name}\`: ${
           c.commandSchema.description
-        }
-        ${
-          c.commandSchema?.options?.map(
-            (o) => `\`${o.name}\` - ${o.description}`
-          ) ?? ""
+        }\n${
+          c.commandSchema?.options
+            ?.map((o) => `\t\`${o.name}\` - ${o.description}`)
+            .join("\n") ?? ""
         }`,
       });
     }
