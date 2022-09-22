@@ -43,31 +43,31 @@ client.on("messageCreate", async (message) => {
     getGuildCommands(undefined).then((commands) => {
       message.channel.send({
         content: `Commands available globally, either slash or context menu commands: ${commands
-          .map(
-            (c) =>
-              `\`${c.name}\` - ${c.description}\nOptions:\n${
-                c.options
-                  .map((o) => `\`${o.name}\` - ${o.description}`)
-                  .join("\n") || "No options"
-              }`
-          )
+          .map((c) => `\`${c.name}\` - ${c.description}`)
           .join("\n")}`,
       });
     });
     getGuildCommands(message.guildId).then((commands) => {
       message.channel.send({
         content: `Commands available only in this server, either slash or context menu commands: ${commands
-          .map(
-            (c) =>
-              `\`${c.name}\` - ${c.description}Options:\n${
-                c.options
-                  .map((o) => `\`${o.name}\` - ${o.description}`)
-                  .join("\n") || "No options"
-              }`
-          )
+          .map((c) => `\`${c.name}\` - ${c.description}`)
           .join("\n")}`,
       });
     });
+  }
+  for (var c of Object.values(commands)) {
+    if (message.content.startsWith("!help " + c.commandSchema.name)) {
+      message.channel.send({
+        content: `Help for command \`${c.commandSchema.name}\`: ${
+          c.commandSchema.description
+        }
+        ${
+          c.commandSchema?.options?.map(
+            (o) => `\`${o.name}\` - ${o.description}`
+          ) ?? ""
+        }`,
+      });
+    }
   }
 });
 const runCommands = async (interaction: Interaction): Promise<void> => {
