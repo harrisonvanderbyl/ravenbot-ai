@@ -9,7 +9,7 @@ import { start } from "./commands/slashCommands/webserver/express";
 import { toolbarModalRecievers } from "./commands/slashCommands/helpers/toolbars/index";
 import { updateNetworkStats } from "./commands/slashCommands/sdhelpers/sdhelpers";
 import { startWebUi } from "./commands/slashCommands/sdhelpers/webui/webui";
-import { getGuildCommands } from "./commands/createSlashCommands";
+import { getGuildCommands } from "./commands/common";
 
 // Finally, WriterBot Begins
 client.on("ready", async () => {
