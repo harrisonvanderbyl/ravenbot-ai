@@ -58,12 +58,13 @@ export const addToolbar = async (
         ),
       });
     }
+    if (!i.deferred && !i.replied) {
+      await i.deferUpdate();
+    }
     toolbars.forEach(async (t) => {
       if (t.id === number) {
         const newtoolbar = await t.createToolbars(buffers, i);
-        if (!i.deferred && !i.replied) {
-          await i.deferUpdate();
-        }
+
         try {
           await i.editReply({
             components: [
