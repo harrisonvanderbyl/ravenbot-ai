@@ -11,15 +11,18 @@ export const rwkyCommand: SlashCommand = {
         return "0.9";
       }
     };
-    rwky(
-      interaction,
-      (interaction.options.get("prompt").value as string).split("\\n").join("\n"),
-      clean((interaction.options.get("temperature")?.value as string) ?? "1.3"),
-      clean((interaction.options.get("top_p")?.value as string) ?? "0.8"),
-      await interaction.editReply({
-        content: "Generating...",
-      })
-    );
+    await interaction.editReply({
+      content: "Please use +rwkv instead",
+    });
+    // rwky(
+    //   interaction,
+    //   (interaction.options.get("prompt").value as string).split("\\n").join("\n"),
+    //   clean((interaction.options.get("temperature")?.value as string) ?? "1.3"),
+    //   clean((interaction.options.get("top_p")?.value as string) ?? "0.8"),
+    //   await interaction.editReply({
+    //     content: "Generating...",
+    //   })
+    // );
   },
   commandSchema: {
     name: "rwkv",
