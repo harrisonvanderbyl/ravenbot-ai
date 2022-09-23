@@ -41,10 +41,15 @@ export const stablediffusion: SlashCommand = {
       const optionsString = interaction.options.data
         .map((option) => `${option.name}: ${option.value}`)
         .join(", ");
-
-      await interaction.reply(
-        `Generating image with stable diffusion with options ${optionsString}. Ideal generation time is below 2 minutes`
-      );
+      if (!interaction.replied) {
+        await interaction.reply(
+          `Generating image with stable diffusion with options ${optionsString}. Ideal generation time is below 2 minutes`
+        );
+      } else {
+        await interaction.editReply(
+          `Generating image with stable diffusion with options ${optionsString}. Ideal generation time is below 2 minutes`
+        );
+      }
       var iterations =
         (interaction.options.get("iterations")?.value as string) ?? "1";
 
@@ -76,8 +81,8 @@ export const stablediffusion: SlashCommand = {
 
       var height =
         (interaction.options.get("height")?.value as string) ?? "512";
-      if(Math.min(Number(width), Number(height))>512){
-        throw ("Image size too large. Maximum size for small side is 512")
+      if (Math.min(Number(width), Number(height)) > 512) {
+        throw "Image size too large. Maximum size for small side is 512";
       }
       var steps = (interaction?.options?.get("steps")?.value as string) ?? "50";
       // remove anything non numeric
