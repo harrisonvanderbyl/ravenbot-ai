@@ -26,7 +26,7 @@ app.get("/files/error/:id/file.png", (req, res) => {
   res.setHeader("content-type", "image/png");
   res.send(
     buffers[req.params.id] ??
-      readFileSync(__dirname + "./placeholder/placeholder.png")
+      readFileSync(__dirname + "/placeholder/placeholder.png")
   );
 });
 
