@@ -65,6 +65,44 @@ export const stablediffusion: SlashCommand = {
       }
       const newSeed = "[" + seeds.join(",") + "]";
 
+      const bannedWords = [
+        "child",
+        "children",
+        "kid",
+        "kids",
+        "baby",
+        "babies",
+        "infant",
+        "infants",
+        "toddler",
+        "toddlers",
+        "teen",
+        "teens",
+        "teenager",
+        "teenagers",
+        "preteen",
+        "preteens",
+        "preteenager",
+        "preteenagers",
+        "schoolgirl",
+        "schoolgirls",
+        "schoolboy",
+        "schoolboys",
+      ];
+
+      if (
+        bannedWords.some((word) =>
+          (interaction.options.get("prompt")?.value as string)
+            .toLowerCase()
+            .includes(word)
+        )
+      ) {
+        await interaction.editReply(
+          "Banned word detected. Please try again with a different prompt."
+        );
+        return;
+      }
+
       const seed =
         iseed && iseed.includes("[") && iseed.includes("]") ? iseed : newSeed;
 
