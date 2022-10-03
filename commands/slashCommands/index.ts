@@ -17,6 +17,7 @@ import { stablediffusion } from "./buildPrompt";
 import { styles } from "./styles";
 import { updateServer } from "./updateServer";
 import { womocommand } from "./wombo";
+import { stablehoard } from "./stable-hoard";
 export default {
   dalleusage,
   heyCommand,
@@ -37,4 +38,5 @@ export default {
   createSubmission,
   rwkyCommand,
   updateServer,
+  stablehoard,
 };
