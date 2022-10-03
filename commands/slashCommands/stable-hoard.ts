@@ -216,7 +216,10 @@ export const stablehoard: SlashCommand = {
       if (!interaction.replied && !interaction.deferred) {
         await interaction.reply({ content: "error: " + e, ephemeral: true });
       } else {
-        await interaction.followUp({ content: "error: " + e, ephemeral: true });
+        await interaction.followUp({
+          content: "error: " + JSON.stringify(e.data?.data ?? e),
+          ephemeral: true,
+        });
       }
     }
   },
