@@ -213,7 +213,7 @@ export const stablehoard: SlashCommand = {
                         interaction.createdAt.getTime() + 1000 * 60 * 10 >
                         Date.now()
                       ) {
-                        setTimeout(checkItem, 5000);
+                        setTimeout(checkItem, 10000);
                       } else {
                         reject("Generation timed out");
                       }
@@ -224,7 +224,7 @@ export const stablehoard: SlashCommand = {
                   reject(err);
                 });
             };
-            setTimeout(checkItem, 5000);
+            setTimeout(checkItem, 10000);
           });
         })
         .catch(async (e) => {
