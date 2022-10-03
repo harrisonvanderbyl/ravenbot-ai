@@ -44,11 +44,11 @@ export const stablehoard: SlashCommand = {
         .join(", ");
       if (!interaction.replied) {
         await interaction.reply(
-          `Generating image with stable diffusion with options ${optionsString}. Ideal generation time is below 2 minutes`
+          `Generating image with stablehoard with stable diffusion with options ${optionsString}. Ideal generation time is below 2 minutes`
         );
       } else {
         await interaction.editReply(
-          `Generating image with stable diffusion with options ${optionsString}. Ideal generation time is below 2 minutes`
+          `Generating image with stablehoard with stable diffusion with options ${optionsString}. Ideal generation time is below 2 minutes`
         );
       }
 
@@ -129,9 +129,6 @@ export const stablehoard: SlashCommand = {
         (interaction.options.get("style")?.value as string) ?? "raw"
       ](interaction.options.get("prompt").value as string);
 
-      const m = await interaction.reply({
-        content: "Attempting Stablehoard Image Generation...",
-      });
       const data = await new hoard.Api({
         baseURL: "https://stablehorde.net/api/",
       }).v2.postSyncGenerate({
