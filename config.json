@@ -1,0 +1,7 @@
+{
+  "discord": "YOUR DISCORD BOT API KEY",
+  "homeGuild": "YOUR DISCORD HOME GUILD ID",
+  "statusChannel": "STATUS UPDATE CHANNEL",
+  "adminChannel": "ADMIN CHANNEL FOR BOT",
+  "serverUrl": "https://yourserver.com"
+}

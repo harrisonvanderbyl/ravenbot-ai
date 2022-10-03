@@ -1,5 +1,5 @@
 import body from "body-parser";
-import config from "./../../../config/config.json";
+import config from "./../../../config.json";
 import { createServer } from "https";
 import debug from "../../../offline.json";
 import express from "express";
@@ -19,18 +19,19 @@ console.log("Starting load of server");
 console.log("Exporting starts");
 
 export const start = async () => {
+  // certs for https
   if (!debug.debug) {
     const privateKey1 = readFileSync(
-      "/etc/letsencrypt/live/" + config.redirectUrl + "/privkey.pem",
+      "/etc/letsencrypt/live/" + config.serverUrl + "/privkey.pem",
       "utf8"
     );
     console.log(privateKey1);
     const certificate1 = readFileSync(
-      "/etc/letsencrypt/live/" + config.redirectUrl + "/cert.pem",
+      "/etc/letsencrypt/live/" + config.serverUrl + "/cert.pem",
       "utf8"
     );
     const ca1 = readFileSync(
-      "/etc/letsencrypt/live/" + config.redirectUrl + "/chain.pem",
+      "/etc/letsencrypt/live/" + config.serverUrl + "/chain.pem",
       "utf8"
     );
     const credentials1 = {
