@@ -156,6 +156,7 @@ export const stablehoard: SlashCommand = {
       if (data == null) {
         return;
       }
+      console.log(JSON.stringify(data.data));
       const base64 = data.data.generations[0].img;
 
       const buff = Buffer.from(base64, "base64");
