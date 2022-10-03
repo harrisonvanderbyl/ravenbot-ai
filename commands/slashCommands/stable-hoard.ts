@@ -228,9 +228,14 @@ export const stablehoard: SlashCommand = {
           });
         })
         .catch(async (e) => {
-          await interaction.editReply(
-            "Error generating image. Please try again later."
-          );
+          await interaction.editReply({
+            content: "Error generating image. Please try again later.",
+            embeds: null,
+          });
+          await interaction.followUp({
+            content: "```" + e + "```",
+            ephemeral: true,
+          });
           return null;
         });
 
