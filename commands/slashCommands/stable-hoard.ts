@@ -129,6 +129,9 @@ export const stablehoard: SlashCommand = {
         (interaction.options.get("style")?.value as string) ?? "raw"
       ](interaction.options.get("prompt").value as string);
 
+      const m = await interaction.reply({
+        content: "Attempting Stablehoard Image Generation...",
+      });
       const data = await new hoard.Api({
         baseURL: "https://stablehorde.net/api/",
       }).v2.postSyncGenerate({
