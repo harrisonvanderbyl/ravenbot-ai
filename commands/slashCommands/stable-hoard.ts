@@ -151,10 +151,12 @@ export const stablehoard: SlashCommand = {
         })
         .then(({ data }): Promise<string | null> => {
           return new Promise<string | null>((resolve, reject) => {
-            const checkItem = () => {
+            const checkItem = (done: boolean = false) => {
               axios
                 .request({
-                  url: `https://stablehorde.net/api/v2/generate/status/${data.id}`,
+                  url: `https://stablehorde.net/api/v2/generate/${
+                    done ? "status" : "check"
+                  }/${data.id}`,
                   method: "GET",
                   headers: {
                     apikey: h,
@@ -178,7 +180,11 @@ export const stablehoard: SlashCommand = {
                     };
                   }) => {
                     if (res.data.done) {
-                      resolve(res.data.generations[0].img);
+                      if (done) {
+                        resolve(res.data.generations[0].img);
+                      } else {
+                        checkItem(true);
+                      }
                     } else {
                       await interaction.editReply({
                         embeds: [
