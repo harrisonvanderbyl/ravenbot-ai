@@ -210,7 +210,7 @@ export const stablehoard: SlashCommand = {
                         ],
                       });
                       if (
-                        interaction.createdAt.getTime() + 1000 * 60 * 10 <
+                        interaction.createdAt.getTime() + 1000 * 60 * 10 >
                         Date.now()
                       ) {
                         setTimeout(checkItem, 5000);
