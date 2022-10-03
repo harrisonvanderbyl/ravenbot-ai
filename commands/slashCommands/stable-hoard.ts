@@ -15,7 +15,8 @@ import { split } from "./helpers/imagesplit";
 import { stable } from "./sdhelpers/sdhelpers";
 import { main } from "ts-node/dist/bin";
 import * as hoard from "./sdhelpers/myApi";
-
+import { hoard as h } from "../../config/config.json";
+import axios from "axios";
 const styles = {
   raw: (p) => p,
   fantasy: (p) =>
@@ -129,37 +130,125 @@ export const stablehoard: SlashCommand = {
         (interaction.options.get("style")?.value as string) ?? "raw"
       ](interaction.options.get("prompt").value as string);
 
-      const data = await new hoard.Api({
-        baseURL: "https://stablehorde.net/api/",
-      }).v2.postSyncGenerate({
-        prompt: prompt,
-        censor_nsfw: false,
-        nsfw: true,
-        payload: {
-          seed: seed,
-          width: Number(width),
-          height: Number(height),
-          cfg_scale: Number(cfg),
-          steps: Number(steps),
-          batch_size: 1,
-          sampler_name: "k_lms",
-          toggles: [1, 4],
-          realesrgan_model_name: "string",
-          ddim_eta: 0,
-          fp: 512,
-          variant_amount: 0,
-          variant_seed: 0,
-          n: 1,
-        },
-      });
+      const data = await axios
+        .request({
+          url: "https://stablehorde.net/api/v2/generate/async",
+          method: "POST",
+          headers: {
+            apikey: h,
+          },
+          data: {
+            prompt: prompt,
+            censor_nsfw: false,
+            nsfw: true,
+            payload: {
+              seed: seed,
+              width: Number(width),
+              height: Number(height),
+              cfg_scale: Number(cfg),
+              steps: Number(steps),
+              batch_size: 1,
+              sampler_name: "k_lms",
+              toggles: [1, 4],
+              realesrgan_model_name: "string",
+              ddim_eta: 0,
+              fp: 512,
+              variant_amount: 0,
+              variant_seed: 0,
+              n: 1,
+            },
+          },
+        })
+        .then(({ data }): Promise<string | null> => {
+          return new Promise<string | null>((resolve, reject) => {
+            const checkItem = () => {
+              axios
+                .request({
+                  url: `https://stablehorde.net/api/v2/generate/status/${data.id}`,
+                  method: "GET",
+                  headers: {
+                    apikey: h,
+                  },
+                })
+                .then(
+                  async (res: {
+                    data: {
+                      finished: number;
+                      processing: number;
+                      waiting: number;
+                      done: boolean;
+                      wait_time: number;
+                      queue_position: number;
+                      generations: {
+                        worker_id: string;
+                        worker_name: string;
+                        img: string;
+                        seed: string;
+                      }[];
+                    };
+                  }) => {
+                    if (res.data.done) {
+                      resolve(res.data.generations[0].img);
+                    } else {
+                      await interaction.editReply({
+                        embeds: [
+                          {
+                            title: "Generation in progress",
+                            fields: [
+                              {
+                                name: "Finished",
+                                value: res.data.finished.toFixed(2),
+                              },
+                              {
+                                name: "Processing",
+                                value: res.data.processing.toFixed(2),
+                              },
+                              {
+                                name: "Waiting",
+                                value: res.data.waiting.toFixed(2),
+                              },
+                              {
+                                name: "Queue Position",
+                                value: res.data.queue_position.toFixed(2),
+                              },
+                              {
+                                name: "Wait Time",
+                                value: res.data.wait_time.toFixed(2),
+                              },
+                            ],
+                          },
+                        ],
+                      });
+                      if (
+                        interaction.createdAt.getTime() + 1000 * 60 * 10 <
+                        Date.now()
+                      ) {
+                        setTimeout(checkItem, 2000);
+                      } else {
+                        reject("Generation timed out");
+                      }
+                    }
+                  }
+                )
+                .catch((err) => {
+                  reject(err);
+                });
+            };
+            setTimeout(checkItem, 2000);
+          });
+        })
+        .catch(async (e) => {
+          await interaction.editReply(
+            "Error generating image. Please try again later."
+          );
+          return e;
+        });
 
       if (data == null) {
         return;
       }
-      console.log(JSON.stringify(data.data));
-      const base64 = data.data.generations[0].img;
 
-      const buff = Buffer.from(base64, "base64");
+      const buff = Buffer.from(data, "base64");
       const messageData = {
         content: null,
 
@@ -212,7 +301,7 @@ export const stablehoard: SlashCommand = {
         ]
       );
     } catch (e) {
-      console.log(e);
+      console.log(JSON.stringify(e));
       if (!interaction.replied && !interaction.deferred) {
         await interaction.reply({ content: "error: " + e, ephemeral: true });
       } else {
