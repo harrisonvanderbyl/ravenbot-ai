@@ -59,9 +59,8 @@ export const stablehoard: SlashCommand = {
         iseed && !iseed.includes("[")
           ? Number(iseed)
           : Math.round(Math.random() * 10000);
-      var seeds = [];
 
-      const newSeed = "[" + seeds.join(",") + "]";
+      const newSeed = createSeed;
 
       const bannedWords = [
         "child",
@@ -101,8 +100,7 @@ export const stablehoard: SlashCommand = {
         return;
       }
 
-      const seed =
-        iseed && iseed.includes("[") && iseed.includes("]") ? iseed : newSeed;
+      const seed = newSeed;
 
       var width = (interaction.options.get("width")?.value as string) ?? "512";
       var cfg = (interaction.options.get("cfg")?.value as string) ?? "7.5";
@@ -142,20 +140,12 @@ export const stablehoard: SlashCommand = {
             censor_nsfw: false,
             nsfw: true,
             payload: {
-              seed: seed,
+              seed: `${seed}`,
               width: Number(width),
               height: Number(height),
               cfg_scale: Number(cfg),
               steps: Number(steps),
               batch_size: 1,
-              sampler_name: "k_lms",
-              toggles: [1, 4],
-              realesrgan_model_name: "string",
-              ddim_eta: 0,
-              fp: 512,
-              variant_amount: 0,
-              variant_seed: 0,
-              n: 1,
             },
           },
         })
@@ -223,7 +213,7 @@ export const stablehoard: SlashCommand = {
                         interaction.createdAt.getTime() + 1000 * 60 * 10 <
                         Date.now()
                       ) {
-                        setTimeout(checkItem, 2000);
+                        setTimeout(checkItem, 5000);
                       } else {
                         reject("Generation timed out");
                       }
@@ -234,14 +224,14 @@ export const stablehoard: SlashCommand = {
                   reject(err);
                 });
             };
-            setTimeout(checkItem, 2000);
+            setTimeout(checkItem, 5000);
           });
         })
         .catch(async (e) => {
           await interaction.editReply(
             "Error generating image. Please try again later."
           );
-          return e;
+          return null;
         });
 
       if (data == null) {
@@ -259,7 +249,7 @@ export const stablehoard: SlashCommand = {
             fields: [
               {
                 name: "Seed",
-                value: seed,
+                value: `${seed}`,
                 inline: true,
               },
             ],
