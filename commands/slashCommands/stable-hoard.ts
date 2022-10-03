@@ -285,19 +285,21 @@ export const stablehoard: SlashCommand = {
         [
           new MessageActionRow().addComponents(
             new MessageButton()
-              .setLabel("Patreon")
+              .setLabel("Adopt this bot")
               .setStyle("LINK")
               .setURL("https://patreon.com/unexplored_horizons"),
             new MessageButton()
-              .setLabel("Writerbot home discord")
+              .setLabel("Writerbot home")
               .setStyle("LINK")
-              .setURL("https://discord.gg/eZqw6gMhf6"),
+              .setURL("http://harrisonvanderbyl.github.io/WriterBot"),
             new MessageButton()
-              .setLabel("Run Colab Node")
+              .setLabel("Join The Horde!")
               .setStyle("LINK")
-              .setURL(
-                "https://colab.research.google.com/github/harrisonvanderbyl/ravenbot-ai/blob/master/WriterBot_node.ipynb"
-              )
+              .setURL("https://discord.gg/uwqEGZ9Sph"),
+            new MessageButton()
+              .setLabel("Run Horde Node")
+              .setStyle("LINK")
+              .setURL("https://stablehorde.net/")
           ),
         ]
       );
