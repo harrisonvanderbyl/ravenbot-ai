@@ -141,6 +141,15 @@ export const stablehoard: SlashCommand = {
           height: Number(height),
           cfg_scale: Number(cfg),
           steps: Number(steps),
+          batch_size: 1,
+          sampler_name: "k_lms",
+          toggles: [1, 4],
+          realesrgan_model_name: "string",
+          ddim_eta: 0,
+          fp: 512,
+          variant_amount: 0,
+          variant_seed: 0,
+          n: 1,
         },
       });
 
