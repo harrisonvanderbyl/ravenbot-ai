@@ -187,23 +187,23 @@ export const stablehoard: SlashCommand = {
                             fields: [
                               {
                                 name: "Finished",
-                                value: res.data.finished.toFixed(2),
+                                value: res.data.finished.toString(),
                               },
                               {
                                 name: "Processing",
-                                value: res.data.processing.toFixed(2),
+                                value: res.data.processing.toString(),
                               },
                               {
                                 name: "Waiting",
-                                value: res.data.waiting.toFixed(2),
+                                value: res.data.waiting.toString(),
                               },
                               {
                                 name: "Queue Position",
-                                value: res.data.queue_position.toFixed(2),
+                                value: res.data.queue_position.toString(),
                               },
                               {
                                 name: "Wait Time",
-                                value: res.data.wait_time.toFixed(2),
+                                value: res.data.wait_time.toString(),
                               },
                             ],
                           },
