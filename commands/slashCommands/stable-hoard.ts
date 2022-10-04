@@ -128,6 +128,8 @@ export const stablehoard: SlashCommand = {
       width = width.replace(/\D/g, "");
       height = height.replace(/\D/g, "");
 
+      console.log(width, height);
+
       const prompt = styles[
         (interaction.options.get("style")?.value as string) ?? "raw"
       ](interaction.options.get("prompt").value as string);
@@ -149,7 +151,7 @@ export const stablehoard: SlashCommand = {
               height: Number(height),
               cfg_scale: Number(cfg),
               steps: Number(steps),
-              batch_size: Number(iterations),
+              n: Number(iterations),
             },
           },
         })
