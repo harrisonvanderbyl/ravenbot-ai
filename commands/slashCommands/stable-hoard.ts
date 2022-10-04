@@ -145,13 +145,13 @@ export const stablehoard: SlashCommand = {
             prompt: prompt,
             censor_nsfw: false,
             nsfw: true,
-            payload: {
+            params: {
               seed: `${seed}`,
-              width: width,
-              height: height,
-              cfg_scale: cfg,
-              steps: steps,
-              n: iterations,
+              width: Number(width),
+              height: Number(height),
+              cfg_scale: Number(cfg),
+              steps: Number(steps),
+              n: Number(iterations),
             },
           },
         })
@@ -236,7 +236,7 @@ export const stablehoard: SlashCommand = {
                               },
                             ],
                           },
-                          ...(interaction.createdAt.getTime() + 1000 * 60 * 1 >
+                          ...(interaction.createdAt.getTime() + 1000 * 60 * 1 <
                           Date.now()
                             ? [
                                 {
