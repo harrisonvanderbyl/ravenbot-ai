@@ -214,8 +214,17 @@ export const stablehoard: SlashCommand = {
                                 value: res.data.queue_position.toString(),
                               },
                               {
-                                name: "Wait Time",
-                                value: res.data.wait_time.toString(),
+                                name: "Elapsed",
+                                value: `<t:${(
+                                  interaction.createdAt.getTime() / 1000
+                                ).toFixed(0)}:R>`,
+                              },
+                              {
+                                name: "ETA",
+                                value: `<t:${(
+                                  new Date().getTime() / 1000 +
+                                  res.data.wait_time
+                                ).toFixed(0)}:R>`,
                               },
                               {
                                 name: "Active Workers",
