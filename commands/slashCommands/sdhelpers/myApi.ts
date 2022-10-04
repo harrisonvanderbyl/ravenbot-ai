@@ -12,7 +12,7 @@
 export interface GenerationInput {
   /** The prompt which will be sent to Stable Diffusion to generate an image */
   prompt?: string;
-  payload?: ModelGenerationInputStable;
+  params?: ModelGenerationInputStable;
 
   /** Set to true if this request is NSFW. This will skip workers which censor images. */
   nsfw?: boolean;
@@ -402,103 +402,32 @@ export enum ContentType {
 }
 
 export class HttpClient<SecurityDataType = unknown> {
-  public instance: AxiosInstance;
-  private securityData: SecurityDataType | null = null;
-  private securityWorker?: ApiConfig<SecurityDataType>["securityWorker"];
-  private secure?: boolean;
-  private format?: ResponseType;
-
-  constructor({
-    securityWorker,
-    secure,
-    format,
-    ...axiosConfig
-  }: ApiConfig<SecurityDataType> = {}) {
-    this.instance = axios.create({
-      ...axiosConfig,
-      baseURL: axiosConfig.baseURL || "/api",
-    });
-    this.secure = secure;
-    this.format = format;
-    this.securityWorker = securityWorker;
-  }
-
-  public setSecurityData = (data: SecurityDataType | null) => {
-    this.securityData = data;
-  };
-
-  protected mergeRequestParams(
-    params1: AxiosRequestConfig,
-    params2?: AxiosRequestConfig
-  ): AxiosRequestConfig {
-    const method = params1.method || (params2 && params2.method);
-
-    return {
-      ...this.instance.defaults,
-      ...params1,
-      ...(params2 || {}),
-      headers: {
-        ...((method &&
-          this.instance.defaults.headers[
-            method.toLowerCase() as keyof HeadersDefaults
-          ]) ||
-          {}),
-        ...(params1.headers || {}),
-        ...((params2 && params2.headers) || {}),
-      },
-    };
-  }
-
-  protected stringifyFormItem(formItem: unknown) {
-    if (typeof formItem === "object" && formItem !== null) {
-      return JSON.stringify(formItem);
-    } else {
-      return `${formItem}`;
-    }
+  baseUrl = "https://stablehorde.net/api/";
+  apikey = "0000000000";
+  constructor(apikey = "0000000000") {
+    this.apikey = apikey;
   }
 
   public request = async <T = any, _E = any>({
-    secure,
+    method,
     path,
-    type,
-    query,
-    format,
     body,
-    ...params
-  }: FullRequestParams): Promise<AxiosResponse<T>> => {
-    const secureParams =
-      ((typeof secure === "boolean" ? secure : this.secure) &&
-        this.securityWorker &&
-        (await this.securityWorker(this.securityData))) ||
-      {};
-    const requestParams = this.mergeRequestParams(params, secureParams);
-    const responseFormat = format || this.format || undefined;
-
-    if (
-      type === ContentType.FormData &&
-      body &&
-      body !== null &&
-      typeof body === "object"
-    ) {
-      body = body;
-    }
-
-    return this.instance.request({
-      ...requestParams,
-      headers: {
-        ...(type && type !== ContentType.FormData
-          ? { "Content-Type": type }
-          : {}),
-        ...(requestParams.headers || {}),
-      },
-      params: query,
-      responseType: responseFormat,
-      data: body,
-      url: path,
-    });
-  };
+  }: {
+    method: AxiosRequestConfig["method"];
+    path: string;
+    body?: any;
+  }): Promise<T> =>
+    axios
+      .request({
+        method,
+        data: body,
+        url: this.baseUrl + path,
+        headers: {
+          apikey: this.apikey,
+        },
+      })
+      .then((response) => response.data);
 }
-
 /**
  * @title Stable Horde
  * @version 1.0
@@ -509,273 +438,6 @@ export class HttpClient<SecurityDataType = unknown> {
 export class Api<
   SecurityDataType extends unknown
 > extends HttpClient<SecurityDataType> {
-  v1 = {
-    /**
-     * No description
-     *
-     * @tags v1
-     * @name PutAdminMaintenanceMode
-     * @request PUT:/v1/admin/maintenance
-     */
-    putAdminMaintenanceMode: (
-      query: { api_key: string; active: boolean },
-      params: RequestParams = {}
-    ) =>
-      this.request<void, any>({
-        path: `/v1/admin/maintenance`,
-        method: "PUT",
-        query: query,
-        ...params,
-      }),
-
-    /**
-     * No description
-     *
-     * @tags v1
-     * @name PostAsyncGenerate
-     * @request POST:/v1/generate/async
-     */
-    postAsyncGenerate: (
-      query: {
-        prompt: string;
-        api_key: string;
-        params?: string;
-        servers?: string[];
-      },
-      params: RequestParams = {}
-    ) =>
-      this.request<void, any>({
-        path: `/v1/generate/async`,
-        method: "POST",
-        query: query,
-        ...params,
-      }),
-
-    /**
-     * No description
-     *
-     * @tags v1
-     * @name GetAsyncCheck
-     * @request GET:/v1/generate/check/{id}
-     */
-    getAsyncCheck: (id: string, params: RequestParams = {}) =>
-      this.request<void, any>({
-        path: `/v1/generate/check/${id}`,
-        method: "GET",
-        ...params,
-      }),
-
-    /**
-     * No description
-     *
-     * @tags v1
-     * @name PostPromptPop
-     * @request POST:/v1/generate/pop
-     */
-    postPromptPop: (
-      query: {
-        api_key: string;
-        name: string;
-        max_pixels?: number;
-        priority_usernames?: string[];
-      },
-      params: RequestParams = {}
-    ) =>
-      this.request<void, any>({
-        path: `/v1/generate/pop`,
-        method: "POST",
-        query: query,
-        ...params,
-      }),
-
-    /**
-     * No description
-     *
-     * @tags v1
-     * @name GetAsyncStatus
-     * @request GET:/v1/generate/prompt/{id}
-     */
-    getAsyncStatus: (id: string, params: RequestParams = {}) =>
-      this.request<RequestStatusStableV1, any>({
-        path: `/v1/generate/prompt/${id}`,
-        method: "GET",
-        format: "json",
-        ...params,
-      }),
-
-    /**
-     * No description
-     *
-     * @tags v1
-     * @name PostSubmitGeneration
-     * @request POST:/v1/generate/submit
-     */
-    postSubmitGeneration: (
-      query: { id: string; api_key: string; generation?: string; seed: string },
-      params: RequestParams = {}
-    ) =>
-      this.request<void, any>({
-        path: `/v1/generate/submit`,
-        method: "POST",
-        query: query,
-        ...params,
-      }),
-
-    /**
-     * No description
-     *
-     * @tags v1
-     * @name PostSyncGenerate
-     * @request POST:/v1/generate/sync
-     */
-    postSyncGenerate: (
-      query: {
-        prompt: string;
-        api_key: string;
-        params?: string;
-        servers?: string[];
-      },
-      params: RequestParams = {}
-    ) =>
-      this.request<GenerationStableV1, void>({
-        path: `/v1/generate/sync`,
-        method: "POST",
-        query: query,
-        format: "json",
-        ...params,
-      }),
-
-    /**
-     * No description
-     *
-     * @tags v1
-     * @name PostTransferKudos
-     * @request POST:/v1/kudos/transfer
-     */
-    postTransferKudos: (
-      query: { username: string; api_key: string; amount?: number },
-      params: RequestParams = {}
-    ) =>
-      this.request<void, any>({
-        path: `/v1/kudos/transfer`,
-        method: "POST",
-        query: query,
-        ...params,
-      }),
-
-    /**
-     * No description
-     *
-     * @tags v1
-     * @name GetServers
-     * @request GET:/v1/servers
-     */
-    getServers: (params: RequestParams = {}) =>
-      this.request<void, any>({
-        path: `/v1/servers`,
-        method: "GET",
-        ...params,
-      }),
-
-    /**
-     * No description
-     *
-     * @tags v1
-     * @name GetServerSingle
-     * @request GET:/v1/servers/{server_id}
-     */
-    getServerSingle: (serverId: string, params: RequestParams = {}) =>
-      this.request<void, any>({
-        path: `/v1/servers/${serverId}`,
-        method: "GET",
-        ...params,
-      }),
-
-    /**
-     * No description
-     *
-     * @tags v1
-     * @name PutServerSingle
-     * @request PUT:/v1/servers/{server_id}
-     */
-    putServerSingle: (
-      serverId: string,
-      query: { api_key: string; maintenance?: boolean; paused?: boolean },
-      params: RequestParams = {}
-    ) =>
-      this.request<void, any>({
-        path: `/v1/servers/${serverId}`,
-        method: "PUT",
-        query: query,
-        ...params,
-      }),
-
-    /**
-     * No description
-     *
-     * @tags v1
-     * @name GetHordeLoad
-     * @request GET:/v1/status/performance
-     */
-    getHordeLoad: (params: RequestParams = {}) =>
-      this.request<void, any>({
-        path: `/v1/status/performance`,
-        method: "GET",
-        ...params,
-      }),
-
-    /**
-     * No description
-     *
-     * @tags v1
-     * @name GetUsers
-     * @request GET:/v1/users
-     */
-    getUsers: (params: RequestParams = {}) =>
-      this.request<void, any>({
-        path: `/v1/users`,
-        method: "GET",
-        ...params,
-      }),
-
-    /**
-     * No description
-     *
-     * @tags v1
-     * @name GetUserSingle
-     * @request GET:/v1/users/{user_id}
-     */
-    getUserSingle: (userId: string, params: RequestParams = {}) =>
-      this.request<void, any>({
-        path: `/v1/users/${userId}`,
-        method: "GET",
-        ...params,
-      }),
-
-    /**
-     * No description
-     *
-     * @tags v1
-     * @name PutUserSingle
-     * @request PUT:/v1/users/{user_id}
-     */
-    putUserSingle: (
-      userId: string,
-      query: {
-        api_key: string;
-        kudos?: number;
-        concurrency?: number;
-        usage_multiplier?: number;
-      },
-      params: RequestParams = {}
-    ) =>
-      this.request<void, any>({
-        path: `/v1/users/${userId}`,
-        method: "PUT",
-        query: query,
-        ...params,
-      }),
-  };
   v2 = {
     /**
      * @description This endpoint will immediately return with the UUID of the request for generation. This endpoint will always be accepted, even if there are no workers available currently to fulfill this request. Perhaps some will appear in the next 10 minutes. Asynchronous requests live for 10 minutes before being considered stale and being deleted.
@@ -785,13 +447,11 @@ export class Api<
      * @summary Initiate an Asynchronous request to generate images
      * @request POST:/v2/generate/async
      */
-    postAsyncGenerate: (payload: GenerationInput, params: RequestParams = {}) =>
+    postAsyncGenerate: (payload: GenerationInput) =>
       this.request<RequestAsync, RequestError>({
         path: `/v2/generate/async`,
         method: "POST",
         body: payload,
-        format: "json",
-        ...params,
       }),
 
     /**
@@ -802,12 +462,10 @@ export class Api<
      * @summary Retrieve the status of an Asynchronous generation request without images
      * @request GET:/v2/generate/check/{id}
      */
-    getAsyncCheck: (id: string, params: RequestParams = {}) =>
+    getAsyncCheck: (id: string) =>
       this.request<RequestStatusCheck, RequestError>({
         path: `/v2/generate/check/${id}`,
         method: "GET",
-        format: "json",
-        ...params,
       }),
 
     /**
@@ -818,22 +476,16 @@ export class Api<
      * @summary Check if there are generation requests queued for fulfillment
      * @request POST:/v2/generate/pop
      */
-    postJobPop: (
-      payload: {
-        name?: string;
-        priority_usernames?: any[];
-        nsfw?: boolean;
-        max_pixels?: number;
-      },
-      params: RequestParams = {}
-    ) =>
+    postJobPop: (payload: {
+      name?: string;
+      priority_usernames?: any[];
+      nsfw?: boolean;
+      max_pixels?: number;
+    }) =>
       this.request<GenerationPayload, RequestError>({
         path: `/v2/generate/pop`,
         method: "POST",
         body: payload,
-        type: ContentType.Json,
-        format: "json",
-        ...params,
       }),
 
     /**
@@ -844,12 +496,10 @@ export class Api<
      * @summary Retrieve the full status of an Asynchronous generation request
      * @request GET:/v2/generate/status/{id}
      */
-    getAsyncStatus: (id: string, params: RequestParams = {}) =>
+    getAsyncStatus: (id: string) =>
       this.request<RequestStatusStable, RequestError>({
         path: `/v2/generate/status/${id}`,
         method: "GET",
-        format: "json",
-        ...params,
       }),
 
     /**
@@ -860,12 +510,10 @@ export class Api<
      * @summary Cancel an unfinished request
      * @request DELETE:/v2/generate/status/{id}
      */
-    deleteAsyncStatus: (id: string, params: RequestParams = {}) =>
+    deleteAsyncStatus: (id: string) =>
       this.request<RequestStatusStable, RequestError>({
         path: `/v2/generate/status/${id}`,
         method: "DELETE",
-        format: "json",
-        ...params,
       }),
 
     /**
@@ -876,17 +524,15 @@ export class Api<
      * @summary Submit a generated image
      * @request POST:/v2/generate/submit
      */
-    postJobSubmit: (
-      payload: { id?: string; generation?: string; seed?: string },
-      params: RequestParams = {}
-    ) =>
+    postJobSubmit: (payload: {
+      id?: string;
+      generation?: string;
+      seed?: string;
+    }) =>
       this.request<GenerationSubmitted, RequestError>({
         path: `/v2/generate/submit`,
         method: "POST",
         body: payload,
-        type: ContentType.Json,
-        format: "json",
-        ...params,
       }),
 
     /**
@@ -897,13 +543,11 @@ export class Api<
      * @summary Initiate a Synchronous request to generate images
      * @request POST:/v2/generate/sync
      */
-    postSyncGenerate: (payload: GenerationInput, params: RequestParams = {}) =>
+    postSyncGenerate: (payload: GenerationInput) =>
       this.request<RequestStatusStable, RequestError>({
         path: `/v2/generate/sync`,
         method: "POST",
         body: payload,
-        format: "json",
-        ...params,
       }),
 
     /**
@@ -914,17 +558,11 @@ export class Api<
      * @summary Transfer Kudos to another registed user
      * @request POST:/v2/kudos/transfer
      */
-    postTransferKudos: (
-      payload: { username?: string; amount?: number },
-      params: RequestParams = {}
-    ) =>
+    postTransferKudos: (payload: { username?: string; amount?: number }) =>
       this.request<KudosTransferred, RequestError>({
         path: `/v2/kudos/transfer`,
         method: "POST",
         body: payload,
-        type: ContentType.Json,
-        format: "json",
-        ...params,
       }),
 
     /**
@@ -935,12 +573,10 @@ export class Api<
      * @summary Horde Maintenance Mode Status
      * @request GET:/v2/status/maintenance
      */
-    getHordeMaintenance: (params: RequestParams = {}) =>
+    getHordeMaintenance: () =>
       this.request<HordeMaintenanceMode, any>({
         path: `/v2/status/maintenance`,
         method: "GET",
-        format: "json",
-        ...params,
       }),
 
     /**
@@ -951,17 +587,11 @@ export class Api<
      * @summary Change Horde Maintenance Mode
      * @request PUT:/v2/status/maintenance
      */
-    putHordeMaintenance: (
-      payload: { active?: boolean },
-      params: RequestParams = {}
-    ) =>
+    putHordeMaintenance: (payload: { active?: boolean }) =>
       this.request<MaintenanceModeSet, RequestError>({
         path: `/v2/status/maintenance`,
         method: "PUT",
         body: payload,
-        type: ContentType.Json,
-        format: "json",
-        ...params,
       }),
 
     /**
@@ -972,12 +602,10 @@ export class Api<
      * @summary Details about the current performance of this Horde
      * @request GET:/v2/status/performance
      */
-    getHordeLoad: (params: RequestParams = {}) =>
+    getHordeLoad: () =>
       this.request<HordePerformanceStable, any>({
         path: `/v2/status/performance`,
         method: "GET",
-        format: "json",
-        ...params,
       }),
 
     /**
@@ -988,12 +616,10 @@ export class Api<
      * @summary A List with the details and statistic of all registered users
      * @request GET:/v2/users
      */
-    getUsers: (params: RequestParams = {}) =>
+    getUsers: () =>
       this.request<UserDetails, any>({
         path: `/v2/users`,
         method: "GET",
-        format: "json",
-        ...params,
       }),
 
     /**
@@ -1004,12 +630,10 @@ export class Api<
      * @summary Details and statistics about a specific user
      * @request GET:/v2/users/{user_id}
      */
-    getUserSingle: (userId: string, params: RequestParams = {}) =>
+    getUserSingle: (userId: string) =>
       this.request<UserDetails, RequestError>({
         path: `/v2/users/${userId}`,
         method: "GET",
-        format: "json",
-        ...params,
       }),
 
     /**
@@ -1026,16 +650,12 @@ export class Api<
         kudos?: number;
         concurrency?: number;
         usage_multiplier?: number;
-      },
-      params: RequestParams = {}
+      }
     ) =>
       this.request<ModifyUser, RequestError>({
         path: `/v2/users/${userId}`,
         method: "PUT",
         body: payload,
-        type: ContentType.Json,
-        format: "json",
-        ...params,
       }),
 
     /**
@@ -1046,12 +666,10 @@ export class Api<
      * @summary A List with the details of all registered and active workers
      * @request GET:/v2/workers
      */
-    getWorkers: (params: RequestParams = {}) =>
+    getWorkers: () =>
       this.request<WorkerDetailsStable[], any>({
         path: `/v2/workers`,
         method: "GET",
-        format: "json",
-        ...params,
       }),
 
     /**
@@ -1062,12 +680,10 @@ export class Api<
      * @summary Details of a registered worker
      * @request GET:/v2/workers/{worker_id}
      */
-    getWorkerSingle: (workerId: string, params: RequestParams = {}) =>
+    getWorkerSingle: (workerId: string) =>
       this.request<WorkerDetailsStable, RequestError>({
         path: `/v2/workers/${workerId}`,
         method: "GET",
-        format: "json",
-        ...params,
       }),
 
     /**
@@ -1080,16 +696,12 @@ export class Api<
      */
     putWorkerSingle: (
       workerId: string,
-      payload: { maintenance?: boolean; paused?: boolean; info?: string },
-      params: RequestParams = {}
+      payload: { maintenance?: boolean; paused?: boolean; info?: string }
     ) =>
       this.request<ModifyWorker, RequestError>({
         path: `/v2/workers/${workerId}`,
         method: "PUT",
         body: payload,
-        type: ContentType.Json,
-        format: "json",
-        ...params,
       }),
   };
 }

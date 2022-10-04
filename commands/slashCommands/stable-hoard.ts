@@ -10,14 +10,9 @@ import {
 
 import { SlashCommand } from "./typing";
 import { addToolbar } from "./helpers/buttons";
-import sharp from "sharp";
-import { split } from "./helpers/imagesplit";
-import { stable } from "./sdhelpers/sdhelpers";
-import { main } from "ts-node/dist/bin";
 import * as hoard from "./sdhelpers/myApi";
 import { hoard as h } from "../../config/config.json";
 import axios from "axios";
-import joinImages from "join-images";
 import { imageJoin } from "./helpers/imageJoin";
 const styles = {
   raw: (p) => p,
@@ -36,6 +31,8 @@ const styles = {
   butter: (p) =>
     `${p} award-winning butter sculpture at the Minnesota State Fair, made of butter, dairy creation`,
 };
+
+const hordeApi = new hoard.Api(h);
 
 export const stablehoard: SlashCommand = {
   skipDeferReply: true,
@@ -134,134 +131,95 @@ export const stablehoard: SlashCommand = {
         (interaction.options.get("style")?.value as string) ?? "raw"
       ](interaction.options.get("prompt").value as string);
 
-      const data = await axios
-        .request({
-          url: "https://stablehorde.net/api/v2/generate/async",
-          method: "POST",
-          headers: {
-            apikey: h,
-          },
-          data: {
-            prompt: prompt,
-            censor_nsfw: false,
-            nsfw: true,
-            params: {
-              seed: `${seed}`,
-              width: Number(width),
-              height: Number(height),
-              cfg_scale: Number(cfg),
-              steps: Number(steps),
-              n: Number(iterations),
-            },
+      const data = await hordeApi.v2
+        .postAsyncGenerate({
+          prompt: prompt,
+          censor_nsfw: false,
+          nsfw: true,
+          params: {
+            seed: `${seed}`,
+            width: Number(width),
+            height: Number(height),
+            cfg_scale: Number(cfg),
+            steps: Number(steps),
+            n: Number(iterations),
+            variant_amount: 1,
           },
         })
-        .then(({ data }): Promise<string[] | null> => {
+        .then((data): Promise<string[] | null> => {
           return new Promise<string[] | null>((resolve, reject) => {
-            const checkItem = (done: boolean = false) => {
-              axios
-                .request({
-                  url: `https://stablehorde.net/api/v2/generate/${
-                    done ? "status" : "check"
-                  }/${data.id}`,
-                  method: "GET",
-                  headers: {
-                    apikey: h,
+            const checkItem = async () => {
+              const res = await hordeApi.v2.getAsyncCheck(data.id);
+
+              if (res.done) {
+                hordeApi.v2
+                  .getAsyncStatus(data.id)
+                  .then((res) => resolve(res.generations.map((e) => e.img)));
+                return;
+              }
+
+              const workers = await hordeApi.v2.getWorkers();
+
+              await interaction.editReply({
+                embeds: [
+                  {
+                    title: "Generation in progress",
+                    fields: [
+                      {
+                        name: "Status (🟢, 🟡, 🔴)",
+                        value:
+                          res.finished.toString() +
+                          "/" +
+                          res.processing.toString() +
+                          "/" +
+                          res.waiting.toString(),
+                        inline: true,
+                      },
+                      {
+                        name: "Queue Position",
+                        value: res.queue_position.toString(),
+                      },
+                      {
+                        name: "Elapsed",
+                        value: `<t:${(
+                          interaction.createdAt.getTime() / 1000
+                        ).toFixed(0)}:R>`,
+                      },
+                      {
+                        name: "ETA",
+                        value: `<t:${(
+                          new Date().getTime() / 1000 +
+                          res.wait_time
+                        ).toFixed(0)}:R>`,
+                      },
+                      {
+                        name: "Active Workers",
+                        value: workers
+                          .filter((f) => !f.paused)
+                          .length.toFixed(0),
+                      },
+                    ],
                   },
-                })
-                .then(
-                  async (res: {
-                    data: {
-                      finished: number;
-                      processing: number;
-                      waiting: number;
-                      done: boolean;
-                      wait_time: number;
-                      queue_position: number;
-                      generations: {
-                        worker_id: string;
-                        worker_name: string;
-                        img: string;
-                        seed: string;
-                      }[];
-                    };
-                  }) => {
-                    if (res.data.done) {
-                      if (done) {
-                        resolve(res.data.generations.map((e) => e.img));
-                      } else {
-                        checkItem(true);
-                      }
-                    } else {
-                      const workers: hoard.WorkerDetails[] = await axios
-                        .get("https://stablehorde.net/api/v2/workers")
-                        .then((res) => res.data);
-                      console.log(workers);
-                      await interaction.editReply({
-                        embeds: [
-                          {
-                            title: "Generation in progress",
-                            fields: [
-                              {
-                                name: "Status (🟢, 🟡, 🔴)",
-                                value:
-                                  res.data.finished.toString() +
-                                  "/" +
-                                  res.data.processing.toString() +
-                                  "/" +
-                                  res.data.waiting.toString(),
-                                inline: true,
-                              },
-                              {
-                                name: "Queue Position",
-                                value: res.data.queue_position.toString(),
-                              },
-                              {
-                                name: "Elapsed",
-                                value: `<t:${(
-                                  interaction.createdAt.getTime() / 1000
-                                ).toFixed(0)}:R>`,
-                              },
-                              {
-                                name: "ETA",
-                                value: `<t:${(
-                                  new Date().getTime() / 1000 +
-                                  res.data.wait_time
-                                ).toFixed(0)}:R>`,
-                              },
-                              {
-                                name: "Active Workers",
-                                value: workers
-                                  .filter((f) => !f.paused)
-                                  .length.toFixed(0),
-                              },
-                            ],
-                          },
-                          ...(interaction.createdAt.getTime() + 1000 * 60 * 1 <
-                          Date.now()
-                            ? [
-                                {
-                                  title: "StableHorde Currently Under Load",
-                                  description:
-                                    "StableHorde is currently under load, Stablehorde is a community driven stable diffusion botnet. You can help by running a worker. You can find more information [here](https://stablehorde.net).",
-                                },
-                              ]
-                            : []),
-                        ],
-                      });
-                      if (
-                        interaction.createdAt.getTime() + 1000 * 60 * 10 >
-                        Date.now()
-                      ) {
-                        setTimeout(checkItem, 10000);
-                      } else {
-                        reject("Generation timed out");
-                      }
-                    }
-                  }
-                )
-                .catch((err) => {
-                  reject(err);
-                });
+                  ...(interaction.createdAt.getTime() + 1000 * 60 * 1 <
+                  Date.now()
+                    ? [
+                        {
+                          title: "StableHorde Currently Under Load",
+                          description:
+                            "StableHorde is currently under load, Stablehorde is a community driven stable diffusion botnet. You can help by running a worker. You can find more information [here](https://stablehorde.net).",
+                        },
+                      ]
+                    : []),
+                ],
+              });
+              if (
+                interaction.createdAt.getTime() + 1000 * 60 * 10 >
+                Date.now()
+              ) {
+                setTimeout(checkItem, 10000);
+              } else {
+                reject("Generation timed out");
+              }
             };
             setTimeout(checkItem, 10000);
           });
@@ -351,7 +309,7 @@ export const stablehoard: SlashCommand = {
     return;
   },
   commandSchema: {
-    name: "stablehoard",
+    name: "stablehorde",
     description: "use stable hoard",
     options: [
       {
