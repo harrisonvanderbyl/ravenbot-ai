@@ -190,22 +190,23 @@ export const stablehoard: SlashCommand = {
                         checkItem(true);
                       }
                     } else {
+                      const workers: hoard.WorkerDetails[] = await axios
+                        .get("https://stablehorde.net/api/v2/workers")
+                        .then((res) => JSON.parse(res.data));
                       await interaction.editReply({
                         embeds: [
                           {
                             title: "Generation in progress",
                             fields: [
                               {
-                                name: "Finished",
-                                value: res.data.finished.toString(),
-                              },
-                              {
-                                name: "Processing",
-                                value: res.data.processing.toString(),
-                              },
-                              {
-                                name: "Waiting",
-                                value: res.data.waiting.toString(),
+                                name: "Status (🟢, 🟡, 🔴)",
+                                value:
+                                  res.data.finished.toString() +
+                                  "/" +
+                                  res.data.processing.toString() +
+                                  "/" +
+                                  res.data.waiting.toString(),
+                                inline: true,
                               },
                               {
                                 name: "Queue Position",
@@ -215,8 +216,24 @@ export const stablehoard: SlashCommand = {
                                 name: "Wait Time",
                                 value: res.data.wait_time.toString(),
                               },
+                              {
+                                name: "Active Workers",
+                                value: workers
+                                  .filter((f) => !f.paused)
+                                  .length.toFixed(0),
+                              },
                             ],
                           },
+                          ...(interaction.createdAt.getTime() + 1000 * 60 * 1 >
+                          Date.now()
+                            ? [
+                                {
+                                  title: "StableHorde Currently Under Load",
+                                  description:
+                                    "StableHorde is currently under load, Stablehorde is a community driven stable diffusion botnet. You can help by running a worker. You can find more information [here](https://stablehorde.net).",
+                                },
+                              ]
+                            : []),
                         ],
                       });
                       if (
