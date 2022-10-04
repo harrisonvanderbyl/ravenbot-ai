@@ -192,7 +192,7 @@ export const stablehoard: SlashCommand = {
                     } else {
                       const workers: hoard.WorkerDetails[] = await axios
                         .get("https://stablehorde.net/api/v2/workers")
-                        .then((res) => JSON.parse(res.data));
+                        .then((res) => res.data);
                       await interaction.editReply({
                         embeds: [
                           {
