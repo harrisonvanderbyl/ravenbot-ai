@@ -7,7 +7,7 @@ export const createStatusSheet = (
   }
 ): MessageEmbedOptions => ({
   title,
-  fields: Object.values(details).map(([name, value]) => ({
+  fields: Object.entries(details).map(([name, value]) => ({
     name,
     value,
     inline: true,
