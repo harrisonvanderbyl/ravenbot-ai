@@ -147,11 +147,11 @@ export const stablehoard: SlashCommand = {
             nsfw: true,
             payload: {
               seed: `${seed}`,
-              width: Number(width),
-              height: Number(height),
-              cfg_scale: Number(cfg),
-              steps: Number(steps),
-              n: Number(iterations),
+              width: width,
+              height: height,
+              cfg_scale: cfg,
+              steps: steps,
+              n: iterations,
             },
           },
         })
