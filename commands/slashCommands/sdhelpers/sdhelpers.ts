@@ -23,11 +23,7 @@ const NoNodeError = async (updatemessaged: Message) => {
     );
   const message = await messageToEdit.edit({
     content: `
-No Nodes Available. 
-Please click on the link below, 
-login to your coogle account, 
-and select [runtime->run all] from the main menu(top right) to start a node. 
-After 2-3 minutes, your node will be active and ready to take requests`,
+No Colab Nodes available. Please try the stablehorde command.`,
     components: [
       {
         type: "ACTION_ROW",

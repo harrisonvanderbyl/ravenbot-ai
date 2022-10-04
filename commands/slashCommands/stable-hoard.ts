@@ -17,6 +17,8 @@ import { main } from "ts-node/dist/bin";
 import * as hoard from "./sdhelpers/myApi";
 import { hoard as h } from "../../config/config.json";
 import axios from "axios";
+import joinImages from "join-images";
+import { imageJoin } from "./helpers/imageJoin";
 const styles = {
   raw: (p) => p,
   fantasy: (p) =>
@@ -104,6 +106,8 @@ export const stablehoard: SlashCommand = {
 
       var width = (interaction.options.get("width")?.value as string) ?? "512";
       var cfg = (interaction.options.get("cfg")?.value as string) ?? "7.5";
+      var iterations =
+        (interaction.options.get("iterations")?.value as string) ?? "1";
       // Make sure cfg is a number
       try {
         if (isNaN(Number(cfg))) {
@@ -145,12 +149,12 @@ export const stablehoard: SlashCommand = {
               height: Number(height),
               cfg_scale: Number(cfg),
               steps: Number(steps),
-              batch_size: 1,
+              batch_size: Number(iterations),
             },
           },
         })
-        .then(({ data }): Promise<string | null> => {
-          return new Promise<string | null>((resolve, reject) => {
+        .then(({ data }): Promise<string[] | null> => {
+          return new Promise<string[] | null>((resolve, reject) => {
             const checkItem = (done: boolean = false) => {
               axios
                 .request({
@@ -181,7 +185,7 @@ export const stablehoard: SlashCommand = {
                   }) => {
                     if (res.data.done) {
                       if (done) {
-                        resolve(res.data.generations[0].img);
+                        resolve(res.data.generations.map((e) => e.img));
                       } else {
                         checkItem(true);
                       }
@@ -249,11 +253,11 @@ export const stablehoard: SlashCommand = {
         return;
       }
 
-      const buff = Buffer.from(data, "base64");
+      const buff: Buffer[] = data.map((d) => Buffer.from(d, "base64"));
       const messageData = {
         content: null,
 
-        files: [new MessageAttachment(buff, `generation.png`)],
+        files: [new MessageAttachment(await imageJoin(buff), `generation.png`)],
         embeds: [
           {
             title: prompt.slice(0, 200) + "...",
@@ -279,30 +283,26 @@ export const stablehoard: SlashCommand = {
             .fetch(interaction.channelId)
             .then(async (channel: TextChannel) => channel.send(messageData)));
 
-      await addToolbar(
-        message as Message,
-        [buff],
-        [
-          new MessageActionRow().addComponents(
-            new MessageButton()
-              .setLabel("Adopt this bot")
-              .setStyle("LINK")
-              .setURL("https://patreon.com/unexplored_horizons"),
-            new MessageButton()
-              .setLabel("Writerbot home")
-              .setStyle("LINK")
-              .setURL("http://harrisonvanderbyl.github.io/WriterBot"),
-            new MessageButton()
-              .setLabel("Join The Horde!")
-              .setStyle("LINK")
-              .setURL("https://discord.gg/uwqEGZ9Sph"),
-            new MessageButton()
-              .setLabel("Run Horde Node")
-              .setStyle("LINK")
-              .setURL("https://stablehorde.net/")
-          ),
-        ]
-      );
+      await addToolbar(message as Message, buff, [
+        new MessageActionRow().addComponents(
+          new MessageButton()
+            .setLabel("Adopt this bot")
+            .setStyle("LINK")
+            .setURL("https://patreon.com/unexplored_horizons"),
+          new MessageButton()
+            .setLabel("Writerbot home")
+            .setStyle("LINK")
+            .setURL("http://harrisonvanderbyl.github.io/WriterBot"),
+          new MessageButton()
+            .setLabel("Join The Horde!")
+            .setStyle("LINK")
+            .setURL("https://discord.gg/uwqEGZ9Sph"),
+          new MessageButton()
+            .setLabel("Run Horde Node")
+            .setStyle("LINK")
+            .setURL("https://stablehorde.net/")
+        ),
+      ]);
     } catch (e) {
       console.log(JSON.stringify(e));
       if (!interaction.replied && !interaction.deferred) {
@@ -374,6 +374,17 @@ export const stablehoard: SlashCommand = {
           name: (i * 64).toString(),
           value: (i * 64).toString(),
         })),
+      },
+      {
+        name: "iterations",
+        required: false,
+        type: 3,
+        description: "The number of images to generate(colab only)",
+        choices: [
+          { name: "single", value: "1" },
+          { name: "4 panel", value: "4" },
+          { name: "9 panel", value: "9" },
+        ],
       },
       {
         name: "cfg",
