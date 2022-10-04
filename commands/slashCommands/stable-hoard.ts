@@ -14,6 +14,7 @@ import * as hoard from "./sdhelpers/myApi";
 import { hoard as h } from "../../config/config.json";
 import axios from "axios";
 import { imageJoin } from "./helpers/imageJoin";
+import { createStatusSheet } from "./helpers/quicktools/createStatusSheet";
 const styles = {
   raw: (p) => p,
   fantasy: (p) =>
@@ -162,44 +163,20 @@ export const stablehoard: SlashCommand = {
 
               await interaction.editReply({
                 embeds: [
-                  {
-                    title: "Generation in progress",
-                    fields: [
-                      {
-                        name: "Status (🟢, 🟡, 🔴)",
-                        value:
-                          res.finished.toString() +
-                          "/" +
-                          res.processing.toString() +
-                          "/" +
-                          res.waiting.toString(),
-                        inline: true,
-                      },
-                      {
-                        name: "Queue Position",
-                        value: res.queue_position.toString(),
-                      },
-                      {
-                        name: "Elapsed",
-                        value: `<t:${(
-                          interaction.createdAt.getTime() / 1000
-                        ).toFixed(0)}:R>`,
-                      },
-                      {
-                        name: "ETA",
-                        value: `<t:${(
-                          new Date().getTime() / 1000 +
-                          res.wait_time
-                        ).toFixed(0)}:R>`,
-                      },
-                      {
-                        name: "Active Workers",
-                        value: workers
-                          .filter((f) => !f.paused)
-                          .length.toFixed(0),
-                      },
-                    ],
-                  },
+                  createStatusSheet("Generation in progress", {
+                    "Status (🟢, 🟡, 🔴)": `${res.finished.toString()}/${res.processing.toString()}/${res.waiting.toString()}`,
+                    "Queue Position": res.queue_position.toString(),
+                    Elapsed: `<t:${(
+                      interaction.createdAt.getTime() / 1000
+                    ).toFixed(0)}:R>`,
+                    ETA: `<t:${(
+                      new Date().getTime() / 1000 +
+                      res.wait_time
+                    ).toFixed(0)}:R>`,
+                    "Active Workers": workers
+                      .filter((f) => !f.paused)
+                      .length.toFixed(0),
+                  }),
                   ...(interaction.createdAt.getTime() + 1000 * 60 * 1 <
                   Date.now()
                     ? [

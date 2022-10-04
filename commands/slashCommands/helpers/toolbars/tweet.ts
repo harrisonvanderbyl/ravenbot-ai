@@ -47,7 +47,7 @@ export const createTweetModal = async (
         },
       ],
     });
-    return;
+    throw "You need to login first";
   }
   const modal = new Modal({
     title: "Tweet",
@@ -84,7 +84,10 @@ export const tweetToolBar: ToolBarItem = {
     // Different behaviors for different number of buffers
     switch (buffers.length) {
       case 1:
-        await createTweetModal(i, buffers[0]);
+        await createTweetModal(i, buffers[0]).catch((e) => {
+          throw e;
+        });
+
         return [];
       case 4:
         return [

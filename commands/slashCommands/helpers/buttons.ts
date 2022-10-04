@@ -61,8 +61,10 @@ export const addToolbar = async (
 
     toolbars.forEach(async (t) => {
       if (t.id === number) {
-        const newtoolbar = await t.createToolbars(buffers, i);
-
+        const newtoolbar = await t
+          .createToolbars(buffers, i)
+          .catch((e) => null);
+        if (newtoolbar == null) return;
         try {
           if (!i.deferred && !i.replied) {
             await i.deferUpdate();
