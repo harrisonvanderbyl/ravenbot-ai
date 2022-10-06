@@ -94,6 +94,7 @@ export const createWebhook: SlashCommand = {
                       value: channel.id,
                     };
                   })
+                  .slice(0, 25)
               )
               .setCustomId("channelselect")
           ),
