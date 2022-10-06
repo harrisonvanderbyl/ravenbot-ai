@@ -117,7 +117,7 @@ export const createWebhook: SlashCommand = {
             import axios from "axios";
             axios.request({
                 method: "POST",
-                url: "${redirectUrl}/webhooks/${channel}/",
+                url: "https://${redirectUrl}/webhooks/${channel}/",
                 data: {
                     auth: "${auth}",
                     message: "Hello World",
@@ -127,7 +127,7 @@ export const createWebhook: SlashCommand = {
             
             Python\n\`\`\`py
             import requests
-            requests.post("${redirectUrl}/webhooks/${channel}/", json={
+            requests.post("https://${redirectUrl}/webhooks/${channel}/", json={
                 "auth": "${auth}",
                 "message": "Hello World",
             })
