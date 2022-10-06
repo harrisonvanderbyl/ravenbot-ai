@@ -18,6 +18,7 @@ import { styles } from "./styles";
 import { updateServer } from "./updateServer";
 import { womocommand } from "./wombo";
 import { stablehoard } from "./stable-hoard";
+import { createWebhook } from "./createWebhook";
 export default {
   dalleusage,
   heyCommand,
@@ -39,4 +40,5 @@ export default {
   rwkyCommand,
   updateServer,
   stablehoard,
+  createWebhook,
 };
