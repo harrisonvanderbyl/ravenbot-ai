@@ -140,9 +140,7 @@ export const createWebhook: SlashCommand = {
           });
         });
     } catch (e) {
-      await interaction.editReply({
-        content: JSON.stringify(e),
-      });
+      console.log(e);
     }
   },
   contextCommand: async (interaction) => {
