@@ -81,23 +81,21 @@ export const createWebhook: SlashCommand = {
           //     },
           //   ],
           // },
-          new MessageActionRow().setComponents(
-            new MessageActionRow().addComponents(
-              new MessageSelectMenu()
-                .addOptions(
-                  (
-                    await interaction.guild.channels.fetch()
-                  )
-                    .filter((channel) => channel.type == "GUILD_TEXT")
-                    .map((channel) => {
-                      return {
-                        label: channel.name,
-                        value: channel.id,
-                      };
-                    })
+          new MessageActionRow().addComponents(
+            new MessageSelectMenu()
+              .addOptions(
+                (
+                  await interaction.guild.channels.fetch()
                 )
-                .setCustomId("channelselect")
-            )
+                  .filter((channel) => channel.type == "GUILD_TEXT")
+                  .map((channel) => {
+                    return {
+                      label: channel.name,
+                      value: channel.id,
+                    };
+                  })
+              )
+              .setCustomId("channelselect")
           ),
         ],
       })) as Message;
