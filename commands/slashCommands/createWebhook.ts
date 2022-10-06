@@ -5,7 +5,9 @@ import { listFolders, storeToken } from "./googleDriveHelpers/oauth";
 import {
   CommandInteraction,
   Message,
+  MessageActionRow,
   MessageInteraction,
+  MessageSelectMenu,
   TextChannel,
 } from "discord.js";
 import { SlashCommand } from "./typing";
@@ -57,25 +59,45 @@ export const createWebhook: SlashCommand = {
       content: "Please enter the channel for the webhook",
 
       components: [
-        {
-          type: "ACTION_ROW",
-          components: [
-            {
-              type: "SELECT_MENU",
-              customId: "channelSelect",
-              options: (
-                await interaction.guild.channels.fetch()
+        // {
+        //   type: "ACTION_ROW",
+
+        //   components: [
+        //     {
+        //       type: "SELECT_MENU",
+        //       customId: "channelSelect",
+
+        //       options: (
+        //         await interaction.guild.channels.fetch()
+        //       )
+        //         .filter((channel) => channel.type == "GUILD_TEXT")
+        //         .map((channel) => {
+        //           return {
+        //             label: channel.name,
+        //             value: channel.id,
+        //           };
+        //         }),
+        //     },
+        //   ],
+        // },
+        new MessageActionRow().setComponents(
+          new MessageActionRow().addComponents(
+            new MessageSelectMenu()
+              .addOptions(
+                (
+                  await interaction.guild.channels.fetch()
+                )
+                  .filter((channel) => channel.type == "GUILD_TEXT")
+                  .map((channel) => {
+                    return {
+                      label: channel.name,
+                      value: channel.id,
+                    };
+                  })
               )
-                .filter((channel) => channel.type == "GUILD_TEXT")
-                .map((channel) => {
-                  return {
-                    label: channel.name,
-                    value: channel.id,
-                  };
-                }),
-            },
-          ],
-        },
+              .setCustomId("channelselect")
+          )
+        ),
       ],
     })) as Message;
 
