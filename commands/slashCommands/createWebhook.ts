@@ -63,7 +63,9 @@ export const createWebhook: SlashCommand = {
             {
               type: "SELECT_MENU",
               customId: "channelSelect",
-              options: interaction.guild.channels.cache
+              options: (
+                await interaction.guild.channels.fetch()
+              )
                 .filter((channel) => channel.type == "GUILD_TEXT")
                 .map((channel) => {
                   return {
@@ -85,18 +87,16 @@ export const createWebhook: SlashCommand = {
       })
       .then(async (interaction) => {
         await interaction.deferUpdate();
-        const channel = interaction.guild.channels.cache.get(
-          interaction.values[0]
-        );
+        const channel = interaction.channelId;
         const auth = Math.random().toString(36).substring(2, 15);
-        createCrudeWebhook(channel.id, auth);
+        createCrudeWebhook(channel, auth);
         await interaction.editReply({
-          content: `Heres the code to send messages to ${channel.name}\n\n
+          content: `Heres the code to send messages to ${channel}\n\n
             JS/TS\n\`\`\`js
             import axios from "axios";
             axios.request({
                 method: "POST",
-                url: "${redirectUrl}/webhooks/${channel.id}/",
+                url: "${redirectUrl}/webhooks/${channel}/",
                 data: {
                     auth: "${auth}",
                     message: "Hello World",
@@ -106,7 +106,7 @@ export const createWebhook: SlashCommand = {
             
             Python\n\`\`\`py
             import requests
-            requests.post("${redirectUrl}/webhooks/${channel.id}/", json={
+            requests.post("${redirectUrl}/webhooks/${channel}/", json={
                 "auth": "${auth}",
                 "message": "Hello World",
             })
