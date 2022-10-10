@@ -18,7 +18,7 @@ import { hoard as h } from "../../config/config.json";
 import axios from "axios";
 import { imageJoin } from "./helpers/imageJoin";
 import { createStatusSheet } from "./helpers/quicktools/createStatusSheet";
-import { existsSync, writeFileSync } from "fs";
+import { existsSync, readFileSync, writeFileSync } from "fs";
 const styles = {
   raw: (p) => p,
   fantasy: (p) =>
@@ -41,7 +41,7 @@ const getApiKey = (discordID: string) => {
   if (!existsSync("./hordeapikeys.json")) {
     writeFileSync("./hordeapikeys.json", "{}");
   }
-  const keys = require("./hordeapikeys.json");
+  const keys = JSON.parse(readFileSync("./hordeapikeys.json", "utf-8"));
   if (!keys[discordID]) {
     return null;
   }
@@ -52,7 +52,7 @@ const setApiKey = (discordID: string, key: string) => {
   if (!existsSync("./hordeapikeys.json")) {
     writeFileSync("./hordeapikeys.json", "{}");
   }
-  const keys = require("./hordeapikeys.json");
+  const keys = JSON.parse(readFileSync("./hordeapikeys.json", "utf-8"));
   keys[discordID] = key;
   writeFileSync("./hordeapikeys.json", JSON.stringify(keys));
 };
