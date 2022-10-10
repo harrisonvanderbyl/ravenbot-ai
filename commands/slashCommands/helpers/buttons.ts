@@ -5,6 +5,7 @@ import {
   MessageActionRowComponent,
   MessageActionRowOptions,
   MessageAttachment,
+  MessageComponentInteraction,
 } from "discord.js";
 
 import { toolbars } from "./toolbars/index";
@@ -30,7 +31,11 @@ const toolbar = (buffers: Buffer[]): MessageActionRowOptions[] => {
 export const addToolbar = async (
   message: Message<boolean>,
   buffers: Buffer[],
-  addons: MessageActionRowOptions[] = []
+  addons: MessageActionRowOptions[] = [],
+  callbacks: Record<
+    string,
+    (interaction: MessageComponentInteraction) => void
+  > = {}
 ) => {
   await message.edit({
     components: [...toolbar(buffers), ...addons].map(
@@ -81,5 +86,19 @@ export const addToolbar = async (
       }
       await t.process(buffers, i, addons);
     });
+    for (const add of addons) {
+      if (
+        add.components.filter(
+          (c: MessageActionRowComponent) =>
+            c.type == "BUTTON" && c.customId == i.customId
+        )
+      ) {
+        try {
+          callbacks[i.customId](i);
+        } catch {
+          console.log("callback failed");
+        }
+      }
+    }
   });
 };

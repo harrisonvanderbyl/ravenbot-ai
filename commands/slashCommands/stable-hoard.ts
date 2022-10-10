@@ -5,7 +5,10 @@ import {
   MessageActionRow,
   MessageAttachment,
   MessageButton,
+  Modal,
+  ModalSubmitInteraction,
   TextChannel,
+  TextInputComponent,
 } from "discord.js";
 
 import { SlashCommand } from "./typing";
@@ -15,6 +18,7 @@ import { hoard as h } from "../../config/config.json";
 import axios from "axios";
 import { imageJoin } from "./helpers/imageJoin";
 import { createStatusSheet } from "./helpers/quicktools/createStatusSheet";
+import { existsSync, writeFileSync } from "fs";
 const styles = {
   raw: (p) => p,
   fantasy: (p) =>
@@ -33,7 +37,25 @@ const styles = {
     `${p} award-winning butter sculpture at the Minnesota State Fair, made of butter, dairy creation`,
 };
 
-const hordeApi = new hoard.Api(h);
+const getApiKey = (discordID: string) => {
+  if (!existsSync("./hordeapikeys.json")) {
+    writeFileSync("./hordeapikeys.json", "{}");
+  }
+  const keys = require("./hordeapikeys.json");
+  if (!keys[discordID]) {
+    return null;
+  }
+  return keys[discordID];
+};
+
+const setApiKey = (discordID: string, key: string) => {
+  if (!existsSync("./hordeapikeys.json")) {
+    writeFileSync("./hordeapikeys.json", "{}");
+  }
+  const keys = require("./hordeapikeys.json");
+  keys[discordID] = key;
+  writeFileSync("./hordeapikeys.json", JSON.stringify(keys));
+};
 
 export const stablehoard: SlashCommand = {
   skipDeferReply: true,
@@ -131,7 +153,8 @@ export const stablehoard: SlashCommand = {
       const prompt = styles[
         (interaction.options.get("style")?.value as string) ?? "raw"
       ](interaction.options.get("prompt").value as string);
-
+      const hordekey = getApiKey(interaction.user.id);
+      const hordeApi = new hoard.Api(hordekey ?? "0000000000");
       const data = await hordeApi.v2
         .postAsyncGenerate({
           prompt: prompt,
@@ -247,26 +270,61 @@ export const stablehoard: SlashCommand = {
             .fetch(interaction.channelId)
             .then(async (channel: TextChannel) => channel.send(messageData)));
 
-      await addToolbar(message as Message, buff, [
-        new MessageActionRow().addComponents(
-          new MessageButton()
-            .setLabel("Adopt this bot")
-            .setStyle("LINK")
-            .setURL("https://patreon.com/unexplored_horizons"),
-          new MessageButton()
-            .setLabel("Writerbot home")
-            .setStyle("LINK")
-            .setURL("http://harrisonvanderbyl.github.io/WriterBot"),
-          new MessageButton()
-            .setLabel("Join The Horde!")
-            .setStyle("LINK")
-            .setURL("https://discord.gg/uwqEGZ9Sph"),
-          new MessageButton()
-            .setLabel("Run Horde Node")
-            .setStyle("LINK")
-            .setURL("https://stablehorde.net/")
-        ),
-      ]);
+      await addToolbar(
+        message as Message,
+        buff,
+        [
+          new MessageActionRow().addComponents(
+            new MessageButton()
+              .setLabel("Adopt this bot")
+              .setStyle("LINK")
+              .setURL("https://patreon.com/unexplored_horizons"),
+            new MessageButton()
+              .setLabel("Writerbot home")
+              .setStyle("LINK")
+              .setURL("http://harrisonvanderbyl.github.io/WriterBot"),
+            new MessageButton()
+              .setLabel("Join The Horde!")
+              .setStyle("LINK")
+              .setURL("https://discord.gg/uwqEGZ9Sph"),
+            new MessageButton()
+              .setLabel("Run Horde Node")
+              .setStyle("LINK")
+              .setURL("https://stablehorde.net/"),
+            ...(hordekey
+              ? []
+              : [
+                  new MessageButton()
+                    .setLabel("Login")
+                    .setStyle("PRIMARY")
+                    .setCustomId("logintohorde"),
+                ])
+          ),
+        ],
+        {
+          logintohorde: async (interaction) => {
+            // create a modal
+            const modal = new Modal()
+              .setCustomId("stablehorde")
+              .setTitle("login to Horde");
+
+            const apibox = new TextInputComponent()
+              .setCustomId("apikey")
+              .setLabel("What is your apikey?")
+              .setStyle("SHORT")
+              .setValue("0000000000");
+
+            const informationValueRow: MessageActionRow<TextInputComponent> =
+              new MessageActionRow<TextInputComponent>().addComponents(
+                apibox
+              ) as any as MessageActionRow<TextInputComponent>;
+
+            modal.addComponents(informationValueRow);
+
+            await interaction.showModal(modal);
+          },
+        }
+      );
     } catch (e) {
       console.log(JSON.stringify(e));
       if (!interaction.replied && !interaction.deferred) {
@@ -282,8 +340,13 @@ export const stablehoard: SlashCommand = {
   contextCommand: async (interaction) => {
     return;
   },
-  modalSubmit: async (interaction) => {
-    return;
+  modalSubmit: async (interaction: ModalSubmitInteraction) => {
+    const apikey = interaction.fields.getTextInputValue("apikey");
+    setApiKey(interaction.user.id, apikey);
+    await interaction.reply({
+      content: "API Key set!",
+      ephemeral: true,
+    });
   },
   commandSchema: {
     name: "stablehorde",
