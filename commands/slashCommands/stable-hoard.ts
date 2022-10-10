@@ -88,6 +88,8 @@ export const stablehoard: SlashCommand = {
         "schoolgirls",
         "schoolboy",
         "schoolboys",
+        "girl",
+        "girls",
       ];
 
       if (
