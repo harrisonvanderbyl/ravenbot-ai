@@ -19,6 +19,7 @@ import axios from "axios";
 import { imageJoin } from "./helpers/imageJoin";
 import { createStatusSheet } from "./helpers/quicktools/createStatusSheet";
 import { existsSync, readFileSync, writeFileSync } from "fs";
+import { getApiKey } from "./helpers/horde/login";
 const styles = {
   raw: (p) => p,
   fantasy: (p) =>
@@ -35,26 +36,6 @@ const styles = {
     `${p} ui art icon by victo ngai, kilian eng, lois van baarle, flat`,
   butter: (p) =>
     `${p} award-winning butter sculpture at the Minnesota State Fair, made of butter, dairy creation`,
-};
-
-const getApiKey = (discordID: string) => {
-  if (!existsSync("./hordeapikeys.json")) {
-    writeFileSync("./hordeapikeys.json", "{}");
-  }
-  const keys = JSON.parse(readFileSync("./hordeapikeys.json", "utf-8"));
-  if (!keys[discordID]) {
-    return null;
-  }
-  return keys[discordID];
-};
-
-const setApiKey = (discordID: string, key: string) => {
-  if (!existsSync("./hordeapikeys.json")) {
-    writeFileSync("./hordeapikeys.json", "{}");
-  }
-  const keys = JSON.parse(readFileSync("./hordeapikeys.json", "utf-8"));
-  keys[discordID] = key;
-  writeFileSync("./hordeapikeys.json", JSON.stringify(keys));
 };
 
 export const stablehoard: SlashCommand = {
@@ -305,7 +286,7 @@ export const stablehoard: SlashCommand = {
           logintohorde: async (interaction) => {
             // create a modal
             const modal = new Modal()
-              .setCustomId("stablehorde")
+              .setCustomId("hordeloginmodal")
               .setTitle("login to Horde");
 
             const apibox = new TextInputComponent()
@@ -340,32 +321,7 @@ export const stablehoard: SlashCommand = {
   contextCommand: async (interaction) => {
     return;
   },
-  modalSubmit: async (interaction: ModalSubmitInteraction) => {
-    const apikey = interaction.fields.getTextInputValue("apikey");
-    setApiKey(interaction.user.id, apikey);
-    const message = (await interaction.editReply({
-      content: interaction.user.username + " logged in to horde",
-      components: [
-        new MessageActionRow().addComponents(
-          new MessageButton()
-            .setLabel("X")
-            .setStyle("DANGER")
-            .setCustomId("remove")
-        ),
-      ],
-    })) as Message;
-    message
-      .awaitMessageComponent({
-        filter: (i) => i.customId === "remove",
-        time: 60000,
-        dispose: true,
-        componentType: "BUTTON",
-      })
-      .then(async (i) => {
-        message.delete();
-      })
-      .catch((i) => message.delete());
-  },
+  modalSubmit: async (interaction: ModalSubmitInteraction) => {},
   commandSchema: {
     name: "stablehorde",
     description: "use stable hoard",
