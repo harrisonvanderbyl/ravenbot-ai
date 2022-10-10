@@ -312,7 +312,7 @@ export const stablehoard: SlashCommand = {
               .setCustomId("apikey")
               .setLabel("What is your apikey?")
               .setStyle("SHORT")
-              .setValue("0000000000");
+              .setValue(hordekey ?? "0000000000");
 
             const informationValueRow: MessageActionRow<TextInputComponent> =
               new MessageActionRow<TextInputComponent>().addComponents(
