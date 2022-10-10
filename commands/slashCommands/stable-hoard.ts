@@ -343,10 +343,28 @@ export const stablehoard: SlashCommand = {
   modalSubmit: async (interaction: ModalSubmitInteraction) => {
     const apikey = interaction.fields.getTextInputValue("apikey");
     setApiKey(interaction.user.id, apikey);
-    await interaction.reply({
-      content: "API Key set!",
-      ephemeral: true,
-    });
+    const message = (await interaction.editReply({
+      content: interaction.user.username + " logged in to horde",
+      components: [
+        new MessageActionRow().addComponents(
+          new MessageButton()
+            .setLabel("X")
+            .setStyle("DANGER")
+            .setCustomId("remove")
+        ),
+      ],
+    })) as Message;
+    message
+      .awaitMessageComponent({
+        filter: (i) => i.customId === "remove",
+        time: 60000,
+        dispose: true,
+        componentType: "BUTTON",
+      })
+      .then(async (i) => {
+        message.delete();
+      })
+      .catch((i) => message.delete());
   },
   commandSchema: {
     name: "stablehorde",
