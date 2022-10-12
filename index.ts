@@ -227,7 +227,7 @@ client.on("guildDelete", (guild) => {
   client.user?.setActivity("exposition fairy");
 });
 
-client.login(config.token);
+client.login(config.token).catch(console.log);
 
 process.on("uncaughtException", async (e) => {
   console.log(e);
