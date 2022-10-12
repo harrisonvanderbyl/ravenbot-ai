@@ -17,6 +17,7 @@ console.log("Starting load of server");
 
 //..
 console.log("Exporting starts");
+console.log("hmm");
 
 export const start = async () => {
   if (!debug.debug) {

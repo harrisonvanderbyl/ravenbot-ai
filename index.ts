@@ -15,7 +15,8 @@ console.log(config.token);
 // Finally, WriterBot Begins
 client.on("ready", async () => {
   // Every 5 seconds
-  startWebUi();
+  console.log("ready");
+  //startWebUi();
   setInterval(() => {
     console.log("starting loop");
     updateNetworkStats().catch((e) => console.log(e));
@@ -226,9 +227,12 @@ client.on("guildDelete", (guild) => {
   console.log(`I have been removed from: ${guild.name} (id: ${guild.id})`);
   client.user?.setActivity("exposition fairy");
 });
-
-client.login(config.token).catch(console.log);
-
+console.log("attempting logon");
+client
+  .login(config.token)
+  .catch(console.log)
+  .then(() => console.log("logged in"));
+console.log("wtf is happening");
 process.on("uncaughtException", async (e) => {
   console.log(e);
   const status = "1011284410345205820";
