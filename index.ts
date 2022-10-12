@@ -223,6 +223,10 @@ client.on("guildCreate", (guild) => {
   client.user?.setActivity("exposition fairy");
 });
 
+client.on("shardError", (error) => {
+  console.error("A websocket connection encountered an error:", error);
+});
+
 client.on("guildDelete", (guild) => {
   console.log(`I have been removed from: ${guild.name} (id: ${guild.id})`);
   client.user?.setActivity("exposition fairy");
