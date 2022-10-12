@@ -13,7 +13,11 @@ export const imageJoin = async (buffers: Buffer[], isCompressed = false) =>
         }).then((buff) => buff.png().toBuffer()),
       ])
         .then((buffers) => joinImages(buffers, { direction: "vertical" }))
-        .then((buff) => buff.png().toBuffer())
+        .then((buff) =>
+          isCompressed
+            ? buff.jpeg({ quality: 80 }).resize(1024, 1024).toBuffer()
+            : buff.png().toBuffer()
+        )
     : Promise.all([
         joinImages([buffers[0], buffers[1], buffers[2]], {
           direction: "horizontal",
@@ -28,6 +32,6 @@ export const imageJoin = async (buffers: Buffer[], isCompressed = false) =>
         .then((buffers) => joinImages(buffers, { direction: "vertical" }))
         .then((buff) =>
           isCompressed
-            ? buff.jpeg({ quality: 80 }).resize(512, 512).toBuffer()
+            ? buff.jpeg({ quality: 80 }).resize(1024, 1024).toBuffer()
             : buff.png().toBuffer()
         );
