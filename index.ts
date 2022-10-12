@@ -10,6 +10,7 @@ import { toolbarModalRecievers } from "./commands/slashCommands/helpers/toolbars
 import { updateNetworkStats } from "./commands/slashCommands/sdhelpers/sdhelpers";
 import { startWebUi } from "./commands/slashCommands/sdhelpers/webui/webui";
 import { getGuildCommands } from "./commands/common";
+console.log(config.token);
 
 // Finally, WriterBot Begins
 client.on("ready", async () => {
