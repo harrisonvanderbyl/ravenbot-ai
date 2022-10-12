@@ -179,7 +179,6 @@ export const inpaintwithdalle: SlashCommand = {
     }
 
     const buffers = [
-      buffer,
       ...(await new Dalle(dalleKey)
         .generate(prompt, buffer)
         .then(
@@ -203,14 +202,17 @@ export const inpaintwithdalle: SlashCommand = {
       content: null,
 
       files: [
-        new MessageAttachment(await imageJoin(buffers), `generation.png`),
+        new MessageAttachment(
+          await imageJoin(buffers, true),
+          `generation.jpeg`
+        ),
       ],
       embeds: [
         {
           title: (prompt as string).slice(0, 200) + "...",
 
           image: {
-            url: `attachment://generation.png`,
+            url: `attachment://generation.jpeg`,
           },
         },
       ],

@@ -61,7 +61,10 @@ export const picture: SlashCommand = {
 
     const message = await interaction.editReply({
       files: [
-        new MessageAttachment(await imageJoin(buffers), `generation.png`),
+        new MessageAttachment(
+          await imageJoin(buffers, true),
+          `generation.jpeg`
+        ),
       ],
       embeds: [
         {
@@ -74,7 +77,7 @@ export const picture: SlashCommand = {
             },
           ],
           image: {
-            url: "attachment://generation.png",
+            url: "attachment://generation.jpeg",
           },
         },
       ],

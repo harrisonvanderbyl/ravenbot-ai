@@ -59,7 +59,7 @@ export class Dalle {
             task_type: img ? "inpainting" : "text2im",
             prompt: {
               caption: promt,
-              batch_size: img ? 3 : 4,
+              batch_size: 4,
               ...(img
                 ? {
                     masked_image: img.toString("base64"),
@@ -110,4 +110,3 @@ export class Dalle {
     });
   }
 }
-
