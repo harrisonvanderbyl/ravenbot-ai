@@ -232,10 +232,16 @@ client.on("guildDelete", (guild) => {
   client.user?.setActivity("exposition fairy");
 });
 console.log("attempting logon");
-client
-  .login(config.token)
-  .catch(console.log)
-  .then(() => console.log("logged in"));
+
+const login = async () => {
+  console.log("logging in");
+  await client
+    .login(config.token)
+    .catch(console.log)
+    .then(() => console.log("logged in"));
+};
+login();
+
 console.log("wtf is happening");
 process.on("uncaughtException", async (e) => {
   console.log(e);
