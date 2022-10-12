@@ -46,7 +46,7 @@ export const updatePatreonData = async () => {
 };
 
 // update every 2 minutes
-setInterval(updatePatreonData, 1000 * 60 * 2);
+//setInterval(updatePatreonData, 1000 * 60 * 2);
 
 export const patreonCommand: SlashCommand = {
   skipDeferReply: true,
