@@ -62,12 +62,16 @@ export const patreonCommand: SlashCommand = {
     if (!patreonInfo) {
       return await generateLoginButton(interaction);
     } else {
-      await interaction.deferReply();
-
       const data = await getPatreonData(
         patreonInfo.token,
         "/current_user/campaigns"
-      );
+      ).catch((e) => null);
+
+      if (!data) {
+        return await generateLoginButton(interaction);
+      }
+      await interaction.deferReply();
+
       const camp = data.rawJson.data[0].id;
 
       const mypatreons = await getPatreonDiscordIDs(patreonInfo.token, camp);
