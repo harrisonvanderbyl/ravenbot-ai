@@ -155,10 +155,6 @@ client.on("ready", async () => {
         message: "What do you want to do?",
         choices: [
           {
-            name: "view channels",
-            value: "channels",
-          },
-          {
             name: "view owner",
             value: "owner",
           },
@@ -172,23 +168,7 @@ client.on("ready", async () => {
           },
         ],
       });
-      if (action === "channels") {
-        const { channelID } = await prompt({
-          type: "list",
-          name: "channelID",
-          message: "What is the channel ID?",
-          choices: (await (await client.guilds.fetch(guildID)).channels.fetch())
-            .filter((c) => !!c)
-            .map((c) => ({ value: c.id, name: c.name })),
-        });
-        client.channels.fetch(channelID).then((g) => {
-          if (g.isText()) {
-            g.messages.fetch().then((m) => {
-              console.log(m.map((m) => m.content));
-            });
-          }
-        });
-      } else if (action === "leave") {
+      if (action === "leave") {
         await client.guilds.fetch(guildID).then((g) => g.leave());
       } else if (action === "owner") {
         await client.guilds.fetch(guildID).then((g) => console.log(g.ownerId));
