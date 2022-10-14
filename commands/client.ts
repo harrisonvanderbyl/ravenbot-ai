@@ -6,8 +6,6 @@ import {
   TextChannel,
 } from "discord.js";
 
-import { statusChannel, adminChannel } from "../config.json";
-
 // Client options with intents for new Discord API v9
 const clientOptions: ClientOptions = {
   intents: [
@@ -23,14 +21,3 @@ export const client = new Client(clientOptions);
 
 export const channelTypeGuard = (channel: AnyChannel): channel is TextChannel =>
   channel.type === "GUILD_TEXT";
-
-export const getChannel = async (ID: string): Promise<TextChannel> => {
-  const channel = await client.channels.fetch(ID);
-  if (channel && channelTypeGuard(channel)) {
-    return channel;
-  }
-  throw new Error("Admin channel is not a text channel");
-};
-
-export const getAdminChannel = () => getChannel(adminChannel);
-export const getStatusChannel = () => getChannel(statusChannel);

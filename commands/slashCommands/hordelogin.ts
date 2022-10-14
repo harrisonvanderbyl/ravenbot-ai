@@ -1,60 +1,34 @@
-import { CommandInteraction, MessageAttachment } from "discord.js";
+import {
+  CommandInteraction,
+  MessageActionRow,
+  MessageAttachment,
+  Modal,
+  TextInputComponent,
+} from "discord.js";
 import { SlashCommand } from "./typing";
 import { serverUrl } from "../../config.json";
-import { app } from "./webserver/express";
-import { storeLoginDetails } from "./horde/storage";
-
-const stateStorage: {
-  [key: string]: {
-    discordID: string;
-    callback: () => Promise<string>;
-  };
-} = {};
-
-app.get("/connectDiscord", async (req, res) => {
-  const link = await stateStorage[req.params.state].callback();
-  // Something like dis
-  storeLoginDetails(
-    stateStorage[req.params.state].discordID,
-    req.headers.apikey,
-    {
-      username: req.headers.username,
-      id: req.headers.id,
-    }
-  );
-  res.redirect(link);
-});
+import { storeLoginDetails, retrieveLoginDetails } from "./horde/storage";
 
 export const hordelogin: SlashCommand = {
   skipDeferReply: true,
   slashCommand: async (client, interaction: CommandInteraction) => {
-    stateStorage[interaction.id] = {
-      discordID: interaction.user.id,
-      callback: async () => {
-        const message = await interaction.editReply({
-          content: "You are now connected to your Horde account",
-        });
-        // Send back to login message
-        return `https://discord.com/channels/${interaction.guildId}/${interaction.channelId}/${message.id}`;
-      },
-    };
-    await interaction.reply({
-      ephemeral: true,
-      content: "Please login to Horde",
+    const hordemodal = new Modal({
+      customId: "hordelogin",
+      title: "Horde Login",
       components: [
-        {
-          type: "ACTION_ROW",
+        new MessageActionRow<TextInputComponent>({
           components: [
-            {
-              type: "BUTTON",
-              style: "LINK",
-              label: "Login",
-              url: serverUrl + "/connectDiscord?state=" + interaction.id,
-            },
+            new TextInputComponent({
+              customId: "apikey",
+              value: retrieveLoginDetails(interaction.user.id).apiKey,
+              label: "API Key",
+              style: "SHORT",
+            }),
           ],
-        },
+        }),
       ],
     });
+    await interaction.showModal(hordemodal);
   },
   commandSchema: {
     name: "hordelogin",
@@ -65,6 +39,8 @@ export const hordelogin: SlashCommand = {
     return;
   },
   modalSubmit: async (client, interaction) => {
-    return;
+    const apiKey = interaction.components[0].components[0].value;
+    storeLoginDetails(interaction.user.id, apiKey);
+    await interaction.reply({ content: "apikey saved", ephemeral: true });
   },
 };
