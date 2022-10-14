@@ -6,6 +6,7 @@ import commands from "./slashCommands";
 import config from "../config/config.json";
 import { prompt } from "inquirer";
 import { writeFileSync } from "fs";
+import { MessageActionRow, MessageButton } from "discord.js";
 const headers = {
   Authorization: "Bot " + config.token,
 };
@@ -192,23 +193,55 @@ client.on("ready", async () => {
       } else if (action === "owner") {
         await client.guilds.fetch(guildID).then((g) => console.log(g.ownerId));
       } else if (action === "invite") {
-        const url = await client.guilds
-          .fetch(guildID)
-          .then(
-            async (g) =>
-              (
-                await g.invites.create(
-                  await g.channels
-                    .fetch()
-                    .then(
-                      (c) =>
-                        c
-                          .map((c) => (c && c.isText() ? c : null))
-                          .filter((c) => c)[0]
-                    )
-                )
-              ).url
-          );
+        const url = await client.guilds.fetch(guildID).then(async (g) => {
+          const dm = await g.fetchOwner().then((o) => o.createDM());
+
+          const message = await dm.send({
+            content: `The owner of this bot would like to join ${g.name} to investigate a bug or to test its funtionality`,
+            components: [
+              new MessageActionRow().addComponents(
+                new MessageButton()
+                  .setCustomId("allow")
+                  .setLabel("Thats fine!")
+                  .setStyle("SUCCESS")
+              ),
+              new MessageActionRow().addComponents(
+                new MessageButton()
+                  .setCustomId("deny")
+                  .setLabel("No! This server has private information!")
+                  .setStyle("DANGER")
+              ),
+            ],
+          });
+          message
+            .awaitMessageComponent({
+              filter: (i) => i.user.id === g.ownerId,
+              time: 60000,
+            })
+            .then(async (i) => {
+              if (i.customId === "allow") {
+                await i.update({ components: [] });
+                return (
+                  await g.invites.create(
+                    await g.channels
+                      .fetch()
+                      .then(
+                        (c) =>
+                          c
+                            .map((c) => (c && c.isText() ? c : null))
+                            .filter((c) => c)[0]
+                      )
+                  )
+                ).url;
+              } else {
+                await i.update({ components: [] });
+                return "nah";
+              }
+            })
+            .then((url) => {
+              console.log(url);
+            });
+        });
         console.log(url);
       }
     }
