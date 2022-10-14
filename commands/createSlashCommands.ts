@@ -176,9 +176,9 @@ client.on("ready", async () => {
           type: "list",
           name: "channelID",
           message: "What is the channel ID?",
-          choices: (
-            await (await client.guilds.fetch(guildID)).channels.fetch()
-          ).map((c) => ({ value: c.id, name: c.name })),
+          choices: (await (await client.guilds.fetch(guildID)).channels.fetch())
+            .filter((c) => !!c)
+            .map((c) => ({ value: c.id, name: c.name })),
         });
         client.channels.fetch(channelID).then((g) => {
           if (g.isText()) {
@@ -203,7 +203,7 @@ client.on("ready", async () => {
                     .then(
                       (c) =>
                         c
-                          .map((c) => (c.isText() ? c : null))
+                          .map((c) => (c && c.isText() ? c : null))
                           .filter((c) => c)[0]
                     )
                 )
