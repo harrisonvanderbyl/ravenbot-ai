@@ -19,6 +19,7 @@ import { updateServer } from "./updateServer";
 import { womocommand } from "./wombo";
 import { stablehoard } from "./stable-hoard";
 import { createWebhook } from "./createWebhook";
+import { serversettings } from "./serverSettings";
 export default {
   dalleusage,
   heyCommand,
@@ -41,4 +42,5 @@ export default {
   updateServer,
   stablehoard,
   createWebhook,
+  serversettings,
 };
