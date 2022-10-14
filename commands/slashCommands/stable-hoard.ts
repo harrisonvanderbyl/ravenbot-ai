@@ -20,6 +20,7 @@ import { imageJoin } from "./helpers/imageJoin";
 import { createStatusSheet } from "./helpers/quicktools/createStatusSheet";
 import { existsSync, readFileSync, writeFileSync } from "fs";
 import { getApiKey } from "./helpers/horde/login";
+import { readConfigFile } from "./helpers/configFiles/configfiles";
 const styles = {
   raw: (p) => p,
   fantasy: (p) =>
@@ -136,11 +137,15 @@ export const stablehoard: SlashCommand = {
       ](interaction.options.get("prompt").value as string);
       const hordekey = getApiKey(interaction.user.id);
       const hordeApi = new hoard.Api(hordekey ?? "0000000000");
+      const isfw =
+        readConfigFile("serversettings")[interaction.guildId]?.filternsfw ??
+        false;
+
       const data = await hordeApi.v2
         .postAsyncGenerate({
           prompt: prompt,
-          censor_nsfw: false,
-          nsfw: true,
+          censor_nsfw: isfw,
+          nsfw: !isfw,
           params: {
             seed: `${seed}`,
             width: Number(width),
