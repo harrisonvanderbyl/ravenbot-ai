@@ -251,7 +251,7 @@ class StableDiffusionImg2ImgPipeline(DiffusionPipeline):
 
 
 device = "cuda"
-model_path = os.environ.get("MODEL_PATH", "CompVis/stable-diffusion-v1-4")
+model_path = os.environ["MODEL_PATH"]
 
 # Using DDIMScheduler as anexample,this also works with PNDMScheduler
 # uncomment this line if you want to use it.
