@@ -413,12 +413,13 @@ async def on_message(message):
         if "--seed" in msg:
             seed = int(msg.split("--seed")[1].split(" ")[0])
 
-        prompt = msg.split("+imagine ")[1].split("--")[0].strip()
+        prompt = [msg.split("+imagine ")[1].split("--")[0].strip()]
+        with autocast("cuda"):
+            img = pipe(prompt, num_inference_steps=min(max(steps, 10), 150), generator=[
+                seed], height=h, guidance_scale=cfg, width=w)["sample"][0]
 
-        img = pipe([prompt], num_inference_steps=min(max(steps, 10), 150), generator=[
-            seed], height=h, guidance_scale=cfg, width=w)["sample"][0]
-
-        message.channel.send(file=discord.File(img, "image.png"))
+            img.save("./temp.png")
+            await message.reply(file=discord.File("./temp.png"))
 
 
 client.run(os.environ["TOKEN"])
