@@ -251,7 +251,7 @@ class StableDiffusionImg2ImgPipeline(DiffusionPipeline):
 
 
 device = "cuda"
-model_path = "CompVis/stable-diffusion-v1-4"
+model_path = os.environ.get("MODEL_PATH", "CompVis/stable-diffusion-v1-4")
 
 # Using DDIMScheduler as anexample,this also works with PNDMScheduler
 # uncomment this line if you want to use it.
@@ -260,13 +260,22 @@ model_path = "CompVis/stable-diffusion-v1-4"
 
 scheduler = DDIMScheduler(beta_start=0.00085, beta_end=0.012,
                           beta_schedule="scaled_linear", clip_sample=False, set_alpha_to_one=False)
-img2imgpipe = StableDiffusionImg2ImgPipeline.from_pretrained(
-    model_path,
-    scheduler=scheduler,
-    revision="fp16",
-    torch_dtype=torch.float16,
-    use_auth_token=True
-).to(device)
+if (model_path == "CompVis/stable-diffusion-v1-4"):
+    img2imgpipe = StableDiffusionImg2ImgPipeline.from_pretrained(
+        model_path,
+        scheduler=scheduler,
+        revision="fp16",
+        torch_dtype=torch.float16,
+        use_auth_token=True
+    ).to(device)
+else:
+    img2imgpipe = StableDiffusionImg2ImgPipeline.from_pretrained(
+        model_path,
+        scheduler=scheduler,
+        local_files_only=True,
+        revision="fp16",
+        torch_dtype=torch.float16,
+    ).to(device)
 pipe = img2imgpipe
 pipe.enable_attention_slicing()
 # bot.py
