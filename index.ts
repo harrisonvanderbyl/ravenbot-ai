@@ -88,6 +88,7 @@ const runCommands = async (interaction: Interaction): Promise<void> => {
     const patreonInfo = JSON.parse(
       readFileSync("./patreonConfig.json", "utf-8")
     );
+    const homeguild = "989166996153323591";
     const guildLeader =
       interaction.guild?.ownerId ??
       (await client.guilds
@@ -109,7 +110,11 @@ const runCommands = async (interaction: Interaction): Promise<void> => {
         guildLeader === "244212157242277888" ||
         guildLeader === "66237642349477888" ||
         guildLeader === "134295609287901184" ||
-        guildLeader === "964349462950584402"
+        guildLeader === "964349462950584402" ||
+        (await client.guilds
+          .fetch(homeguild)
+          .then((g) => g.roles.fetch("1022485145627934771"))
+          .then((r) => r.members.map((m) => m.id).includes(guildLeader)))
       )
     ) {
       console.log(
