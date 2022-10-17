@@ -180,7 +180,7 @@ export const remixwithsd: SlashCommand = {
           .then((b) => b.toString("base64")),
       },
     };
-    const buff = await stable(
+    var buff = await stable(
       interaction as any,
       prompt,
       (Math.random() * 10000).toFixed(0),
@@ -197,6 +197,10 @@ export const remixwithsd: SlashCommand = {
       steps
     ).catch(async (e) => {
       console.log(e);
+      return null;
+    });
+    if (buff == null) {
+      await interaction.editReply("Falling back to horde");
       const bb = await hordeGenerate(hordeApi, params, interaction)
         .then((b) => b[0])
         .catch(
@@ -208,10 +212,8 @@ export const remixwithsd: SlashCommand = {
               })
               .then((e) => null)
         );
-      return bb;
-    });
-    if (buff == null) {
-      return;
+      if (bb == null) return;
+      buff = bb;
     }
     const message = await interaction.editReply({
       content: null,
