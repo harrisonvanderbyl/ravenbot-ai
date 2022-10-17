@@ -15,11 +15,14 @@ import {
   downloadToBuffer,
   wombo,
 } from "../../charaterBuilders/imageGenerators/wombo";
-
+import * as horde from "./sdhelpers/myApi";
 import { SlashCommand } from "./typing";
 import { addToolbar } from "./helpers/buttons";
 import sharp from "sharp";
 import { stable } from "./sdhelpers/sdhelpers";
+import { hordeGenerate } from "./helpers/horde/async";
+import { readConfigFile } from "./helpers/configFiles/configfiles";
+import { getApiKey } from "./helpers/horde/login";
 
 export const remixwithsd: SlashCommand = {
   slashCommand: async (client, interaction) => {
@@ -146,31 +149,66 @@ export const remixwithsd: SlashCommand = {
       await interaction.editReply("level must be between 0.0 and 1.0");
       return;
     }
-    const image = sharp(await downloadToBuffer(imageUrl))
+    const image = sharp(await downloadToBuffer(imageUrl));
 
-    const [w,h] =  await image.metadata().then((m) => [m.width,m.height]).then(([w,h])=>{
-      const ww = Math.min(w,512)
-      // Resize to keep aspect ratio
-      return [ww,Math.min(Math.round(h*(ww/w)),1024)]
-    }).then(m=>m.map(w=>Math.floor(w/64)*64)).then(([w,h])=>[`${w}`,`${h}`])
+    const [w, h] = await image
+      .metadata()
+      .then((m) => [m.width, m.height])
+      .then(([w, h]) => {
+        const ww = Math.min(w, 512);
+        // Resize to keep aspect ratio
+        return [ww, Math.min(Math.round(h * (ww / w)), 1024)];
+      })
+      .then((m) => m.map((w) => Math.floor(w / 64) * 64))
+      .then(([w, h]) => [`${w}`, `${h}`]);
+    const hordekey = getApiKey(interaction.user.id);
+    const hordeApi = new horde.Api(hordekey ?? "0000000000");
+    const isfw =
+      readConfigFile("serversettings")[interaction.guildId]?.filternsfw ??
+      false;
+    const params = {
+      prompt: prompt,
+      censor_nsfw: isfw,
+      nsfw: !isfw,
+      params: {
+        width: Number(w),
+        height: Number(h),
+        steps: Number(steps),
+        source_image: await image
+          .png()
+          .toBuffer()
+          .then((b) => b.toString("base64")),
+      },
+    };
     const buff = await stable(
       interaction as any,
       prompt,
-      (Math.random()*10000).toFixed(0),
-        await image
+      (Math.random() * 10000).toFixed(0),
+      await image
         .png()
         .toBuffer()
         .then((b) => b.toString("base64")),
       level,
       true,
-      h,w,
+      h,
+      w,
       "1",
       undefined,
       steps
     ).catch(async (e) => {
       console.log(e);
-      await interaction.followUp({ content: "error: " + e, ephemeral: true });
-      return null;
+      const bb = await hordeGenerate(hordeApi, params, interaction)
+        .then((b) => b[0])
+        .catch(
+          async (e) =>
+            await interaction
+              .followUp({
+                content: "error: " + e,
+                ephemeral: true,
+              })
+              .then((e) => null)
+        );
+      return bb;
     });
     if (buff == null) {
       return;
