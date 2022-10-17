@@ -202,7 +202,7 @@ export const remixwithsd: SlashCommand = {
     if (buff == null) {
       await interaction.editReply("Falling back to horde");
       const bb = await hordeGenerate(hordeApi, params, interaction)
-        .then((b) => b[0])
+        .then((b) => Buffer.from(b[0], "base64"))
         .catch(
           async (e) =>
             await interaction
