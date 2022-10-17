@@ -23,38 +23,9 @@ const NoNodeError = async (updatemessaged: Message) => {
     );
   const message = await messageToEdit.edit({
     content: `
-No Colab Nodes available. Please try the stablehorde command.`,
-    components: [
-      {
-        type: "ACTION_ROW",
-        components: [
-          {
-            style: "LINK",
-            type: "BUTTON",
-            url: "https://colab.research.google.com/drive/1xxypspWywNT6IOnXdSQz9phL0MRPhPCp?usp=sharing",
-            label: "Run Node",
-          },
-          new MessageButton()
-            .setCustomId("deletemessage")
-            .setLabel("X")
-            .setStyle("DANGER"),
-        ],
-      },
-    ],
+No Colab Nodes available. Please try the stablehorde command`,
   });
-  message
-    .awaitMessageComponent({
-      componentType: "BUTTON",
-      dispose: true,
-      filter: (i) => {
-        return i.customId == "deletemessage";
-      },
-      time: 60 * 1000,
-    })
-    .then((i) => {
-      message.delete();
-    })
-    .catch((i) => message.delete());
+
   return null;
 };
 
