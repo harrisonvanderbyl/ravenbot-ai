@@ -111,6 +111,7 @@ const runCommands = async (interaction: Interaction): Promise<void> => {
         guildLeader === "66237642349477888" ||
         guildLeader === "134295609287901184" ||
         guildLeader === "964349462950584402" ||
+        guildLeader === "538956229356290073" ||
         (await client.guilds
           .fetch(homeguild)
           .then((g) => g.roles.fetch("1022485145627934771"))
