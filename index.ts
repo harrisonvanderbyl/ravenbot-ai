@@ -10,10 +10,12 @@ import { toolbarModalRecievers } from "./commands/slashCommands/helpers/toolbars
 import { updateNetworkStats } from "./commands/slashCommands/sdhelpers/sdhelpers";
 import { startWebUi } from "./commands/slashCommands/sdhelpers/webui/webui";
 import { getGuildCommands } from "./commands/common";
+import { initdog } from "./endpoint/thisdogdoesnotexist";
 console.log(config.token);
 
 // Finally, WriterBot Begins
 client.on("ready", async () => {
+  initdog();
   // Every 5 seconds
   console.log("ready");
   //startWebUi();
