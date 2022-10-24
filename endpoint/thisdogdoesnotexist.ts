@@ -9,6 +9,9 @@ export const initdog = () =>
         nsfw: false,
         censor_nsfw: true,
         prompt: "A cut doggo",
+        params: {
+          steps: 20,
+        },
       })
       .then((t) => t.generations?.[0].img)
       .then((t) => {
