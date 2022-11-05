@@ -153,7 +153,7 @@ export const inpaintwithdalle: SlashCommand = {
             .resize(
               1024 * (parseInt(percent) / 100),
               1024 * (parseInt(percent) / 100),
-              { fit: "fill" }
+              { fit: "inside" }
             )
             .toBuffer(),
           blend: "over",
