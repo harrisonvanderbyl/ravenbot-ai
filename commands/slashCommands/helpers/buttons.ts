@@ -41,12 +41,21 @@ export const addToolbar = async (
   addons: MessageActionRowOptions[] = []
 ) => {
   const message = await messaged.fetch();
+
   await message.edit({
     components: [...toolbar(buffers), ...addons].map(
       (m) => new MessageActionRow<MessageActionRowComponent>(m)
     ),
     embeds: [
-      ...message.embeds,
+      {
+        title: message.embeds[0].title,
+        description: message.embeds[0].description,
+        image: {
+          url: message.attachments.first()
+            ? `attachment://` + message.attachments.first().name
+            : message.embeds[0].image?.url,
+        },
+      },
       createStatusSheet("Metadata", {
         Images: buffers.length.toFixed(0),
         Size: await sharp(buffers[0])
@@ -55,7 +64,6 @@ export const addToolbar = async (
       }),
     ],
   });
-  await message.removeAttachments();
 };
 
 export const handleButtons = async (i: ButtonInteraction) => {
