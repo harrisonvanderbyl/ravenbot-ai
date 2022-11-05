@@ -61,11 +61,9 @@ export const handleButtons = async (i: ButtonInteraction) => {
   const number = i.customId;
   console.log(number);
   const addons = [
-    new MessageActionRow<MessageActionRowComponent>(
-      i.message.components.flatMap((row) =>
-        row.components.filter((c: MessageButton) => c.url)
-      ) as any
-    ),
+    i.message.components.flatMap((row) =>
+      row.components.filter((c: MessageButton) => c.url)
+    ) as any,
   ];
   const metadata = (i.message.embeds as MessageEmbed[]).find(
     (e) => e.title === "Metadata"
