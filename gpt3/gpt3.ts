@@ -42,16 +42,12 @@ export const gptj = async (
         inputs: prompt,
       }
     )
-    .then(
-      async (
-        res
-      ): Promise<Pick<AxiosResponse<CreateCompletionResponse>, "data">> => {
-        return {
-          data: {
-            choices: (await res.data).map((d) => ({
-              text: d.generated_text.replace(prompt, ""),
-            })),
-          },
-        };
-      }
-    );
+    .then(async (res): Promise<Pick<AxiosResponse<any>, "data">> => {
+      return {
+        data: {
+          choices: (await res.data).map((d) => ({
+            text: d.generated_text.replace(prompt, ""),
+          })),
+        },
+      };
+    });
