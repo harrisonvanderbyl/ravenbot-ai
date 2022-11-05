@@ -60,11 +60,11 @@ export const addToolbar = async (
 export const handleButtons = async (i: ButtonInteraction) => {
   const number = i.customId;
   console.log(number);
-  const addons = [
-    i.message.components.flatMap((row) =>
+  const addons: MessageActionRowOptions = {
+    components: i.message.components.flatMap((row) =>
       row.components.filter((c: MessageButton) => c.url)
     ) as any,
-  ];
+  };
   const metadata = (i.message.embeds as MessageEmbed[]).find(
     (e) => e.title === "Metadata"
   );
