@@ -36,16 +36,21 @@ const toolbar = (buffers: Buffer[]): MessageActionRowOptions[] => {
 };
 
 export const addToolbar = async (
-  message: Message<boolean>,
+  messaged: Message<boolean>,
   buffers: Buffer[],
   addons: MessageActionRowOptions[] = []
 ) => {
+  const message = await messaged.fetch();
   await message.edit({
     components: [...toolbar(buffers), ...addons].map(
       (m) => new MessageActionRow<MessageActionRowComponent>(m)
     ),
     embeds: [
-      ...message.embeds,
+      {
+        title: message.embeds[0]?.title ?? message.content,
+        description: message.embeds[0]?.description ?? message.content,
+        image: { url: "attachment://" + message.attachments.toJSON()[0].name },
+      },
       createStatusSheet("Metadata", {
         Images: buffers.length.toFixed(0),
         Size: await sharp(buffers[0])
@@ -53,7 +58,6 @@ export const addToolbar = async (
           .then((m) => m.width.toFixed(0) + "x" + m.height.toFixed(0)),
       }),
     ],
-    files: null,
   });
 };
 
@@ -71,15 +75,13 @@ export const handleButtons = async (i: ButtonInteraction) => {
     (e) => e.title === "Metadata"
   );
   const buffersize = metadata.fields.find((f) => f.name === "Images").value;
-
+  const url = (i.message.embeds as MessageEmbed[]).find((e) => e.image.url)
+    .image.url;
   const buffers = await axios
-    .get(
-      (i.message.embeds as MessageEmbed[]).find((e) => e.image.url).image.url,
-      {
-        responseType: "arraybuffer",
-        responseEncoding: "binary",
-      }
-    )
+    .get(url, {
+      responseType: "arraybuffer",
+      responseEncoding: "binary",
+    })
     .then((r) => r.data)
     .then((b) => split(b, Number(buffersize) as any));
 
