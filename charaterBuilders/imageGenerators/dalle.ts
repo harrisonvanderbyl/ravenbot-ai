@@ -4,9 +4,12 @@ import {
   Message,
   MessageAttachment,
 } from "discord.js";
+import { Configuration, OpenAIApi } from "openai";
+import { ReadStream, createReadStream, writeFile, writeFileSync } from "fs";
 
 import axios from "axios";
 import config from "../../config/config.json";
+import { generate } from "stability-ts";
 import request from "request";
 
 export class Dalle {
@@ -108,5 +111,38 @@ export class Dalle {
         }
       );
     });
+  }
+}
+
+export class DallePostPaid {
+  async generate(prompt, image?: Buffer) {
+    const configuration = new Configuration({
+      apiKey: config.apikey,
+    });
+    const client = new OpenAIApi(configuration);
+
+    if (image) {
+      writeFileSync("./temp.png", image, { encoding: "binary" });
+    }
+
+    const completion = image
+      ? await client.createImageEdit(
+          createReadStream("./temp.png") as any,
+          createReadStream("./temp.png") as any,
+          prompt,
+          1,
+          "1024x1024",
+          "b64_json"
+        )
+      : await client.createImage({
+          prompt: prompt,
+          n: 1,
+          size: "1024x1024",
+          response_format: "b64_json",
+        });
+    const { data } = completion.data;
+    const resultData: string[] = data.map((d) => d.b64_json) as string[];
+    const images: Buffer[] = resultData.map((j) => Buffer.from(j, "base64"));
+    return images;
   }
 }

@@ -1,4 +1,8 @@
 import {
+  Dalle,
+  DallePostPaid,
+} from "../../charaterBuilders/imageGenerators/dalle";
+import {
   Message,
   MessageActionRow,
   MessageAttachment,
@@ -10,7 +14,6 @@ import {
 } from "discord.js";
 import { existsSync, readFileSync, writeFileSync } from "fs";
 
-import { Dalle } from "../../charaterBuilders/imageGenerators/dalle";
 import { SlashCommand } from "./typing";
 import { addToolbar } from "./helpers/buttons";
 import axios from "axios";
@@ -170,32 +173,11 @@ export const inpaintwithdalle: SlashCommand = {
       interaction.user.id
     ];
 
-    if (!dalleKey) {
-      await interaction.editReply({
-        content:
-          "You need to set your dalle key. You can use /dalleusage to set your key, or ask someone to share their key with you using /dalleusage config:true",
-      });
-      return;
-    }
-
     const buffers = [
-      ...(await new Dalle(dalleKey)
-        .generate(prompt, buffer)
-        .then(
-          async (generations) =>
-            await Promise.all(
-              generations.map((gen, i) =>
-                axios.get(gen.generation.image_path, {
-                  responseType: "arraybuffer",
-                  responseEncoding: "binary",
-                })
-              )
-            ).then((buffers) => buffers.map((buff) => buff.data as Buffer))
-        )
-        .catch((e) => {
-          console.log(e);
-          throw e;
-        })),
+      ...(await new DallePostPaid().generate(prompt, buffer).catch((e) => {
+        console.log(e);
+        throw e;
+      })),
     ];
 
     const message = await interaction.editReply({

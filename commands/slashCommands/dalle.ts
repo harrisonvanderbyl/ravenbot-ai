@@ -1,6 +1,10 @@
 import * as WomboDreamApi from "wombo-dream-api";
 
 import {
+  Dalle,
+  DallePostPaid,
+} from "../../charaterBuilders/imageGenerators/dalle";
+import {
   Message,
   MessageActionRow,
   MessageAttachment,
@@ -8,7 +12,6 @@ import {
 } from "discord.js";
 import { existsSync, readFileSync, writeFileSync } from "fs";
 
-import { Dalle } from "../../charaterBuilders/imageGenerators/dalle";
 import { SlashCommand } from "./typing";
 import { addToolbar } from "./helpers/buttons";
 import axios from "axios";
@@ -24,36 +27,12 @@ export const picture: SlashCommand = {
       writeFileSync("./dalleconfig.json", JSON.stringify({}));
     }
 
-    // read dalle key from config file
-    const dalleKey = JSON.parse(readFileSync("./dalleconfig.json").toString())[
-      interaction.user.id
-    ];
-
-    if (!dalleKey) {
-      await interaction.editReply({
-        content:
-          "You need to set your dalle key. You can use /dalleusage to set your key, or ask someone to share their key with you by using the context menu.",
-      });
-      return;
-    }
-
-    const dallec = new Dalle(dalleKey);
+    const dallec = new DallePostPaid();
 
     console.log(JSON.stringify(interaction.options.data));
 
     const buffers = await dallec
       .generate(interaction.options.get("prompt").value as string)
-      .then(
-        async (generations) =>
-          await Promise.all(
-            generations.map((gen, i) =>
-              axios.get(gen.generation.image_path, {
-                responseType: "arraybuffer",
-                responseEncoding: "binary",
-              })
-            )
-          ).then((buffers) => buffers.map((buff) => buff.data as Buffer))
-      )
       .catch((e) => {
         console.log("Error", JSON.stringify(e));
         throw e;
@@ -70,12 +49,12 @@ export const picture: SlashCommand = {
         {
           title:
             (("" + interaction.options.get("prompt").value) as string) + "",
-          fields: [
-            {
-              name: "Remaining:",
-              value: `${(await dallec.getUsage()).aggregate_credits}`,
-            },
-          ],
+          // fields: [
+          //   {
+          //     name: "Remaining:",
+          //     value: `${(await dallec.getUsage()).aggregate_credits}`,
+          //   },
+          // ],
           image: {
             url: "attachment://generation.jpeg",
           },
