@@ -70,7 +70,7 @@ export const handleButtons = async (i: ButtonInteraction) => {
   const metadata = (i.message.embeds as MessageEmbed[]).find(
     (e) => e.title === "Metadata"
   );
-  const buffersize = metadata.fields.find((f) => f.name === "Size").value;
+  const buffersize = metadata.fields.find((f) => f.name === "Images").value;
 
   const buffers = await axios
     .get(
