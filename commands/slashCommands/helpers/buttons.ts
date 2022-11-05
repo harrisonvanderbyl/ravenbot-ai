@@ -53,14 +53,17 @@ export const addToolbar = async (
           .then((m) => m.width.toFixed(0) + "x" + m.height.toFixed(0)),
       }),
     ],
+    files: null,
   });
 };
 
 export const handleButtons = async (i: ButtonInteraction) => {
   const number = i.customId;
   console.log(number);
-  const addons = i.message.components.flatMap((row) =>
-    row.components.filter((c: MessageButton) => c.url)
+  const addons = new MessageActionRow<MessageActionRowComponent>(
+    i.message.components.flatMap((row) =>
+      row.components.filter((c: MessageButton) => c.url)
+    ) as any
   );
   const metadata = (i.message.embeds as MessageEmbed[]).find(
     (e) => e.title === "Metadata"
