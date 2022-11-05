@@ -46,11 +46,7 @@ export const addToolbar = async (
       (m) => new MessageActionRow<MessageActionRowComponent>(m)
     ),
     embeds: [
-      {
-        title: message.embeds[0]?.title ?? message.content,
-        description: message.embeds[0]?.description ?? message.content,
-        image: { url: "attachment://" + message.attachments.toJSON()[0].name },
-      },
+      ...message.embeds,
       createStatusSheet("Metadata", {
         Images: buffers.length.toFixed(0),
         Size: await sharp(buffers[0])
@@ -59,6 +55,7 @@ export const addToolbar = async (
       }),
     ],
   });
+  await message.removeAttachments();
 };
 
 export const handleButtons = async (i: ButtonInteraction) => {
