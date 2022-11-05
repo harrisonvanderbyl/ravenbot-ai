@@ -1,3 +1,5 @@
+import * as hoard from "./sdhelpers/myApi";
+
 import {
   Client,
   CommandInteraction,
@@ -10,18 +12,18 @@ import {
   TextChannel,
   TextInputComponent,
 } from "discord.js";
+import { existsSync, readFileSync, writeFileSync } from "fs";
 
 import { SlashCommand } from "./typing";
 import { addToolbar } from "./helpers/buttons";
-import * as hoard from "./sdhelpers/myApi";
-import { hoard as h } from "../../config/config.json";
 import axios from "axios";
-import { imageJoin } from "./helpers/imageJoin";
 import { createStatusSheet } from "./helpers/quicktools/createStatusSheet";
-import { existsSync, readFileSync, writeFileSync } from "fs";
 import { getApiKey } from "./helpers/horde/login";
-import { readConfigFile } from "./helpers/configFiles/configfiles";
+import { hoard as h } from "../../config/config.json";
 import { hordeGenerate } from "./helpers/horde/async";
+import { imageJoin } from "./helpers/imageJoin";
+import { readConfigFile } from "./helpers/configFiles/configfiles";
+
 const styles = {
   raw: (p) => p,
   fantasy: (p) =>
@@ -191,61 +193,26 @@ export const stablehoard: SlashCommand = {
             .fetch(interaction.channelId)
             .then(async (channel: TextChannel) => channel.send(messageData)));
 
-      await addToolbar(
-        message as Message,
-        buff,
-        [
-          new MessageActionRow().addComponents(
-            new MessageButton()
-              .setLabel("Adopt this bot")
-              .setStyle("LINK")
-              .setURL("https://patreon.com/unexplored_horizons"),
-            new MessageButton()
-              .setLabel("Writerbot home")
-              .setStyle("LINK")
-              .setURL("http://harrisonvanderbyl.github.io/WriterBot"),
-            new MessageButton()
-              .setLabel("Join The Horde!")
-              .setStyle("LINK")
-              .setURL("https://discord.gg/uwqEGZ9Sph"),
-            new MessageButton()
-              .setLabel("Run Horde Node")
-              .setStyle("LINK")
-              .setURL("https://stablehorde.net/"),
-            ...(hordekey
-              ? []
-              : [
-                  new MessageButton()
-                    .setLabel("Login")
-                    .setStyle("PRIMARY")
-                    .setCustomId("logintohorde"),
-                ])
-          ),
-        ],
-        {
-          logintohorde: async (interaction) => {
-            // create a modal
-            const modal = new Modal()
-              .setCustomId("hordeloginmodal")
-              .setTitle("login to Horde");
-
-            const apibox = new TextInputComponent()
-              .setCustomId("apikey")
-              .setLabel("What is your apikey?")
-              .setStyle("SHORT")
-              .setValue(hordekey ?? "0000000000");
-
-            const informationValueRow: MessageActionRow<TextInputComponent> =
-              new MessageActionRow<TextInputComponent>().addComponents(
-                apibox
-              ) as any as MessageActionRow<TextInputComponent>;
-
-            modal.addComponents(informationValueRow);
-
-            await interaction.showModal(modal);
-          },
-        }
-      );
+      await addToolbar(message as Message, buff, [
+        new MessageActionRow().addComponents(
+          new MessageButton()
+            .setLabel("Adopt this bot")
+            .setStyle("LINK")
+            .setURL("https://patreon.com/unexplored_horizons"),
+          new MessageButton()
+            .setLabel("Writerbot home")
+            .setStyle("LINK")
+            .setURL("http://harrisonvanderbyl.github.io/WriterBot"),
+          new MessageButton()
+            .setLabel("Join The Horde!")
+            .setStyle("LINK")
+            .setURL("https://discord.gg/uwqEGZ9Sph"),
+          new MessageButton()
+            .setLabel("Run Horde Node")
+            .setStyle("LINK")
+            .setURL("https://stablehorde.net/")
+        ),
+      ]);
     } catch (e) {
       console.log(JSON.stringify(e));
       if (!interaction.replied && !interaction.deferred) {

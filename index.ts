@@ -4,13 +4,15 @@ import { adminChannel, client } from "./commands/client";
 import commands from "./commands/slashCommands";
 import config from "./config/config.json";
 import { debug } from "./offline.json";
+import { getGuildCommands } from "./commands/common";
+import { handleButtons } from "./commands/slashCommands/helpers/buttons";
+import { initdog } from "./endpoint/thisdogdoesnotexist";
 import { readFileSync } from "fs";
 import { start } from "./commands/slashCommands/webserver/express";
+import { startWebUi } from "./commands/slashCommands/sdhelpers/webui/webui";
 import { toolbarModalRecievers } from "./commands/slashCommands/helpers/toolbars/index";
 import { updateNetworkStats } from "./commands/slashCommands/sdhelpers/sdhelpers";
-import { startWebUi } from "./commands/slashCommands/sdhelpers/webui/webui";
-import { getGuildCommands } from "./commands/common";
-import { initdog } from "./endpoint/thisdogdoesnotexist";
+
 console.log(config.token);
 
 // Finally, WriterBot Begins
@@ -146,6 +148,10 @@ const runCommands = async (interaction: Interaction): Promise<void> => {
             })()
           )
       );
+    }
+
+    if (interaction.isButton()) {
+      await handleButtons(interaction);
     }
 
     resolve();

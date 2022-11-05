@@ -1,13 +1,20 @@
 import {
+  ButtonInteraction,
   CommandInteraction,
   Message,
   MessageActionRow,
   MessageActionRowComponent,
   MessageActionRowOptions,
   MessageAttachment,
+  MessageButton,
   MessageComponentInteraction,
+  MessageEmbed,
 } from "discord.js";
 
+import axios from "axios";
+import { createStatusSheet } from "./quicktools/createStatusSheet";
+import sharp from "sharp";
+import { split } from "./imagesplit";
 import { toolbars } from "./toolbars/index";
 
 const toolbar = (buffers: Buffer[]): MessageActionRowOptions[] => {
@@ -31,74 +38,72 @@ const toolbar = (buffers: Buffer[]): MessageActionRowOptions[] => {
 export const addToolbar = async (
   message: Message<boolean>,
   buffers: Buffer[],
-  addons: MessageActionRowOptions[] = [],
-  callbacks: Record<
-    string,
-    (interaction: MessageComponentInteraction) => void
-  > = {}
+  addons: MessageActionRowOptions[] = []
 ) => {
   await message.edit({
     components: [...toolbar(buffers), ...addons].map(
       (m) => new MessageActionRow<MessageActionRowComponent>(m)
     ),
+    embeds: [
+      ...message.embeds,
+      createStatusSheet("Metadata", {
+        Images: buffers.length.toFixed(0),
+        Size: await sharp(buffers[0])
+          .metadata()
+          .then((m) => m.width.toFixed(0) + "x" + m.height.toFixed(0)),
+      }),
+    ],
   });
-  const collector = message.createMessageComponentCollector({
-    time: 60000 * 8,
-  });
-  collector.on("end", async (m) => {
-    message.edit({
-      components: [...addons].map(
+};
+
+export const handleButtons = async (i: ButtonInteraction) => {
+  const number = i.customId;
+  console.log(number);
+  const addons = i.message.components.flatMap((row) =>
+    row.components.filter((c: MessageButton) => c.url)
+  );
+  const metadata = (i.message.embeds as MessageEmbed[]).find(
+    (e) => e.title === "Metadata"
+  );
+  const buffersize = metadata.fields.find((f) => f.name === "Size").value;
+
+  const buffers = await axios
+    .get(
+      (i.message.embeds as MessageEmbed[]).find((e) => e.image.url).image.url,
+      {
+        responseType: "arraybuffer",
+        responseEncoding: "binary",
+      }
+    )
+    .then((r) => r.data)
+    .then((b) => split(b, Number(buffersize) as any));
+
+  if (number === "home") {
+    await i.deferUpdate();
+    await i.editReply({
+      components: [...toolbar(buffers), ...addons].map(
         (m) => new MessageActionRow<MessageActionRowComponent>(m)
       ),
     });
-  });
-  collector.on("collect", async (i) => {
-    const number = i.customId;
-    console.log(number);
-    if (number === "home") {
-      await i.deferUpdate();
-      await i.editReply({
-        components: [...toolbar(buffers), ...addons].map(
-          (m) => new MessageActionRow<MessageActionRowComponent>(m)
-        ),
-      });
-    }
-
-    toolbars.forEach(async (t) => {
-      if (t.id === number) {
-        const newtoolbar = await t
-          .createToolbars(buffers, i)
-          .catch((e) => null);
-        if (newtoolbar == null) return;
-        try {
-          if (!i.deferred && !i.replied) {
-            await i.deferUpdate();
-          }
-          await i.editReply({
-            components: [
-              ...(newtoolbar.length > 0 ? newtoolbar : toolbar(buffers)),
-              ...addons,
-            ].map((m) => new MessageActionRow<MessageActionRowComponent>(m)),
-          });
-        } catch (e) {
-          console.log(e);
+  }
+  toolbars.forEach(async (t) => {
+    if (t.id === number) {
+      const newtoolbar = await t.createToolbars(buffers, i).catch((e) => null);
+      if (newtoolbar == null) return;
+      try {
+        if (!i.deferred && !i.replied) {
+          await i.deferUpdate();
         }
-      }
-      await t.process(buffers, i, addons);
-    });
-    for (const add of addons) {
-      if (
-        add.components.filter(
-          (c: MessageActionRowComponent) =>
-            c.type == "BUTTON" && c.customId == i.customId
-        )
-      ) {
-        try {
-          callbacks[i.customId](i);
-        } catch {
-          console.log("callback failed");
-        }
+        await i.editReply({
+          components: [
+            ...(newtoolbar.length > 0 ? newtoolbar : toolbar(buffers)),
+            ...addons,
+          ].map((m) => new MessageActionRow<MessageActionRowComponent>(m)),
+        });
+      } catch (e) {
+        console.log(e);
       }
     }
+    await t.process(buffers, i, addons);
   });
 };
