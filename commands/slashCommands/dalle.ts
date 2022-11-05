@@ -35,7 +35,7 @@ export const picture: SlashCommand = {
       .generate(interaction.options.get("prompt").value as string)
       .catch((e) => {
         console.log("Error", JSON.stringify(e));
-        throw e;
+        throw "Error: possible innapropriate prompt";
       });
 
     const message = await interaction.editReply({
