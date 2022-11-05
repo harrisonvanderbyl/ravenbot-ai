@@ -49,7 +49,7 @@ app.get("/twitter/", async (req, res) => {
     accessSecret: authLink[1].oauth_token_secret,
   });
   client
-    .login(oauth_verifier)
+    .login(oauth_verifier as string)
     .then(async ({ client: loggedClient, accessToken, accessSecret }) => {
       // {loggedClient} is an authenticated client in behalf of some user
       // Store {accessToken} somewhere, it will be valid until {expiresIn} is hit.

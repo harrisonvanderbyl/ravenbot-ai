@@ -8,10 +8,10 @@ import {
   MessageEmbedOptions,
   TextChannel,
 } from "discord.js";
+import { createDreamString, randomArray } from "./autodream/createPrompt";
 
 import { app } from "../webserver/express";
 import { client } from "../../client";
-import { createDreamString, randomArray } from "./autodream/createPrompt";
 
 const NoNodeError = async (updatemessaged: Message) => {
   const messageToEdit = await client.guilds
@@ -137,7 +137,7 @@ app.get("/sdlist", async (req, res) => {
       awaiters.push(res);
     });
     await PeerSeen(req.ip, {
-      name: req.query.name,
+      name: req.query.name as string,
       status: "idle",
     });
     if (!top) {
@@ -199,7 +199,7 @@ app.get("/sdlist", async (req, res) => {
 app.post("/upload/:id", async (req, res) => {
   try {
     await PeerSeen(req.ip, {
-      name: req.query.name,
+      name: req.query.name as string,
       status: "idle",
     });
 
@@ -221,7 +221,7 @@ app.post("/upload/:id", async (req, res) => {
 app.post("/update/:id", async (req, res) => {
   try {
     await PeerSeen(req.ip, {
-      name: req.query.name,
+      name: req.query.name as string,
       status: "running",
     });
 
